@@ -1,0 +1,116 @@
+# 📁 Linux Filesystem Overview – Explained Like a Closet
+
+## 🧠 What is a Filesystem?
+
+A **filesystem** is the structure used by an operating system to manage how files and directories are:
+- Stored
+- Organized
+- Retrieved
+
+> Think of it like organizing a **closet**:  
+> - Shirts in one section  
+> - Shoes in another  
+> - Accessories, pants, jackets, etc., each in their own place  
+
+If you throw everything into one pile (like one giant unorganized folder), it becomes a **mess** — hard to find anything. The **filesystem prevents this chaos** by organizing data in a logical hierarchy.
+
+---
+
+## 🖥️ Filesystems by OS Type
+
+| OS Type | Filesystems Used         |
+|---------|---------------------------|
+| Linux   | `ext3`, `ext4`, `xfs`     |
+| Windows | `NTFS`, `FAT32`, `exFAT`  |
+
+---
+
+# 📂 Filesystem Hierarchy in Linux (Directory Breakdown)
+
+Linux uses a structured tree starting from the **root directory `/`**.
+
+| Directory | Purpose |
+|-----------|---------|
+| `/`       | Root of the entire Linux filesystem (not the same as `/root`) |
+| `/boot`   | Contains bootloader files like `grub.cfg` used to boot the system |
+| `/root`   | Home directory for the **root user** |
+| `/home`   | Home directories for all normal users (e.g., `/home/john`) |
+| `/etc`    | **Configuration files** for system and applications |
+| `/bin`    | Essential user commands (e.g., `ls`, `pwd`) — now often symlinked to `/usr/bin` |
+| `/sbin`   | System admin commands (e.g., filesystem tools) — also symlinked to `/usr/sbin` |
+| `/usr`    | Secondary hierarchy for user applications, binaries, libraries |
+| `/opt`    | Optional 3rd-party applications (e.g., Oracle, SAP) |
+| `/lib`    | Libraries for binaries in `/bin` and `/sbin` — symlinked to `/usr/lib` |
+| `/proc`   | Virtual filesystem with info about **running processes** and **kernel** — disappears on shutdown |
+| `/var`    | Variable data — **log files**, mail, spool files go here |
+| `/tmp`    | Temporary files, wiped on reboot |
+| `/run`    | Runtime data for processes, PID files — cleared at shutdown |
+| `/mnt`    | Temporary mount point for manual mounts (e.g., USB, NFS) |
+| `/media`  | Auto-mount location for CD-ROMs, USBs when inserted |
+
+---
+
+## 🔧 Key File Examples
+
+| File | Purpose |
+|------|---------|
+| `/boot/grub2/grub.cfg` | Tells the system which OS/version to boot |
+| `/etc/passwd` | Contains user account info |
+| `/etc/fstab` | Static mount configuration |
+| `/var/log/messages` | General system log |
+| `/home/username/` | User's personal files and config |
+
+---
+
+# 🛠️ Tips for Managing Linux Filesystem
+
+- Always back up files in `/etc` before making config changes.
+- Files in `/proc` and `/run` are **temporary** — created and managed by the kernel.
+- `/opt` is ideal for 3rd-party app installations — don’t mix with system apps.
+- Use `ls -l` and `cd /` to explore directory structure.
+- Use `strace -e open <command>` to check which libraries are used by a command.
+
+---
+
+## 🧪 Commands Demonstrated
+
+```bash
+cd /
+ls -l
+cd /boot
+ls -l grub2
+
+cd /root
+pwd
+
+cd /etc
+ls *.conf
+
+cd /bin
+ls -l
+
+cd /opt
+ls -l
+
+cd /proc
+ls
+
+cd /home
+ls -l
+
+cd /var/log
+ls
+
+cd /mnt
+ls
+
+cd /media
+ls
+
+🗂️ Directory Behavior on Shutdown
+| Directory | Emptied on Shutdown? |
+| --------- | -------------------- |
+| `/proc`   | ✅ Yes                |
+| `/run`    | ✅ Yes                |
+| `/tmp`    | ✅ Often              |
+| Others    | ❌ No                 |
