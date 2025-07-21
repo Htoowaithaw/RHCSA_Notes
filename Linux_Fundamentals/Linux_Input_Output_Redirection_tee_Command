@@ -1,0 +1,101 @@
+# 📚 Linux Input/Output Redirection & `tee` Command Notes
+
+---
+
+## 🔄 1. Input and Output Redirection in Linux
+
+### 🔢 File Descriptors
+
+| Type             | Name             | File Descriptor |
+|------------------|------------------|------------------|
+| Standard Input   | `stdin`          | `0`              |
+| Standard Output  | `stdout`         | `1`              |
+| Standard Error   | `stderr`         | `2`              |
+
+> 📌 **In Linux, everything is a file** – regular files, directories, devices, etc.
+
+---
+
+### 📥 Redirecting Standard Output
+
+```bash
+# Redirect output of a command to a file
+ls -l > listings
+
+# View the file contents
+cat listings
+🧠 A single > will overwrite the file.
+Use >> to append data to an existing file.
+
+bash
+Copy
+Edit
+ls -la >> listings
+📤 Redirecting Standard Input
+Feed a file as input to a command:
+
+bash
+Copy
+Edit
+cat < listings
+Or use redirection in programs like mail:
+
+bash
+Copy
+Edit
+mail -s "Office Memo" user@abc.com < memo.txt
+🚫 Redirecting Standard Error
+bash
+Copy
+Edit
+# Redirect only the error output to a file
+ls -l /root 2> errorfile
+
+# View the error message
+cat errorfile
+bash
+Copy
+Edit
+# Another example with telnet
+telnet localhost 2> errorfile
+🪝 2. tee Command - View & Save Output Simultaneously
+🛠️ Use Case
+The tee command splits output:
+✅ shows it on the terminal
+✅ saves it to a file
+
+bash
+Copy
+Edit
+echo "David Puddy is Eliane's boy friend." | tee eliane-david
+➕ Append with -a
+bash
+Copy
+Edit
+echo "David and Eliane" | tee -a eliane-david
+💡 Use tee -a to append, just like >>
+
+🔁 Output to Multiple Files
+bash
+Copy
+Edit
+ls -l | tee file1 file2 file3
+🧾 Word Count Example
+bash
+Copy
+Edit
+wc -c eliane-david | tee countfile
+📖 Help & Version
+bash
+Copy
+Edit
+tee --help
+tee --version
+🧑‍💻 Developed by: Mike Parker, Richard M. Stallman, David MacKenzie
+
+🧪 Try These Commands Yourself
+Redirect ls, pwd, echo outputs
+
+Use > vs >> and see the difference
+
+Practice tee and tee -a on real files

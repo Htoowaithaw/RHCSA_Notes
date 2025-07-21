@@ -1,0 +1,101 @@
+## 🔗 1. What is Command Chaining?
+
+In Linux, you can **execute multiple commands in one line** using the semicolon (`;`).
+
+### 💡 Concept
+
+- Commands are executed **in order**
+- Each command runs **independently**
+- If one command fails, **the next still runs**
+
+```bash
+command1 ; command2 ; command3
+🧪 2. Examples
+📝 Example 1: Basic Usage
+bash
+Copy
+Edit
+ls ; pwd ; whoami
+ls → lists files
+
+pwd → shows present working directory
+
+whoami → displays the current username
+
+✅ All commands run sequentially
+
+🗨️ Example 2: Print Two Parts of a Message
+bash
+Copy
+Edit
+echo "Hello" ; echo "World"
+📤 Output:
+
+nginx
+Copy
+Edit
+Hello
+World
+📁 Example 3: Directory + File Creation in One Line
+bash
+Copy
+Edit
+mkdir test_dir ; cd test_dir ; touch test_file.txt
+Create a directory named test_dir
+
+Move into it
+
+Create an empty file inside
+
+🎯 Perfect for automation scripts or fast command execution
+
+⚠️ Example 4: Including a Failing Command
+bash
+Copy
+Edit
+ls ; invalid_command ; echo "Completed"
+📤 Output:
+
+bash
+Copy
+Edit
+<list of files>
+bash: invalid_command: command not found
+Completed
+✅ Even if invalid_command fails, echo "Completed" still runs
+
+🧠 3. Why It Matters
+Introduced in 1970s UNIX CLI
+
+Shells like Bourne (sh) supported it by early 1980s
+
+Still used today in:
+
+Automation
+
+Scripting
+
+One-liner operations
+
+System administration
+
+🔍 4. When to Use
+Quick testing of multiple commands
+
+One-liner automation
+
+Combining setup or cleanup tasks
+
+🧑‍🔬 Practice Exercise
+Try writing your own chains:
+
+bash
+Copy
+Edit
+mkdir mydir ; cd mydir ; touch file1 file2 ; ls
+Or test failure handling:
+
+bash
+Copy
+Edit
+echo "Start" ; falsecommand ; echo "Still running"

@@ -1,0 +1,147 @@
+# 🔐 Linux Access Control List (ACL) – Fine-Grained File Permissions
+
+This note is based on a Zoom lecture that covered how to manage **user- and group-specific permissions** in Linux using ACL (Access Control List). ACL provides **granular access control** on top of standard Unix file permissions.
+
+---
+
+## 📖 What is ACL?
+
+**ACL (Access Control List)** allows you to define **additional, more flexible permissions** for files and directories — beyond owner/group/other.
+
+🔸 You can grant **read/write/execute** permissions to **specific users or groups**, even if they are not the file owner or in the owning group.
+
+---
+
+## 💡 Why Use ACL?
+
+Imagine:
+- You have a file owned by `root`.
+- You want **user `iafzal`** to read or write to it.
+- But you **don’t want everyone else (others)** to have access.
+
+🔹 **Traditional way**: Change permissions for "others" → risk giving too much access.
+
+🔹 **Better way**: Use ACL to grant access **only to that user**.
+
+---
+
+## 🧰 ACL Command Overview
+
+| Command          | Purpose                              |
+|------------------|--------------------------------------|
+| `setfacl`        | Set or modify ACL entries            |
+| `getfacl`        | View ACL entries on a file/directory |
+
+---
+
+## 🛠️ ACL Syntax & Examples
+
+### ✅ Grant user-specific permission to a file
+
+```bash
+setfacl -m u:iafzal:rw /tmp/TEXAS
+-m → modify ACL
+
+u:iafzal:rw → user iafzal gets read and write
+
+/tmp/TEXAS → target file
+
+💡 Run getfacl /tmp/TEXAS to verify.
+
+✅ Grant group-specific permission
+bash
+Copy
+Edit
+setfacl -m g:devteam:r /tmp/TEXAS
+✅ Inherit ACL (default) for all files under a directory
+bash
+Copy
+Edit
+setfacl -d -m u:iafzal:rw /data/projects
+-d → set default ACLs (inheritance)
+
+Works for new files created inside the directory.
+
+❌ Remove ACL for a specific user
+bash
+Copy
+Edit
+setfacl -x u:iafzal /tmp/TEXAS
+❌ Remove all ACLs from a file
+bash
+Copy
+Edit
+setfacl -b /tmp/TEXAS
+-b → remove all ACL entries
+
+File returns to standard permission model
+
+👀 How to Identify a File with ACL
+When you run:
+
+bash
+Copy
+Edit
+ls -l
+Look for a + sign at the end of the permission field:
+
+css
+Copy
+Edit
+-rw-r--r--+ 1 root root  53 Jul 20 10:00 TEXAS
+The + indicates ACL is applied.
+
+⚠️ Important Behavior Notes
+ACL with w (write) does NOT allow file deletion.
+
+The user can edit the file, but cannot delete it.
+
+Deletion depends on the directory permissions.
+
+Even with ACL, deletion still requires directory write + execute.
+
+🧪 Real-Life Demo Recap
+File /tmp/TEXAS is created by root
+
+User iafzal cannot edit it — gets "read-only" warning
+
+Apply ACL:
+
+bash
+Copy
+Edit
+setfacl -m u:iafzal:rw /tmp/TEXAS
+Now iafzal can open and edit the file with vi
+
+But still cannot delete the file (even with rw ACL)
+
+🔄 Practice This
+bash
+Copy
+Edit
+# Create file
+sudo touch /tmp/testfile
+
+# Check ACL
+getfacl /tmp/testfile
+
+# Give user 'bob' read access
+setfacl -m u:bob:r /tmp/testfile
+
+# Remove user ACL
+setfacl -x u:bob /tmp/testfile
+
+# Remove all ACLs
+setfacl -b /tmp/testfile
+📌 Summary
+Task	Command Example
+Grant user access	setfacl -m u:user:rw file
+Grant group access	setfacl -m g:group:r file
+Default ACL (inherit)	setfacl -d -m u:user:rw dir/
+Remove specific ACL	setfacl -x u:user file
+Remove all ACLs	setfacl -b file
+View ACLs	getfacl file
+Identify ACL on file	Look for + in ls -l output
+
+ACLs give you fine-grained, secure, and user-specific control in multi-user environments. Practice using them in different scenarios to master Linux permissions.
+
