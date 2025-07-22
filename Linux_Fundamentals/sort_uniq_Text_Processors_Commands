@@ -1,0 +1,95 @@
+# 📚 Linux `sort` and `uniq` Commands – Clean and Analyze Text Data
+
+The `sort` and `uniq` commands are essential text-processing tools used to **organize** and **deduplicate** data in Linux.
+
+---
+
+## 🔄 `sort` Command – Alphabetical Sorting
+
+### 📘 What It Does:
+- Sorts lines of text **alphabetically** (default: A → Z)
+- Supports reverse sort, sorting by field, numeric sorting, etc.
+
+### 🛠 Syntax:
+```bash
+sort [options] filename
+🧪 Common Examples:
+bash
+Copy
+Edit
+sort seinfeld-characters              # Sort lines A → Z
+sort -r seinfeld-characters          # Sort in reverse order (Z → A)
+sort -k2 seinfeld-characters         # Sort by the 2nd field (e.g. last names)
+💡 Use with output of other commands:
+
+bash
+Copy
+Edit
+ls -l | sort                         # Sort file list by first column
+ls -l | sort -k9                     # Sort by the 9th column (file/directory name)
+🔁 uniq Command – Remove Duplicate Lines
+📘 What It Does:
+Filters out adjacent duplicate lines
+
+Must be used after sort to group duplicates together
+
+🛠 Syntax:
+bash
+Copy
+Edit
+uniq [options] filename
+🧪 Common Examples:
+bash
+Copy
+Edit
+sort seinfeld-characters | uniq              # Remove duplicates
+sort seinfeld-characters | uniq -c           # Count occurrences
+sort seinfeld-characters | uniq -d           # Show only duplicate lines
+📌 Always sort before uniq:
+
+bash
+Copy
+Edit
+cat seinfeld-characters | sort | uniq
+🧠 Practical Tips
+sort without -k → sorts by the entire line starting at the first character
+
+sort -kN → sort by Nth field (useful for structured text)
+
+uniq -c → adds count of occurrences before each line
+
+uniq -d → shows only the lines that appear more than once
+
+🔗 Combine with Other Commands
+bash
+Copy
+Edit
+ls -l | sort -k9 | uniq
+Sorts ls output by file name (column 9)
+
+Removes duplicate lines
+
+💡 Bonus: Add Duplicate for Testing
+To test uniq behavior, add a duplicate:
+
+bash
+Copy
+Edit
+echo "Jerry Seinfeld" >> seinfeld-characters
+Then try:
+
+bash
+Copy
+Edit
+sort seinfeld-characters | uniq -c
+✅ Summary
+
+Command	Description
+sort file.txt	Sorts file alphabetically
+sort -r file.txt	Reverse sort
+sort -k2 file.txt	Sort by 2nd field
+uniq file.txt	Removes adjacent duplicates
+uniq -c	Count duplicate occurrences
+uniq -d	Show only repeated lines
+
+➡️ Next up: Use wc to count lines, words, and characters in files or command output!
