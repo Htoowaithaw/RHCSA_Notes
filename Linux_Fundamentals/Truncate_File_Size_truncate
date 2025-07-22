@@ -1,0 +1,92 @@
+# 🪓 Linux `truncate` Command - Shrink or Extend File Size
+
+## 📌 What is `truncate`?
+
+The `truncate` command in Linux is used to **shrink** or **extend** the size of a file to a specified number of bytes.  
+It **modifies file size directly** — not by compression, but by cutting or padding the file content.
+
+> ⚠️ Not the same as `gzip` or `zip` — this doesn't compress, it chops off data.
+
+---
+
+## 🧪 Example Workflow
+
+### 🔧 Step 1: Create an empty file
+```bash
+touch seinfeld
+📝 Step 2: Add content to the file
+bash
+Copy
+Edit
+echo "puffyshirt giddyup yadayada kavorka serenitynow festivus" > seinfeld
+📂 Step 3: Check file content and size
+bash
+Copy
+Edit
+cat seinfeld
+ls -l seinfeld
+Expected size: around 57 bytes
+
+🔽 Truncate (Shrink) the File
+🧨 Step 4: Shrink file to 40 bytes
+bash
+Copy
+Edit
+truncate -s 40 seinfeld
+🔍 Step 5: Check file content and size
+bash
+Copy
+Edit
+cat seinfeld
+ls -l seinfeld
+You’ll notice part of the content is cut off (e.g., partial word "serenitynow", "festivus" is gone).
+
+🔼 Truncate (Extend) the File
+➕ Step 6: Extend file back to 60 bytes
+bash
+Copy
+Edit
+truncate -s 60 seinfeld
+🔍 Step 7: Check new size and content
+bash
+Copy
+Edit
+cat seinfeld
+ls -l seinfeld
+The file is now larger, but missing content is not restored — the extended part is filled with null/empty characters.
+
+You can check using vi:
+
+bash
+Copy
+Edit
+vi seinfeld
+You'll see @ symbols in the extra space — these represent null bytes added to pad the file.
+
+🧠 Summary
+Action	Command	Effect
+Shrink file	truncate -s 40 filename	Cuts file to 40 bytes
+Extend file	truncate -s 100 filename	Pads file to 100 bytes
+View content	cat filename	Shows file text
+View size	ls -l filename	Displays file size
+
+⚠️ Important Notes
+Truncating a file deletes content permanently if reduced.
+
+Extending a file does not recover deleted data, it just adds empty bytes.
+
+Use this only when you're sure what you're doing.
+
+🧪 Try it Yourself:
+Create a file, fill it with content, shrink it, extend it, and inspect behavior using cat and vi.
+
+bash
+Copy
+Edit
+touch testfile
+echo "Learning truncate in Linux is fun!" > testfile
+truncate -s 10 testfile
+cat testfile
+truncate -s 30 testfile
+vi testfile
+Escape → :q! → Enter to exit vi

@@ -1,0 +1,115 @@
+# 🗃️ Linux File Archiving & Compression: `tar`, `gzip`, `gunzip`
+
+## 📦 What is `tar`?
+- `tar` (tape archive) is used to **collect multiple files/directories into one file**.
+- It does **not compress** the files — it simply bundles them together like a `.zip` in Windows **without reducing size**.
+- Syntax:  
+  ```bash
+  tar [options] archive_name.tar files_or_dirs
+✅ Common tar options:
+c – Create archive
+
+v – Verbose (show progress)
+
+f – Specify filename of the archive
+
+x – Extract archive
+
+t – List contents inside archive
+
+🧪 Create a .tar file
+👨‍💻 Example: Tar your current directory
+bash
+Copy
+Edit
+tar cvf myhome.tar .
+This creates a file called myhome.tar containing all files & subdirectories in the current directory.
+
+You will see all archived items printed due to v (verbose) option.
+
+📝 Tip: Don’t tar the directory you're currently inside to avoid self-inclusion warnings.
+
+📂 Check the new .tar file
+bash
+Copy
+Edit
+ls -ltr
+Example output:
+
+diff
+Copy
+Edit
+-rw-rw-r-- 1 user user 27258880 Jul 21  myhome.tar
+📤 Move & Extract .tar File
+🧪 Create a new directory and move .tar file there:
+bash
+Copy
+Edit
+mkdir restore_test
+mv myhome.tar restore_test/
+cd restore_test
+🧪 Extract the contents:
+bash
+Copy
+Edit
+tar xvf myhome.tar
+All files will be restored into restore_test/.
+
+🗜️ Compress .tar file with gzip
+✅ Command:
+bash
+Copy
+Edit
+gzip myhome.tar
+Compresses myhome.tar to myhome.tar.gz.
+
+✅ File size will be reduced.
+
+📂 Check size:
+bash
+Copy
+Edit
+ls -ltr
+Example:
+
+diff
+Copy
+Edit
+-rw-rw-r-- 1 user user 8018298 Jul 21  myhome.tar.gz
+🔓 Decompress .tar.gz file
+✅ Using gzip -d or gunzip
+bash
+Copy
+Edit
+gzip -d myhome.tar.gz
+# OR
+gunzip myhome.tar.gz
+Extracts back to myhome.tar.
+
+🧹 Clean Up Test Directory
+🗑️ Remove directory and contents:
+bash
+Copy
+Edit
+cd ..
+rm -rf restore_test
+🧠 Why use tar + gzip?
+To archive large sets of files (logs, backups, etc.).
+
+To compress data before sending to another machine or person.
+
+Speeds up transfer times due to smaller file size.
+
+💡 Practice Exercise
+Try the following:
+
+tar your home directory or any subfolder.
+
+gzip the .tar file.
+
+gunzip or gzip -d to decompress.
+
+Extract the .tar file in a separate folder.
+
+Observe file sizes before and after.
+

@@ -1,0 +1,101 @@
+# 🔢 Linux `wc` Command – Word, Line & Byte Counter
+
+The `wc` (word count) command in Linux is a simple but powerful utility that **counts lines, words, and bytes** in a file or from command output.
+
+---
+
+## 📘 What It Does
+
+- Counts:
+  - 🧾 **Lines**
+  - 📝 **Words**
+  - 📦 **Bytes**
+- Accepts input from a **file** or **command pipeline**
+
+---
+
+## 🛠 Syntax
+```bash
+wc [options] filename
+⚙️ Common Options
+Option	Description
+-l	Count lines
+-w	Count words
+-c	Count bytes
+
+📌 Note: -c counts bytes, not characters.
+
+🧪 Example: Count from File
+Assume seinfeld-characters contains several character names.
+
+bash
+Copy
+Edit
+wc seinfeld-characters
+Output:
+
+bash
+Copy
+Edit
+17 34 236 seinfeld-characters
+# ↑   ↑   ↑
+# |   |   └─ Bytes
+# |   └───── Words
+# └───────── Lines
+🔍 Count Specific Info Only
+bash
+Copy
+Edit
+wc -l seinfeld-characters    # Lines: 17
+wc -w seinfeld-characters    # Words: 34
+wc -c seinfeld-characters    # Bytes: 236
+❗️ wc -b is invalid — use -c for byte count.
+
+🧾 Count from Command Output
+📄 Count Files in a Directory
+bash
+Copy
+Edit
+ls -l | wc -l
+Includes the total line, so subtract 1:
+
+bash
+Copy
+Edit
+expr $(ls -l | wc -l) - 1
+📁 Count Only Directories
+bash
+Copy
+Edit
+ls -l | grep '^d' | wc -l
+^d = lines starting with d (i.e. directories)
+
+Skips the total line automatically
+
+🧠 Optional exercise: Try find . -type d | wc -l to count subdirectories recursively.
+
+🔎 Count Matching Lines with grep
+bash
+Copy
+Edit
+grep "Seinfeld" seinfeld-characters | wc -l
+Counts how many lines match "Seinfeld"
+
+💡 Pro Tips
+Combine wc with grep, ls, or cat for insights
+
+Always check wc --help or man wc for detailed options
+
+Use awk or cut if you need to count specific fields
+
+✅ Summary
+
+Command	Description
+wc file.txt	Lines, words, bytes
+wc -l file.txt	Lines only
+wc -w file.txt	Words only
+wc -c file.txt	Bytes only
+`grep pattern file	wc -l`
+`ls -l	grep '^d'
+
+➡️ This wraps up the core text processing commands in Linux! Keep experimenting and build your own command pipelines!
