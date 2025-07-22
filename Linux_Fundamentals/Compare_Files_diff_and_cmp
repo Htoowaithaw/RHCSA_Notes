@@ -1,0 +1,89 @@
+# 🧾 Linux `diff` and `cmp` – Compare Files Efficiently
+
+In Linux, you can quickly compare the **contents of two files** using the `diff` and `cmp` commands. These are essential tools for tracking changes, debugging, and validating file contents.
+
+---
+
+## 🔍 `diff` – Compare Line by Line
+
+### 📘 What It Does:
+- Compares **two files line by line**
+- Shows **differences** between lines
+- Outputs which lines are different in **file1 vs file2**
+
+### 🛠 Syntax:
+```bash
+diff file1 file2
+🧪 Example:
+bash
+Copy
+Edit
+diff superman-characters superman-characters2
+Output:
+
+yaml
+Copy
+Edit
+3c3
+< Journal Zod
+---
+> Journal Peter
+This means line 3 is different:
+
+In file1: Journal Zod
+
+In file2: Journal Peter
+
+🔎 cmp – Compare Byte by Byte
+📘 What It Does:
+Compares two files byte-by-byte
+
+Reports the first differing byte and line
+
+More low-level than diff
+
+🛠 Syntax:
+bash
+Copy
+Edit
+cmp file1 file2
+🧪 Example:
+bash
+Copy
+Edit
+cmp superman-characters superman-characters2
+Output:
+
+arduino
+Copy
+Edit
+superman-characters superman-characters2 differ: byte 46, line 3
+It tells you where the difference is — down to the byte and line.
+
+🛠 Setup Example Files
+bash
+Copy
+Edit
+echo "Clark Kent" > superman-characters
+echo "Lois Lane" >> superman-characters
+echo "Journal Zod" >> superman-characters
+
+echo "Clark Kent" > superman-characters2
+echo "Lois Lane" >> superman-characters2
+echo "Journal Peter" >> superman-characters2
+Now run diff and cmp on them.
+
+💡 Tips
+diff is best for human-readable comparisons
+
+cmp is great for binary or byte-level checks
+
+Use man diff and man cmp to explore advanced options
+
+✅ Summary
+
+Command	Description
+diff file1 file2	Show line-by-line differences
+cmp file1 file2	Show byte and line where first difference occurs
+
+➡️ Next up: Use wc to count lines, words, and characters!
