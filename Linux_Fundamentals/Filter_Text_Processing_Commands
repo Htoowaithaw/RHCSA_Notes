@@ -1,0 +1,21 @@
+# 🧰 Linux Text Processing: Filter Commands Overview
+
+This lecture introduces essential **text processing commands** in Linux, commonly used in filtering and formatting output in shell scripting and command-line tasks.
+
+## 📋 Commands Covered
+
+- **`cut`** – Extracts specific sections from each line of input (e.g., specific fields or characters).
+- **`awk`** – Pattern scanning and processing language; ideal for **column-based** operations.
+- **`grep` / `egrep`** – Searches for patterns/keywords in text.  
+  Example: `grep "warning" file.txt` → finds lines containing "warning".
+- **`sort`** – Sorts lines of text (alphabetically, numerically, etc.).
+- **`uniq`** – Removes **duplicate adjacent lines** from sorted input.
+- **`wc`** (word count) – Displays **number of lines, words, and characters** in a file/output.
+
+## 🧠 Key Points
+
+- Each command will be explained in its own dedicated lecture.
+- Practical examples will help solidify understanding.
+- Useful for log analysis, automation, parsing, and more.
+
+➡️ **Next up:** Hands-on practice with these commands.

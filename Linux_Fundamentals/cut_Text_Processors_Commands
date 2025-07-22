@@ -1,0 +1,63 @@
+# ✂️ Linux `cut` Command – Text Processor Tool
+
+The `cut` command is a Linux text-processing utility used to extract **specific parts of each line** from a file or piped input. It supports selection by **character, byte, or field** using delimiters.
+
+## 🔧 Basic Syntax
+
+cut [OPTION]... [FILE]
+
+bash
+Copy
+Edit
+
+## 📘 Key Options & Usage
+
+### 🧪 Get Version & Help
+```bash
+cut --version      # Show version
+cut --help         # Brief help
+man cut            # Full manual (press Q to quit)
+📄 By Characters
+bash
+Copy
+Edit
+cut -c1 filename          # First character of each line
+cut -c1,3,5,8 filename    # Specific characters (1st, 3rd, 5th, 8th)
+cut -c1-5 filename        # Character range (1 to 5)
+cut -c1-3,6-8 filename    # Multiple ranges (1-3 and 6-8)
+📦 By Bytes
+bash
+Copy
+Edit
+cut -b1-3 filename        # Similar to -c, based on byte positions
+⚠️ Byte-based cutting may behave differently if file contains multi-byte characters or tabs.
+
+📑 By Fields (Using Delimiters)
+bash
+Copy
+Edit
+cut -d':' -f6 /etc/passwd           # Get 6th field using colon as delimiter
+cut -d':' -f6,7 /etc/passwd         # Get 6th and 7th fields
+You can replace : with any delimiter: ,, ?, |, etc.
+
+Common use-case: extract fields from structured files like CSVs or /etc/passwd.
+
+🧵 With Piped Input (Command Output)
+bash
+Copy
+Edit
+ls -l | cut -c2-4       # Extract permission bits (user permissions)
+📂 Demo File Used in Lecture
+File: seinfeld-characters
+Action: Practice character cutting commands on it.
+
+If missing, manually create this file with a list of character names from the show "Seinfeld."
+
+💡 Tips
+Always provide an option (-c, -b, or -f) — cut filename alone won't work.
+
+Combine cut with other tools (cat, ls, grep, etc.) for efficient text parsing.
+
+Perfect for automation, log parsing, and quick extraction tasks.
+
+➡️ Next up: Explore awk for column-wise text processing!

@@ -1,0 +1,89 @@
+# 🪄 Linux `awk` Command – Text Processor & Data Extractor
+
+The `awk` command is a powerful **pattern scanning and processing language** used to manipulate and extract **fields (columns)** from files or command outputs. It’s ideal for analyzing structured data like CSVs, logs, and system files.
+
+## 📘 What is `awk`?
+
+- A utility for **field-based text processing**
+- Works on **files** or **command output**
+- Syntax:  
+  ```bash
+  awk '{ action }' filename
+🔧 Common Usage Examples
+🔍 Version & Help
+bash
+Copy
+Edit
+awk --version   # Show version info
+man awk         # Full manual
+📄 Extract Fields from Files
+Assume seinfeld-characters contains:
+
+nginx
+Copy
+Edit
+Jerry Seinfeld
+George Costanza
+Elaine Benes
+bash
+Copy
+Edit
+awk '{print $1}' seinfeld-characters     # First name (column 1)
+awk '{print $2}' seinfeld-characters     # Last name (column 2)
+📤 Extract Fields from Command Output
+bash
+Copy
+Edit
+ls -l | awk '{print $1, $3}'             # Permissions and owner
+ls -ltr | awk '{print $NF}'              # Last column using $NF
+🔎 Search for Keywords in Files
+bash
+Copy
+Edit
+awk '/Jerry/ {print}' seinfeld-characters       # Match "Jerry"
+awk '/Seinfeld/ {print}' seinfeld-characters    # Match all "Seinfeld"
+🔁 Extract Fields Using Delimiters
+Example: /etc/passwd (fields separated by :)
+
+bash
+Copy
+Edit
+awk -F':' '{print $1}' /etc/passwd       # Show usernames
+awk -F':' '{print $6}' /etc/passwd       # Show home directories
+🧪 Replace a Specific Field
+bash
+Copy
+Edit
+echo "Hello Tom" | awk '{$2="Adam"; print $0}'       # Output: Hello Adam
+
+awk '{$2="Imran"; print $0}' seinfeld-characters     # Replace all last names
+📏 Filter by Line Length
+bash
+Copy
+Edit
+awk 'length($0) > 15' seinfeld-characters   # Lines longer than 15 chars
+🔢 Conditional Field Match
+bash
+Copy
+Edit
+ls -l | awk '{if($9=="seinfeld") print $0}'     # Match file named "seinfeld"
+🧮 Count Number of Fields
+bash
+Copy
+Edit
+ls -l | awk '{print NF}'         # Show field count per line
+💡 Tips
+$1, $2, ... = Field numbers
+
+$0 = Entire line
+
+NF = Number of fields in the line
+
+Use awk -F':' to define custom delimiters (e.g., : or ,)
+
+Powerful for automation, logs, reports, and system scripting
+
+🧠 Extra: Try gawk, pgawk, or dgawk to explore extended awk variants.
+
+➡️ Next up: Dive into grep & egrep for keyword-based searches!
+
