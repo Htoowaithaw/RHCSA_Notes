@@ -1,0 +1,216 @@
+# 🧑‍💻 Linux User Account Management – Complete Guide
+
+This note covers the essentials of **Linux user and group management**, based on the lesson provided. It also includes **extra details and practical examples** that are important to fully understand this topic.
+
+---
+
+## ✨ Why User and Group Management Matters
+Linux is a **multi-user OS**. Different users can log in at the same time, access files, and run commands. To control **who can do what**, Linux uses:
+- **Users**: Individual accounts.
+- **Groups**: A collection of users with shared permissions.
+- **Others**: Anyone not part of the user or group.
+
+---
+
+## 🔑 Key Commands for User & Group Management
+
+### **1. Create a New User**
+```bash
+sudo useradd <username>
+
+    Creates a new user account.
+
+    By default, it also creates a private group with the same name as the user.
+
+Example:
+
+sudo useradd spiderman
+
+2. Create a New Group
+
+sudo groupadd <groupname>
+
+Example:
+
+sudo groupadd superheroes
+
+3. Delete a User
+
+sudo userdel <username>
+
+    Removes the user but keeps the home directory.
+
+To delete the user and their home directory:
+
+sudo userdel -r <username>
+
+Example:
+
+sudo userdel -r spiderman
+
+4. Delete a Group
+
+sudo groupdel <groupname>
+
+Example:
+
+sudo groupdel superheroes
+
+5. Modify a User (usermod)
+
+sudo usermod [options] <username>
+
+Common Options:
+
+    -G <group> → Add user to a supplementary group.
+
+    -g <group> → Change the primary group.
+
+    -d <new_home> → Change the home directory.
+
+    -s <shell> → Change the default shell.
+
+    -c <comment> → Add a description for the user.
+
+Example: Add spiderman to the superheroes group:
+
+sudo usermod -G superheroes spiderman
+
+6. Set or Change a Password
+
+sudo passwd <username>
+
+Example:
+
+sudo passwd ironman
+
+7. Verify User Information
+
+id <username>
+
+Shows the user’s UID (User ID), GID (Group ID), and groups.
+
+Example:
+
+id spiderman
+
+8. Check Group Information
+
+groups <username>
+
+OR search inside /etc/group:
+
+grep spiderman /etc/group
+
+📂 Key Files for User & Group Information
+1. /etc/passwd
+
+    Stores basic user info.
+
+    Format:
+
+username:x:UID:GID:description:home_directory:shell
+
+Example line:
+
+    spiderman:x:1001:1001:Peter Parker:/home/spiderman:/bin/bash
+
+2. /etc/group
+
+    Stores group info.
+
+    Format:
+
+group_name:x:GID:member1,member2
+
+Example line:
+
+    superheroes:x:1002:spiderman,ironman
+
+3. /etc/shadow
+
+    Stores encrypted passwords and password policies.
+
+    Accessible only by root.
+
+    Format (simplified):
+
+    username:encrypted_password:last_change:min:max:warn:inactive:expire
+
+🏗 Real-Life Example Command
+
+Create ironman in superheroes group with a custom home directory and description:
+
+sudo useradd -G superheroes -s /bin/bash -c "Iron Man Character" -m -d /home/ironman ironman
+sudo passwd ironman
+
+    -G superheroes → Adds to group superheroes.
+
+    -s /bin/bash → Assigns bash shell.
+
+    -c "Iron Man Character" → Adds description.
+
+    -m → Creates home directory if missing.
+
+    -d /home/ironman → Sets home directory path.
+
+🧠 Additional Knowledge You Should Know
+1. UID and GID
+
+    UID (User ID): A unique number for every user.
+
+    GID (Group ID): A unique number for every group.
+
+    Standard users usually start from UID 1000 on most distros.
+
+    Root always has UID = 0.
+
+2. Primary vs Supplementary Group
+
+    Primary group: The default group a user belongs to (usually same as username).
+
+    Supplementary groups: Extra groups for additional permissions.
+
+3. Default User Files
+
+When a user is created, default files are copied from /etc/skel into their home directory. You can add files there to automatically include them for all new users.
+4. Locking or Unlocking Users
+
+    Lock a user (disable login):
+
+sudo usermod -L <username>
+
+Unlock a user:
+
+    sudo usermod -U <username>
+
+5. Changing User Ownership of Files
+
+    If you add a user to a new group but want files to reflect it:
+
+    sudo chgrp -R superheroes /home/spiderman
+
+    (-R applies recursively)
+
+6. Viewing and Switching Users
+
+    Check who you are:
+
+whoami
+
+Switch user:
+
+    su - <username>
+
+📝 Summary
+
+    useradd, userdel, usermod: Manage users.
+
+    groupadd, groupdel: Manage groups.
+
+    passwd: Set passwords.
+
+    /etc/passwd, /etc/group, /etc/shadow: Key files for account info.
+
+    Always run these commands as root or with sudo.
+
