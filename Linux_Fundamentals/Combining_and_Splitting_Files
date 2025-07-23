@@ -1,0 +1,93 @@
+# 🪄 Linux File Combining and Splitting
+
+## 🧩 What Can You Do?
+- ✅ Combine multiple files into one
+- ✅ Split one file into multiple smaller files
+
+---
+
+## 🔗 Combine Files
+
+### 🧪 Example: Combine file1, file2, file3 into file4
+```bash
+cat file1 file2 file3 > file4
+This merges the contents of all three files into file4.
+
+Useful when you want to aggregate logs, text, or data from different files.
+
+✂️ Split a File
+📦 Why Split?
+The original file is too large to send or upload.
+
+You want to process the file in chunks.
+
+You’re sending logs/data to a third party and want to separate sections.
+
+🔧 Command Syntax
+bash
+Copy
+Edit
+split -l [NUMBER_OF_LINES] [INPUT_FILE] [OUTPUT_PREFIX]
+🧪 Example:
+Split countries file into chunks of 2 lines each, prefix with sep:
+
+bash
+Copy
+Edit
+split -l 2 countries sep
+🔍 Output:
+Linux will automatically generate files like:
+
+sepaa
+
+sepab
+
+sepac
+
+sepad
+Each file contains 2 lines (except the last if lines aren’t evenly divisible).
+
+🧪 Practice Scenario
+Step 1: Create a file with 7 country names
+bash
+Copy
+Edit
+echo "USA" > countries
+echo "UK" >> countries
+echo "UAE" >> countries
+echo "Canada" >> countries
+echo "France" >> countries
+echo "Switzerland" >> countries
+echo "Japan" >> countries
+Step 2: Verify content
+bash
+Copy
+Edit
+cat countries
+wc -l countries   # Should show 7 lines
+Step 3: Split into 2-line chunks
+bash
+Copy
+Edit
+split -l 2 countries sep
+Step 4: Check outputs
+bash
+Copy
+Edit
+cat sepaa    # USA, UK
+cat sepab    # UAE, Canada
+cat sepac    # France, Switzerland
+cat sepad    # Japan (alone)
+🤔 Why is Japan alone?
+Total lines = 7 (not divisible by 2)
+
+So the last chunk only contains 1 line
+
+Linux doesn't add padding — just creates as many full chunks as possible
+
+🧠 Summary
+Task	Command Example
+Combine	cat file1 file2 > file3
+Split	split -l 1000 bigfile chunk_
+Check lines	wc -l filename
+View chunk	cat chunk_aa
