@@ -1,0 +1,121 @@
+# ✍️ Linux File Editing with vi & vim
+
+## 🖋️ What is a File Editor?
+- A **file editor** allows creating and editing text files.
+- Common Linux editors: `vi`, `ed`, `ex`, `emacs`, `pico`, and `vim`.
+- **vi** is available on almost every Linux distribution.
+- **vim** is an enhanced version of `vi` with more features.
+
+---
+
+## ⚙️ vi Editor Basics
+
+### **Start Editing**
+```bash
+vi filename
+Opens the file (creates if it doesn't exist).
+
+Two modes:
+
+Command mode – Navigate, delete, copy, save.
+
+Insert mode – Type text (i to enter insert mode).
+
+Insert & Save
+Press i → Insert Mode (bottom shows -- INSERT --).
+
+Type your content.
+
+Press Esc → return to Command Mode.
+
+Save & Exit:
+
+:wq or :x → Save & quit.
+
+Shift + ZZ → Save & quit (shortcut).
+
+:q! → Quit without saving.
+
+Navigation Keys
+Use Arrow Keys or h (left), j (down), k (up), l (right).
+
+0 → Move to line start.
+
+$ → Move to line end.
+
+G → Go to end of file.
+
+gg → Go to start of file.
+
+Editing Text
+x → Delete a single character.
+
+dd → Delete current line.
+
+u → Undo last change.
+
+r + <char> → Replace character under cursor.
+
+o → Create a new line below and enter insert mode.
+
+O → Create a new line above and enter insert mode.
+
+Search in vi
+/word → Search forward.
+
+?word → Search backward.
+
+n → Repeat search forward.
+
+N → Repeat search backward.
+
+vim Editor
+vim = vi Improved – includes:
+
+Syntax highlighting
+
+Spell check
+
+Autocomplete (Tab completion)
+
+Undo history
+
+Plugins & scripting
+
+Comparison (vimdiff)
+
+GUI support
+
+🧠 Key Differences: vi vs vim
+Feature	vi	vim
+Availability	Everywhere	May need installation
+Syntax Highlight	❌ No	✅ Yes
+Undo/Redo	Limited	Multiple levels
+Plugins	❌ No	✅ Yes
+Learning Curve	Simple basics	Slightly more features
+
+🎮 Interactive vim Learning Tools
+openvim.com – Interactive tutorial.
+
+vimgenius.com – Learn through practice drills.
+
+vim-adventures.com – Learn vim as a game.
+
+Pro Tips
+Always Esc to return to Command Mode before executing commands.
+
+Use :q! to avoid saving accidental changes.
+
+Practice navigation using h, j, k, l instead of arrow keys to build speed.
+
+Quick Command Reference
+Command	Action
+i	Enter insert mode
+Esc	Exit insert mode
+x	Delete a character
+dd	Delete current line
+u	Undo last action
+:wq	Save & quit
+:q!	Quit without saving
+/word	Search for "word"
+Shift+ZZ	Save and quit (shortcut)
