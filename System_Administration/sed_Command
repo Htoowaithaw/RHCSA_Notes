@@ -66,9 +66,6 @@ sed 's/\t/ /g' filename
 ### **Replace Spaces with Tabs**
 sed 's/ */\t/g' filename
 
-yaml
-Copy
-Edit
 - Replace multiple spaces with a single tab.
 
 ---
@@ -76,27 +73,17 @@ Edit
 ## 📜 **View Specific Line Ranges**
 sed -n '12,18p' filename
 
-markdown
-Copy
-Edit
 - `-n` → suppress normal output.
 - `p` → print lines between 12 and 18.
 
 ### **View All Except a Range**
 sed '12,18d' filename
 
-yaml
-Copy
-Edit
-
 ---
 
 ## ➕ **Insert Blank Lines Between Lines**
 sed 'G' filename
 
-yaml
-Copy
-Edit
 - `G` → inserts an extra newline after every line.
 
 ---
@@ -105,9 +92,7 @@ Edit
 To replace **all instances except line 8**:
 sed '8!s/Seinfeld/S/g' filename
 
-yaml
-Copy
-Edit
+
 - `8!` → apply substitution on all lines **except line 8**.
 
 ---
@@ -116,9 +101,6 @@ Edit
 - Inside `vi`, use:
 :%s/old_text/new_text/g
 
-yaml
-Copy
-Edit
 - `:%s` → apply to the entire file.
 - `g` → replace globally in each line.
 
@@ -129,15 +111,8 @@ Edit
 - Use `-i.bak` to create a backup before making changes:
 sed -i.bak 's/Kenny/Lenny/g' filename
 
-csharp
-Copy
-Edit
 - `sed` is extremely powerful — explore with:
 man sed
-
-yaml
-Copy
-Edit
 
 ---
 
