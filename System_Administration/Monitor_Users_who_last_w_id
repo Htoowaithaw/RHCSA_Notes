@@ -1,0 +1,149 @@
+# 🧑‍💻 Linux User Monitoring Commands – Who’s Logged In & What They’re Doing
+
+This note explains how to **monitor logged-in users, user activity, and login history** on a Linux system. These are essential tasks for any system administrator to **audit user behavior**, **troubleshoot high load**, or **track unauthorized access**.
+
+---
+
+## 🧩 Why User Monitoring Is Important
+
+- Know **who is logged in**
+- See **when and from where** users logged in
+- Check **what commands** users are running
+- Track **reboots, shutdowns, and suspicious activity**
+
+---
+
+## 🔍 Basic User Monitoring Commands
+
+### ✅ `who`
+
+```bash
+who
+
+    Shows currently logged-in users.
+
+    Includes:
+
+        Username
+
+        Terminal (tty/pts)
+
+        Login time
+
+Example Output:
+
+spiderman  pts/0  Jul 25 14:12
+ironman    pts/1  Jul 25 14:33
+
+    Useful during high load to check how many sessions are active.
+
+✅ last
+
+last
+
+    Displays login history (stored in /var/log/wtmp).
+
+    Includes:
+
+        Username
+
+        IP address (if remote)
+
+        Login + logout times
+
+        System reboots
+
+Example:
+
+last | more
+
+    Pipe through more to scroll one page at a time.
+
+Show just usernames (no duplicates):
+
+last | awk '{print $1}' | sort | uniq
+
+✅ w
+
+w
+
+    Like who but more detailed.
+
+    Includes:
+
+        Username
+
+        Login time
+
+        Idle time
+
+        Terminal
+
+        Current command/process
+
+Example Output:
+
+USER     TTY      FROM             IDLE   WHAT
+spiderman pts/0   192.168.56.101   00:10  vim notes.txt
+
+✅ id
+
+id [username]
+
+    Shows UID, GID, and group memberships.
+
+    Useful for checking a user’s identity or group access.
+
+Examples:
+
+id           # Shows info for current user
+id spiderman # Shows info for another user
+
+⚠️ finger (Optional)
+
+finger <user>
+
+    Gives full user info: login name, home directory, shell, etc.
+
+    Not installed by default. Install with:
+
+sudo yum install finger   # RHEL/CentOS
+sudo apt install finger   # Ubuntu/Debian
+
+    Often used for tracing user origin and session protocol.
+
+🧠 Practice Tips
+
+    Open multiple terminals or PuTTY sessions to simulate multiple users.
+
+    Run:
+
+who
+w
+last
+
+    Observe how they update as users log in/out.
+
+    Check IPs and login timestamps.
+
+📖 Use man for Options
+
+To explore more:
+
+man who
+man last
+man w
+
+Try options like:
+
+    who -a → Show all details including dead processes and run-level info.
+
+    last -x → Show reboots, shutdowns, and runlevel changes.
+
+✅ Summary Table
+Command	Purpose
+who	Shows currently logged-in users
+last	Shows all historical logins
+w	Shows what current users are doing
+id	Displays UID, GID, and group memberships
+finger	Extended user info (must be installed)
