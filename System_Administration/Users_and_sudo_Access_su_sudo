@@ -1,0 +1,140 @@
+# 👥 Linux User Switching & Sudo Privileges (`su`, `sudo`, `visudo`, `wheel` group)
+
+This note explains how to **switch between users**, grant **root-level permissions** using `sudo`, and manage **sudo access** securely via the `visudo` command and `wheel` group.
+
+---
+
+## 🔁 1. Switching Between Users (`su`)
+
+### 📌 `su` (Switch User) Command
+
+```bash
+su - <username>
+
+    Switches to the specified user.
+
+    Prompts for that user’s password.
+
+📌 Switch to Root User
+
+su -
+
+    Switches to the root account.
+
+    Requires root password.
+
+📌 Notes
+
+    If you’re already root, switching to any user does not require their password.
+
+    Use exit to return to your previous user session.
+
+⚙️ 2. Running Root Commands Without Root (sudo)
+📌 What is sudo?
+
+    Allows a regular user to execute privileged (root-only) commands.
+
+    Safer alternative to giving full root access.
+
+📌 Basic Usage
+
+sudo <command>
+
+Examples:
+
+sudo dmidecode
+sudo fdisk -l
+
+If you run them without sudo:
+
+dmidecode
+fdisk -l
+
+You will get:
+
+Permission denied
+
+🛡 3. Managing Sudo Access with visudo
+📌 What is visudo?
+
+    Safely edits the sudo configuration file: /etc/sudoers
+
+    Prevents saving incorrect syntax that could lock you out of sudo access
+
+📌 Run with:
+
+sudo visudo
+
+    Opens file in vi or nano (based on system config)
+
+🧑‍🤝‍🧑 4. Granting Sudo Access to Users (via wheel Group)
+📌 What is wheel?
+
+    A special group pre-configured in many Linux distros to allow sudo access
+
+    Already defined in /etc/sudoers
+
+%wheel  ALL=(ALL)       ALL
+
+✅ Steps to Grant Sudo Access to a User:
+
+    Add user to wheel group:
+
+sudo usermod -G wheel <username>
+
+    Verify membership:
+
+grep wheel /etc/group
+
+    Test with a sudo command:
+
+su - <username>
+sudo dmidecode
+
+    Will prompt for the user’s password the first time.
+
+    If accepted, the user now has sudo privileges.
+
+🛑 Optional: Grant Sudo Access to Specific User in /etc/sudoers
+
+If not using wheel group, you can add a specific line for a user:
+
+username  ALL=(ALL)  ALL
+
+Example:
+
+iafzal  ALL=(ALL)  ALL
+
+    ⚠️ Only use this method if you're not using group-based sudo control.
+
+📝 Summary Table
+Command	Purpose
+su - <user>	Switch to another user (needs their password)
+su -	Switch to root (needs root password)
+sudo <cmd>	Run a command with root privileges
+visudo	Safely edit /etc/sudoers file
+usermod -G wheel <user>	Add user to wheel group for sudo access
+grep wheel /etc/group	Confirm user is in wheel group
+✅ Example Flow: Giving Sudo Access
+
+# Become root
+su -
+
+# Add user to wheel group
+usermod -G wheel ironman
+
+# Confirm
+grep wheel /etc/group
+
+# Switch back and test
+su - ironman
+sudo fdisk -l
+
+👮 Bonus: Security Best Practices
+
+    Prefer group-based sudo (wheel) instead of editing sudoers for each user.
+
+    Use sudo for auditing — logs go to /var/log/secure or /var/log/auth.log.
+
+    Avoid logging in as root unless absolutely necessary.
+
