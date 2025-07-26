@@ -1,0 +1,98 @@
+ # 🔐 Special Permissions in Linux: SetUID, SetGID, and Sticky Bit
+
+## 🎯 Standard Permissions Recap
+- Every file and directory in Linux has **read (r)**, **write (w)**, and **execute (x)** permissions.
+- These permissions are categorized into **user**, **group**, and **others**.
+- Permissions are represented as bits and can be modified using the `chmod` command.
+
+---
+
+## 🧠 Special Permissions Overview
+Linux has **three additional permission bits**:
+1. **SetUID (Set User ID)**
+2. **SetGID (Set Group ID)**
+3. **Sticky Bit**
+
+---
+
+## 1️⃣ SetUID (Set User ID)
+- When a file has the **SetUID** bit, it **executes with the permissions of the file's owner**, not the user who launched it.
+- Example: The `passwd` command is owned by `root` but can be run by normal users because of SetUID.
+- It allows a non-privileged user to run a binary with elevated privileges **safely**, without being granted full root access.
+
+---
+
+## 2️⃣ SetGID (Set Group ID)
+- When a file has the **SetGID** bit, it runs with the **group permissions of the file**, not the group of the user executing it.
+- Example commands that often use SetGID: `locate`, `wall`.
+- Useful in shared group environments.
+
+---
+
+## ⚠️ Important Notes About SetUID and SetGID
+- These bits **only apply to executables** (not to shell scripts or text files).
+- They **do not work** with Bash scripts or interpreted files — only compiled binaries (e.g., C/C++ programs).
+- SetUID is displayed as a lowercase or uppercase `s` in the **user permission section**.
+- SetGID is displayed as a lowercase or uppercase `s` in the **group permission section**.
+- The `chmod` command is still used to assign these bits:
+  - `chmod u+s` → SetUID
+  - `chmod g+s` → SetGID
+  - `chmod u-s` or `g-s` → to remove
+
+---
+
+## 🔍 Finding Files with Special Bits
+- You can locate all executables on the system with SetUID or SetGID using:
+  - `find / -perm /6000 -type f`
+  - This lists all files with SetUID (`4000`) or SetGID (`2000`) bits.
+
+---
+
+## 3️⃣ Sticky Bit
+- Used on **directories**, especially those with **public write access**.
+- Prevents users from deleting **files or folders created by other users**, even if the directory has write permissions for everyone.
+- Example: `/tmp` directory has the sticky bit to prevent file deletion by unauthorized users.
+- When enabled, only the **file owner** or **root** can delete or rename files in that directory.
+
+---
+
+## 📌 How to Apply Sticky Bit
+- Use the `chmod` command with `+t` to set the sticky bit on a directory.
+  - `chmod +t directory_name`
+- It is displayed as a `t` at the **end of the permission string** in the `ls -l` output.
+  - Example: `drwxrwxrwt` (last `t` indicates sticky bit is set)
+
+---
+
+## 🧪 Example Lab Summary
+
+### 1. Create a directory named `allinone`
+- Give full permissions (`777`) to allow everyone access.
+
+### 2. As user A:
+- Create a subdirectory (`Imrandir`) inside `allinone`.
+- Inside it, create some test files (e.g., a, b, c).
+- Set full permissions (`777`) for the subdirectory and files.
+
+### 3. As user B:
+- Access the `allinone` directory and successfully delete the `Imrandir` directory, because no sticky bit is set.
+
+### 4. Add Sticky Bit:
+- As root, add the sticky bit to `allinone` using `chmod +t`.
+
+### 5. Repeat the process:
+- User A creates the same subdirectory and files again.
+- Now, user B tries to delete them — and receives a **permission denied** error.
+- This confirms the sticky bit is **protecting user files from deletion by others**.
+
+---
+
+## ✅ Summary
+| Permission | Applies To | Behavior |
+|------------|------------|----------|
+| **SetUID** | Executable files | Run with owner's user ID |
+| **SetGID** | Executable files | Run with owner's group ID |
+| **Sticky Bit** | Directories | Only owner/root can delete files |
+
+These special permissions are crucial in managing shared environments securely.
+

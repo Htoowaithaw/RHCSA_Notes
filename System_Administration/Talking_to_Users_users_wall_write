@@ -1,0 +1,74 @@
+# 💬 Linux User Communication: `users`, `wall`, and `write`
+
+## 🎯 Purpose
+In a multi-user Linux environment, system administrators often need to communicate with users who are currently logged into the system. This is especially important during planned maintenance, shutdowns, or when users are running processes that consume excessive system resources.
+
+Linux provides simple built-in commands for viewing active users and sending messages to them directly or in broadcast format.
+
+---
+
+## 👥 The `users` Command
+- Displays the usernames of all currently logged-in users in a single line.
+- Useful for quickly checking who is active on the system.
+
+---
+
+## 📢 The `wall` Command (Write All)
+- Used to **broadcast a message to all logged-in users**.
+- Typically used by administrators to send system-wide alerts, such as scheduled reboots or maintenance.
+- When executed, the message is displayed on every user's terminal.
+- Ends input when `Ctrl + D` is pressed.
+- Recipients may temporarily lose their prompt, but pressing Enter restores it.
+
+**Example Scenario:**
+If the system needs to be shut down, the admin can broadcast:
+> Please log off. This system is coming down for maintenance.
+
+This message appears to every logged-in user regardless of who they are.
+
+---
+
+## ✉️ The `write` Command (Private Message)
+- Allows one user to send a **private, direct message** to another logged-in user.
+- The message is shown only on the recipient's terminal.
+- Ideal for sending personalized alerts or requests, such as asking a user to stop a high-resource script.
+- Ends input with `Ctrl + D`.
+
+**Example Interaction:**
+- Admin sends a message to a user named spider:
+  > Hi spider, your web is getting bigger.  
+  > Please stop spreading your web.
+
+- User spider replies:
+  > Okay Imran, I will try my best.  
+  > Thanks, spider.
+
+The message includes the sender’s username and terminal information, helping the recipient know who sent it.
+
+---
+
+## 🔐 Notes on Usage
+- These commands typically require both users to have active terminal sessions.
+- For `write` to work, the receiving user must allow messages (via `mesg y`).
+- `wall` is often used by the **root** user to ensure system-wide reach and authority.
+- Messages sent using `wall` or `write` do not persist; they appear in real time and disappear after being read.
+
+---
+
+## 🧪 Suggested Practice
+- Open multiple terminal sessions logged in as different users.
+- Try sending broadcast messages using `wall`.
+- Try private communication using `write` between users.
+- Observe message format and behavior from both sender and receiver perspectives.
+
+---
+
+## ✅ Summary
+
+| Command | Purpose                                | Visibility         |
+|---------|----------------------------------------|--------------------|
+| `users` | Show currently logged-in users         | System-wide        |
+| `wall`  | Broadcast message to all users         | All terminals      |
+| `write` | Direct message to a single user        | One recipient only |
+
+These commands are simple but effective tools for real-time communication in Linux, especially in collaborative or administrative environments.
