@@ -114,6 +114,3 @@ LDAP is the language or protocol used to talk to directory services. It does not
 - LDAP is a **protocol**, not a service.
 - OpenLDAP is a **service** that uses the LDAP protocol.
 - Active Directory and IDM are full-fledged enterprise-grade **identity management platforms**.
-
-In Module 7, OpenLDAP installation and usage will be demonstrated in detail. This lesson serves as foundational understanding.
-
