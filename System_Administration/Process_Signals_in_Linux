@@ -1,0 +1,128 @@
+# 📶 Linux Process Signals – Understanding and Managing Process Communication
+
+## 🧠 What Are Processes and Signals?
+
+- A **process** is a running instance of a program or task in Linux. Every process is assigned a unique Process ID (PID).
+- A **signal** is a message sent to a process to notify it of an event or request an action (stop, pause, continue, restart, etc.).
+- Together, **process signals** allow the operating system and users to control and manage process behavior in real time.
+
+---
+
+## 🎯 Purpose of Process Signals
+
+Process signals are used to:
+- Interrupt or gracefully terminate processes
+- Forcefully stop frozen or unresponsive processes
+- Pause and resume background jobs
+- Communicate between applications
+- Send custom messages (real-time signals)
+
+---
+
+## 🧱 Types of Signals
+
+### 🔹 Standard Signals
+Predefined, system-level signals used for basic process control.
+
+| Signal Name | Meaning                                  | Typical Use Case                                       |
+|-------------|-------------------------------------------|--------------------------------------------------------|
+| SIGINT      | Interrupt process                        | Sent via Ctrl+C to stop a foreground process           |
+| SIGTERM     | Terminate process gracefully             | Allows app to clean up before exiting                 |
+| SIGKILL     | Forcefully kill process                  | Used when app is unresponsive                         |
+| SIGSTOP     | Pause process                            | Temporarily stop a process                            |
+| SIGCONT     | Resume process                           | Resume a previously stopped process                   |
+| SIGSEGV     | Segmentation fault                       | App accessed invalid memory, results in crash         |
+
+These signals can be sent using system utilities like `kill`.
+
+### 🔹 Real-Time Signals
+User-defined or advanced signals that support:
+- Custom messaging between processes
+- Signal queuing (handled in order of arrival)
+
+| Signal       | Purpose                                                  |
+|--------------|----------------------------------------------------------|
+| SIGRTMIN     | Marks beginning of real-time signal range                |
+| SIGRTMAX     | Marks end of real-time signal range                      |
+| Others       | Custom user-defined signals for app communication        |
+
+---
+
+## 🧪 Signal Behavior Examples
+
+### ▶️ SIGINT
+- Used to interrupt a running process.
+- Triggered by Ctrl+C in terminal.
+- Some programs (like text editors) handle it gracefully (switch modes instead of exiting).
+
+### 🛑 SIGKILL
+- Instantly terminates a process.
+- Cannot be ignored or blocked by the process.
+- Used when process refuses to respond to other signals.
+
+### ✅ SIGTERM
+- Gracefully shuts down a process.
+- Allows time to save work or cleanup before exit.
+- Applications like vim preserve changes before termination.
+
+### ⏸️ SIGSTOP / 🔄 SIGCONT
+- SIGSTOP pauses the process (process remains in memory).
+- SIGCONT resumes the paused process.
+- Useful for temporary suspensions without data loss.
+- Must use `fg` to bring the resumed process back to the foreground.
+
+### 🧩 SIGSEGV
+- Triggered when a process tries to access an invalid memory location.
+- Results in a segmentation fault crash.
+
+---
+
+## 📦 Real-Time Signal Usage (Example)
+
+- Used to check if a process is alive without affecting it.
+- Real-time signal 0 is commonly used for this.
+- When a process receives signal 0, it confirms it’s running but doesn’t change its behavior.
+
+---
+
+## 🏡 Real-Life Analogy: Smart Home System
+
+- SIGRTMIN: Activates all devices when system starts.
+- SIGRTMAX: Shuts down all devices when system stops.
+- Custom real-time signals control:
+  - Turning on lights
+  - Adjusting AC temperature
+  - Activating security camera
+
+Each device receives a specific real-time signal and performs the required action accordingly.
+
+---
+
+## 📝 Practical Lab Summary
+
+1. Start a program like vim in a terminal.
+2. Use another terminal to find its PID using a process listing command.
+3. Send:
+   - SIGINT to try stopping it (may not work if app handles gracefully)
+   - SIGKILL to forcefully stop it
+   - SIGTERM to gracefully request termination and preserve work
+   - SIGSTOP to pause it
+   - SIGCONT to resume it
+   - SIGRTMIN to check if it's alive
+4. Use recovery techniques (swap file) to restore unsaved work after graceful termination.
+
+---
+
+## 🧠 Key Takeaways
+
+| Signal        | Purpose                              | Can Be Ignored? | Effect                                 |
+|---------------|---------------------------------------|------------------|----------------------------------------|
+| SIGINT        | User interrupt (Ctrl+C)               | Yes              | Stop or switch mode (depends on app)  |
+| SIGTERM       | Graceful termination                  | Yes              | Cleans up, saves work, exits          |
+| SIGKILL       | Forceful termination                  | No               | Instant kill, no cleanup              |
+| SIGSTOP       | Pause execution                       | No               | Process stops temporarily             |
+| SIGCONT       | Resume execution                      | Yes              | Continues from paused state           |
+| SIGSEGV       | Crash due to memory error             | No               | Process crashes                       |
+| SIGRTMIN/0    | Real-time check (is alive?)           | No               | Confirms status, no action taken      |
+
+Using these signals effectively is critical for system administrators, developers, and DevOps engineers to manage and troubleshoot Linux systems efficiently.
