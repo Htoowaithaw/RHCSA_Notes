@@ -1,0 +1,34 @@
+# ⏰ Crontab – Scheduling Tasks in Linux
+
+## 📌 What is Crontab?
+
+- `crontab` stands for **cron table**, used to schedule **automated tasks** (cron jobs) in Linux.
+- It helps users and administrators run repetitive tasks at predefined times and intervals.
+- Rather than manually logging in to execute commands daily, `crontab` can automate this based on time rules.
+
+---
+
+## 🛠️ Crontab Command Options
+
+| Command Option | Description                                   |
+|----------------|-----------------------------------------------|
+| -e             | Edit the current user's crontab table         |
+| -l             | List current crontab entries                  |
+| -r             | Remove current crontab                        |
+
+- These commands operate on a per-user basis and do not require elevated privileges unless modifying another user's crontab.
+
+---
+
+## ⚙️ Crond Service
+
+- `crond` is the background **daemon** that reads the crontab entries and executes the scheduled tasks.
+- You can **check the status**, **start**, or **stop** this service through the system service manager.
+- If the service is **stopped**, your scheduled tasks will not run, even if crontab entries exist.
+
+---
+
+## 📐 Crontab Entry Format
+
+Each line in a crontab represents a scheduled task and follows a strict column format:
+
