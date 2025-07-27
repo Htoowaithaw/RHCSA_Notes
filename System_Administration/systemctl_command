@@ -1,0 +1,88 @@
+# ⚙️ Managing Services with `systemctl` in Linux
+
+## 🎯 Purpose
+This lesson introduces the `systemctl` command, which is used to manage system services (also called units) in modern Linux distributions. It is part of the `systemd` system and service manager, replacing the older `service` command used in previous versions of Red Hat and CentOS.
+
+---
+
+## 🧩 What is `systemctl`?
+
+- `systemctl` (system control) is used to **start**, **stop**, **restart**, **reload**, **enable**, **disable**, and **check the status** of services on a Linux system.
+- It is available in Red Hat, CentOS, and similar distributions from version 7 onward.
+- It manages both system services and third-party services using **unit files**.
+
+---
+
+## 🔧 Common Use Cases
+
+| Action             | Description                                                                 |
+|--------------------|-----------------------------------------------------------------------------|
+| Start a service     | Launches a service manually                                                 |
+| Stop a service      | Halts a running service                                                     |
+| Restart a service   | Stops and then starts a service                                             |
+| Reload a service    | Applies configuration changes without stopping the service                 |
+| Enable a service    | Configures the service to start automatically at boot                      |
+| Disable a service   | Prevents the service from starting at boot                                 |
+| Check service status| Displays whether a service is active, its PID, logs, and configuration info|
+
+---
+
+## 🖥 Example: Managing `firewalld`
+
+- Checking status will show whether the service is active, where its config file is located, and its current process ID.
+- If you stop the service, its status will change to **inactive (dead)**.
+- Disabling the service will remove it from the startup process at boot time.
+- Restarting or reloading the service allows changes to be applied without rebooting the machine.
+
+---
+
+## 📋 Listing Services
+
+- `systemctl list-units` shows all currently **active and loaded** units (services).
+- To view **all units** (active, inactive, failed), use `--all`.
+- Each entry is displayed with these columns:
+  - **UNIT**: The name of the unit (e.g., sshd.service)
+  - **LOAD**: Whether the configuration file has been parsed and loaded
+  - **ACTIVE**: High-level status of the unit (e.g., active, inactive)
+  - **SUB**: Detailed, low-level status of the unit (e.g., running, exited)
+  - **DESCRIPTION**: Human-readable description of the service
+
+---
+
+## 🛠️ Adding Third-Party Services to `systemctl`
+
+- To manage a third-party application via `systemctl`, create a **unit file** in the `/etc/systemd/system/` directory.
+- The file must follow the naming convention: `your_service_name.service`.
+- The unit file must follow a specific format, which includes sections like `[Unit]`, `[Service]`, and `[Install]`.
+- Once added, you can control the service using `systemctl` like any native service.
+
+---
+
+## 🧨 System-Level Power Commands
+
+`systemctl` can also be used for full system control, including:
+
+- **Rebooting the system**
+- **Powering off (shutting down) the system**
+
+These commands are equivalent to `reboot` and `halt`, but are integrated into `systemd`.
+
+---
+
+## ✅ Summary
+
+| Task                        | Performed Using                             |
+|-----------------------------|---------------------------------------------|
+| Start a service             | `systemctl start <service>.service`         |
+| Stop a service              | `systemctl stop <service>.service`          |
+| Restart/reload a service    | `systemctl restart` or `systemctl reload`   |
+| Check status of a service   | `systemctl status <service>.service`        |
+| Enable service at boot      | `systemctl enable <service>`                |
+| Disable service at boot     | `systemctl disable <service>`               |
+| List loaded services        | `systemctl list-units`                      |
+| List all services           | `systemctl list-units --all`                |
+| Reboot or power off system  | `systemctl reboot`, `systemctl poweroff`    |
+
+---
+
+`systemctl` is a powerful tool for controlling system services and ensuring system reliability. Mastering it is essential for Linux system administration.
