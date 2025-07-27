@@ -1,0 +1,104 @@
+# 🧠 Understanding the `ps` Command in Linux (Process Status)
+
+## 🎯 Purpose
+The `ps` command (short for "process status") is used to view information about currently running processes on a Linux system. It helps system administrators and users monitor, filter, and troubleshoot process activity, similar to how Task Manager works in Windows.
+
+---
+
+## 📌 What is a Process?
+A **process** is any active instance of a program or command running on a system. When an application or script is executed, it becomes a process and is assigned a **PID** (Process ID).
+
+---
+
+## 🛠 Basic Usage: Viewing Processes
+
+| Column | Description |
+|--------|-------------|
+| PID    | Unique process ID assigned by the OS |
+| TTY    | Terminal that the process is attached to |
+| TIME   | CPU time consumed by the process |
+| CMD    | The command or program being executed |
+
+When you run the basic `ps` command without options, it shows:
+- The current shell's process (e.g., bash)
+- The `ps` command itself
+
+---
+
+## 🔎 Extended Options and Use Cases
+
+### 1. `ps -e`
+- Shows **all processes** running on the system (not just the current shell)
+- Columns: PID, TTY, TIME, CMD
+
+---
+
+### 2. `ps aux`
+- Displays processes in **BSD format**
+- Shows user, PID, CPU %, memory %, start time, and command
+- Provides more detailed system-wide information
+
+---
+
+### 3. `ps -ef`
+- Shows all processes in **full-format listing**
+- Includes UID, PID, PPID (parent process ID), session, and full command
+- Commonly used by system admins to see complete process trees
+
+---
+
+### 4. `ps -u username`
+- Displays all processes **owned by a specific user**
+- Useful to monitor processes tied to a particular account (e.g., root or a normal user)
+
+---
+
+## 🔍 Filtering and Searching Process Output
+
+You can combine the `ps` command with utilities like `grep` to search for specific processes by name or PID. This is helpful when:
+- Looking for a specific service (e.g., firewalld)
+- Verifying whether a service is running
+- Checking for resource-heavy or zombie processes
+
+---
+
+## 🖥 Comparison to Windows Task Manager
+
+In Windows, you would typically use the **Task Manager** to:
+- View running applications and background services
+- Monitor resource usage (CPU, memory)
+- Kill unresponsive processes
+
+In Linux, `ps` (and optionally `top`) provides this functionality through the terminal.
+
+---
+
+## 🧪 Examples of Practical Use
+- Viewing all processes system-wide with full details
+- Finding the PID of a specific service
+- Verifying if a daemon or background process is running
+- Monitoring user-specific process activity
+
+---
+
+## 🔄 Relationship with `systemctl`
+
+If you're managing services using `systemctl`, you can:
+- Use `systemctl status servicename` to view service state and PID
+- Cross-reference the PID with the `ps` command to view its full process tree or resource usage
+
+---
+
+## ✅ Summary
+
+| Option      | Purpose                                      |
+|-------------|----------------------------------------------|
+| `ps`        | Shows processes of the current shell session |
+| `ps -e`     | Lists all running processes (system-wide)    |
+| `ps aux`    | Displays BSD-style full process details      |
+| `ps -ef`    | Full-format listing of all processes         |
+| `ps -u user`| Shows all processes for a specific user      |
+| `grep`      | Helps filter output for specific keywords    |
+
+The `ps` command is a powerful and essential tool in any Linux system administrator’s toolkit for monitoring and managing processes.
+
