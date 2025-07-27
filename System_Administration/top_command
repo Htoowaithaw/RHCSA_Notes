@@ -1,0 +1,110 @@
+# 📊 Real-Time Process Monitoring with `top` in Linux
+
+## 🎯 Purpose
+The `top` command provides a real-time, dynamic view of all processes and system performance in a Linux environment. It is one of the most frequently used tools by system administrators and engineers for monitoring, diagnosing, and managing system resource usage.
+
+---
+
+## 🧩 What is the `top` Command?
+
+- Displays a **live**, continuously updating summary of system activity.
+- Shows **CPU**, **memory**, **swap**, **load average**, and **process-level** details.
+- Enters an **interactive mode** where additional keys can be pressed for real-time actions.
+- Used to identify high-resource processes and optionally terminate them directly.
+
+---
+
+## 🖥️ Top Section Summary
+
+When `top` is executed, the first few lines summarize overall system status:
+
+| Field         | Description                                                              |
+|---------------|--------------------------------------------------------------------------|
+| Uptime        | How long the system has been running                                     |
+| Users         | Number of users currently logged in                                      |
+| Load Average  | System load over 1, 5, and 15 minutes                                    |
+| Tasks         | Total, running, sleeping, stopped, and zombie processes                  |
+| CPU Usage     | Percentages of CPU used by system, user, idle time, I/O wait, etc.       |
+| Memory Usage  | Total, used, free, buffer/cache memory                                   |
+| Swap Usage    | Swap memory total, used, free, and cached                                |
+
+---
+
+## 📋 Process Table Columns
+
+| Column | Description                                                                 |
+|--------|-----------------------------------------------------------------------------|
+| PID    | Process ID – a unique identifier for each running process                   |
+| USER   | User that owns the process                                                  |
+| PR     | Process priority                                                            |
+| NI     | Nice value (affects priority; lower is higher priority)                     |
+| VIRT   | Virtual memory used by the process                                          |
+| RES    | Resident memory used (physical RAM)                                         |
+| SHR    | Shared memory                                                               |
+| S      | State of the process (e.g., R = running, S = sleeping, Z = zombie)          |
+| %CPU   | CPU usage percentage                                                        |
+| %MEM   | Memory usage percentage                                                     |
+| TIME+  | Total CPU time the process has used                                         |
+| COMMAND| The command or executable name                                              |
+
+---
+
+## 🔧 Interactive Commands Within `top`
+
+While `top` is running, you can press the following keys to perform actions:
+
+| Key | Action                                                                 |
+|-----|------------------------------------------------------------------------|
+| Q   | Quit `top` and return to terminal                                     |
+| C   | Toggle full command path display                                     |
+| K   | Kill a process by entering its PID                                   |
+| M   | Sort processes by memory usage (high to low)                         |
+| P   | Sort processes by CPU usage (high to low)                            |
+
+You can change the **refresh interval** (default: 3 seconds) by pressing `d` or using the configuration options.
+
+---
+
+## 🎯 Filtering by User
+
+You can limit the output of `top` to show processes for a specific user:
+
+- Use the `-u` option followed by the username
+- This filters the display to only show that user's processes
+
+Example behavior:
+- `top -u iafzal` shows all tasks owned by user `iafzal`
+- `top -u root` shows all tasks owned by `root`
+
+---
+
+## ⚙️ Usage Tips for System Administrators
+
+- Use `top` to troubleshoot performance issues in real time.
+- Identify high CPU or memory consuming processes.
+- Kill processes directly from within `top` using the `K` key and process ID.
+- Sort data to prioritize high-impact processes using `M` (memory) and `P` (CPU).
+- Quickly locate slow or stuck processes and investigate them interactively.
+
+---
+
+## 🧠 Practical Notes
+
+- Top refreshes automatically every 3 seconds by default.
+- It runs in **interactive mode**, and the terminal prompt will disappear while it’s active.
+- You must press `Q` to quit and return to the shell prompt.
+- `top` is non-root by default, but certain actions like killing root-owned processes require root privileges.
+
+---
+
+## ✅ Summary
+
+| Feature                  | Description                                                   |
+|--------------------------|---------------------------------------------------------------|
+| Real-time monitoring     | View live system performance                                  |
+| Process overview         | See PID, CPU/memory usage, and command details                |
+| Interactive controls     | Sort, kill, and toggle display modes                          |
+| Filtering by user        | Focus on processes owned by a specific user                   |
+| Useful in troubleshooting| Helps detect resource-heavy or zombie processes quickly       |
+
+The `top` command is an essential daily-use tool for Linux administrators. It provides a live snapshot of the system and is vital for managing system performance and stability.
