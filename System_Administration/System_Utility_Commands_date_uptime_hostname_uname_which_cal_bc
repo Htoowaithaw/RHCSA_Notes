@@ -1,0 +1,92 @@
+# 🛠️ System Utility Commands in Linux
+
+## 🎯 Purpose
+These basic system utility commands are used frequently in terminal-based Linux environments, especially when working without a graphical user interface (GUI). They help users check the system time, date, uptime, OS details, and perform simple operations like calculations or viewing the calendar.
+
+These commands are essential for users who log in via terminal clients like PuTTY or SSH, where no GUI is available.
+
+---
+
+## ⏰ Date and Time: `date`
+- Displays the current system date, time, timezone, and year.
+- Often used in scripts to log timestamps or trigger time-based tasks.
+
+---
+
+## 🔁 System Uptime: `uptime`
+- Shows how long the system has been running.
+- Also shows the number of logged-in users and system load averages.
+
+---
+
+## 🖥️ Host Information: `hostname`
+- Prints the hostname of the system.
+- Useful for identifying which server you're logged into, especially in multi-server environments.
+
+---
+
+## 🧠 System Identity: `uname` and `uname -a`
+- `uname` shows the system type (usually "Linux").
+- `uname -a` provides full details: kernel name, version, build date, architecture, and hostname.
+- Helpful in distinguishing between Linux distributions or Unix variants like AIX or Solaris.
+
+---
+
+## 📍 Location of Commands: `which`
+- Displays the full path of a given command.
+- Useful for confirming where a command is stored (usually in `/usr/bin`).
+- Helps understand how commands are structured and which binaries or scripts are executed.
+
+---
+
+## 📂 Viewing All Commands: `ls -l /usr/bin`
+- Most Linux system commands are stored in `/usr/bin`.
+- Listing this directory shows all executable files available to users.
+- You can pipe the list through a pager (like `more`) to view one screen at a time.
+
+---
+
+## 🔢 Counting Commands: `wc -l`
+- You can count how many commands exist in `/usr/bin` using a line count tool.
+- Example: There may be 1,597 command files in a typical system directory.
+
+---
+
+## 📅 View Calendar: `cal`
+- Displays the current month and year.
+- You can also view a specific month and year (e.g., September 1977).
+- Typing only a year shows the calendar for all 12 months.
+
+---
+
+## 🧮 Binary Calculator: `bc`
+- Launches a command-line calculator session.
+- Supports addition, subtraction, multiplication, and division.
+- Useful when working in CLI-only environments without a GUI calculator.
+- Type `quit` to exit the calculator mode.
+
+---
+
+## 📖 Learn More: `man`
+- Every utility command has a manual entry accessible via the manual viewer.
+- Use the manual viewer to explore available options and flags for each command.
+- Helps deepen understanding and discover additional command features.
+
+---
+
+## ✅ Summary of Commands
+
+| Command   | Purpose                                 |
+|-----------|-----------------------------------------|
+| `date`    | Shows current date and time             |
+| `uptime`  | Displays system running time and load   |
+| `hostname`| Shows system’s network name             |
+| `uname`   | Displays OS type and version info       |
+| `which`   | Shows the path to a command             |
+| `cal`     | Displays calendar views                 |
+| `bc`      | Launches a terminal-based calculator    |
+| `man`     | Views the manual for any command        |
+
+---
+
+These commands form the foundation of terminal-based system interaction. While some tasks can be done with GUI tools, mastering these commands improves efficiency and is essential when working on headless servers or in enterprise terminal environments.
