@@ -1,0 +1,74 @@
+🕐 at Command – One-Time Job Scheduler
+======================================
+
+✅ Purpose:
+The `at` command is used to schedule one-time tasks in Linux. Unlike `crontab`, which schedules recurring tasks, `at` runs a task only once at a specific time.
+
+---
+
+🧠 Key Concepts:
+
+- `at` allows one-time execution of a command at a specific time or date.
+- After specifying the time, you enter an interactive mode to type your command.
+- Exit interactive mode using Control + D.
+- Jobs are managed by the `atd` daemon (similar to how `crond` handles `crontab`).
+- You can view and manage scheduled jobs with `atq` and `atrm`.
+
+---
+
+🛠 Usage Summary:
+
+1. To schedule a one-time job:
+   - Run `at` followed by the time (e.g., `5:05 PM`)
+   - Enter your command (e.g., `echo Hello` > file)
+   - Press Control + D to save and exit
+
+2. View scheduled jobs:
+   - Use `atq` to list all scheduled jobs with their job numbers
+
+3. Remove a scheduled job:
+   - Use `atrm` followed by the job number (e.g., `atrm 3`)
+
+4. Check the status of the `atd` service:
+   - Use a system command to check if the daemon is running
+   - If `atd` is stopped, jobs won't execute even if they’re scheduled
+
+---
+
+🧪 Examples:
+
+- Schedule a task at 5:30 PM:
+  `at 5:30 PM`
+  
+- Inside the prompt, enter:
+  `echo "This is my first at entry" > at-entry`
+  (Then press Control + D)
+
+- Schedule a job for a specific date:
+  `at 2:45 AM 10/16/21`
+
+- Schedule a job 4 days from now at 4:00 PM:
+  `at 4:00 PM + 4 days`
+
+- Schedule a job 5 hours from now:
+  `at now + 5 hours`
+
+- Schedule at 8:00 AM on Sunday:
+  `at 8:00 AM Sunday`
+
+- Schedule at 10:00 AM next month:
+  `at 10:00 AM next month`
+
+---
+
+📌 Notes:
+
+- You can use lowercase or uppercase AM/PM.
+- Time formats are flexible and human-friendly.
+- Jobs won't run if `atd` service is not running.
+
+---
+
+📖 To Learn More:
+Run the manual page for `at` to explore more options.
+
