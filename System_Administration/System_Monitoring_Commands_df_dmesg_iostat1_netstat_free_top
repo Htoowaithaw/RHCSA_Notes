@@ -1,0 +1,71 @@
+📊 System Monitoring in Linux
+=============================
+
+✅ Overview:
+System monitoring is a critical responsibility for system administrators and engineers. These commands help you check CPU, memory, disk, network, and system health to ensure your Linux environment is running efficiently.
+
+---
+
+🧠 Must-Know Monitoring Commands:
+
+1. **top**
+   - Displays real-time information about CPU and memory usage.
+   - Shows running processes, their owners, and resource consumption.
+   - Use this to quickly identify processes using high CPU or memory.
+
+2. **df**
+   - Reports disk space usage per filesystem.
+   - Use the human-readable option to make output easier to understand.
+   - Check for 100% disk usage to troubleshoot unresponsive systems.
+
+3. **du**
+   - Summarizes file and directory space usage.
+   - Useful for identifying which files or folders consume the most disk space.
+
+4. **dmesg**
+   - Shows boot and kernel messages.
+   - Helps identify hardware errors, system initialization logs, or failures.
+   - Pipe output through a pager to view one screen at a time.
+
+5. **iostat**
+   - Displays input/output statistics for devices and CPU.
+   - Helps monitor disk read/write activity.
+   - Can be run with an interval to continuously monitor I/O performance.
+
+6. **ip**
+   - Replaces older networking tools like netstat.
+   - Used to show IP address, routes, and interface details.
+   - Commonly used option shows default gateway and device routing.
+
+7. **ss**
+   - Replaces netstat for listing socket connections.
+   - Provides state, local/peer addresses, ports, and associated processes.
+   - Useful for network diagnostics and connection monitoring.
+
+8. **free**
+   - Shows total, used, and free memory (RAM and swap).
+   - Use it to assess memory usage and identify potential memory pressure.
+
+9. **cat /proc/cpuinfo**
+   - Displays detailed information about the CPU(s).
+   - Includes model, cores, speed, and architecture details.
+
+10. **cat /proc/meminfo**
+    - Provides detailed memory usage, buffers, caches, and more.
+    - Useful for low-level memory analysis beyond the free command.
+
+---
+
+📌 Notes:
+
+- If disk usage reaches 100%, the system may become unresponsive.
+- `/proc` is a virtual directory containing runtime system information.
+- `/dev/null` can be used to discard unwanted command output.
+- While it's not necessary to memorize every option, you should know when and why to use each command.
+- Use `man` pages or online documentation to explore more options when needed.
+
+---
+
+🎯 Interview Tip:
+If asked how you monitor system performance in an interview, confidently mention these tools and briefly explain what each is used for. This demonstrates strong foundational knowledge of system administration.
+
