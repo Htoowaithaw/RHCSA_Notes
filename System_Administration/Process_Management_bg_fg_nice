@@ -1,0 +1,77 @@
+⚙️ Linux Process Management
+==========================
+
+✅ What is Process Management?
+Process management involves controlling how processes are started, stopped, paused, resumed, prioritized, and moved between the foreground and background.
+
+---
+
+🔧 Key Concepts & Commands:
+
+🟡 Background & Foreground Jobs
+
+- When you start a process in the terminal, it takes over the session and doesn't return the prompt until it finishes.
+- Use `Ctrl + Z` to stop (pause) a running process.
+- Use `jobs` to list stopped/background jobs.
+- Use `bg` to resume a job in the background.
+- Use `fg` to bring a background job back to the foreground.
+
+---
+
+🛡️ nohup – Run Detached Background Jobs
+
+- `nohup` is used to run a process that continues running even after you close the terminal.
+- It prevents the process from receiving the hangup signal (SIGHUP).
+- Use `nohup` with `&` to run the process in the background.
+- By default, output is stored in a file called `nohup.out`.
+- To suppress all output and warnings, redirect stdout and stderr to `/dev/null`.
+
+---
+
+🔪 Killing Processes
+
+- Kill a process by its **process ID (PID)** using `kill`.
+- Kill a process by its **name** using `pkill`.
+
+---
+
+🎛️ Process Priorities with nice
+
+- `nice` controls the priority level of a process when it's started.
+- Priority (niceness) ranges from `-20` (highest priority) to `19` (lowest priority).
+- A lower niceness value means more CPU time is given to the process.
+- If a task is very important, assign it a niceness of `-20`.
+
+---
+
+🔍 Monitoring Processes
+
+- Use `ps` to list current processes (with various options).
+- Use `top` to monitor live process activity, CPU usage, and memory usage.
+
+---
+
+📌 Summary:
+
+| Task                                 | Command Concept      |
+|--------------------------------------|-----------------------|
+| Stop running process                 | Ctrl + Z             |
+| List jobs                            | jobs                 |
+| Move process to background           | bg                   |
+| Bring process to foreground          | fg                   |
+| Run job that survives logout         | nohup process &      |
+| Suppress nohup messages              | nohup process > /dev/null 2>&1 & |
+| Kill by PID                          | kill PID             |
+| Kill by name                         | pkill name           |
+| Assign process priority              | nice -n [value] process |
+| List processes                       | ps                   |
+| Monitor live usage                   | top                  |
+
+---
+
+🧠 Notes:
+
+- Terminal-attached jobs will die if you close the terminal, unless run with `nohup`.
+- `/dev/null` acts like a trash bin for unwanted output.
+- You can safely run multiple background jobs and check them with `jobs`.
+
