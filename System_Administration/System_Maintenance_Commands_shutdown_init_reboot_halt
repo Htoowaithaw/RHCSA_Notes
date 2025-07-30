@@ -1,0 +1,116 @@
+# 🛠 System Maintenance Commands (Lecture Notes)
+
+System maintenance commands are used by system administrators to perform actions like rebooting, shutting down, or switching to different system modes (e.g., single-user mode). These tasks often require logging off users or restricting access temporarily.
+
+---
+
+## 🔑 Key Commands Discussed
+
+### `shutdown`
+
+- Used to halt, power off, or reboot a Linux system.
+- Can include options for specific actions:
+  - `H` for halt (similar to the `halt` command)
+  - `P` for power off
+  - `R` for reboot
+- Refer to the manual (`man`) page to see all available options.
+- Preferred for safe shutdowns as it notifies users and properly stops services.
+
+### `init`
+
+- A systemd-related command for changing runlevels (legacy method).
+- Uses numbers 0 to 6 (sometimes up to 7):
+  - `0` = halt
+  - `3` = multi-user mode
+  - `6` = reboot
+- Not commonly used in modern systems due to systemd replacing init.
+
+### `reboot`
+
+- Simply restarts the machine.
+- A safe and direct way to reboot a Linux system.
+- Requires root privileges to execute.
+
+### `halt`
+
+- Immediately stops the system without properly shutting down processes.
+- Acts like pressing and holding the power button on physical hardware.
+- Not recommended for regular use as it may cause data loss or corruption.
+
+---
+
+## 🧪 Demonstration Steps Recap
+
+- Logged in via PuTTY to a Linux machine.
+- Used commands like `hostname` to confirm the target system before issuing `reboot`.
+- Man page of `shutdown` was viewed to explore its options.
+- `reboot` command was tested (as root), resulting in PuTTY session disconnection.
+- After a short wait, the system came back online, and PuTTY reconnected.
+
+---
+
+## ✅ Important Reminders
+
+- Always verify which machine you're working on using the `hostname` command before rebooting or shutting down.
+- Use `shutdown` for graceful shutdowns.
+- Avoid `halt` unless absolutely necessary.
+- All reboot or shutdown commands typically require root access.
+
+---
+
+# 🔢 Linux Runlevels (0–7) - Add-on Notes
+
+Runlevels are predefined operating states in traditional SysV-style Linux systems, used to define what services or processes should be running. Though largely replaced by `systemd` in modern systems, understanding runlevels is still useful for legacy systems and exams.
+
+---
+
+## 📊 Runlevel Overview
+
+| Runlevel | Description                                    |
+|----------|------------------------------------------------|
+| 0        | **Halt** – Shuts down the system completely.   |
+| 1        | **Single-user mode** – For administrative tasks; minimal services, no networking. |
+| 2        | **Multi-user mode without networking** – Multiple users allowed, no network services. (Varies by distro) |
+| 3        | **Multi-user mode with networking** – Full CLI environment with networking (no GUI). |
+| 4        | **Undefined/Custom** – Not used by default; can be configured for custom purposes. |
+| 5        | **Multi-user mode with GUI** – Graphical login environment (Desktop mode). |
+| 6        | **Reboot** – Restarts the system.              |
+| 7        | **(Not standard)** – Some distros may support custom runlevels beyond 6, but it's rare and non-standard. |
+
+---
+
+## 🧠 Helpful Notes
+
+- These runlevels are configured in older Linux systems using `/etc/inittab`.
+- `init` or `telinit` can be used to switch between runlevels (`init 3`, `init 6`, etc.).
+- `systemd` replaces runlevels with *targets* (e.g., `runlevel 3` ≈ `multi-user.target`).
+
+---
+
+## ⚠️ Caution
+
+- **Runlevel 0** and **6** should be used carefully:
+  - `0` will power off your system.
+  - `6` will immediately reboot it.
+- Always make sure you're on the correct machine (use `hostname`) before issuing these commands.
+
+---
+
+## 🔁 Modern Equivalent (systemd Targets)
+
+| Runlevel | systemd Target       |
+|----------|----------------------|
+| 0        | `poweroff.target`    |
+| 1        | `rescue.target`      |
+| 3        | `multi-user.target`  |
+| 5        | `graphical.target`   |
+| 6        | `reboot.target`      |
+
+Use `systemctl get-default` and `systemctl isolate <target>` to interact with systemd targets.
+
+---
+
+## 🎯 Practice Tip
+
+Test switching between runlevels (or targets) in a virtual lab. Compare SysV runlevel behavior with modern `systemd` targets to understand the transition.
+
