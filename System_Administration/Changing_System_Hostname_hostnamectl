@@ -1,0 +1,86 @@
+# 🖥️ Changing Linux System Hostname (Lecture Notes)
+
+The **hostname** is the name assigned to a Linux machine during installation. It uniquely identifies the system on a network. Over time, if a system is repurposed or reused for a different role, administrators may need to change its hostname to reflect its new function or to follow organizational naming standards.
+
+---
+
+## 🧾 Command to Change Hostname
+
+To change the hostname in modern Linux distributions (using `systemd`), the following command is used:
+
+- `hostnamectl set-hostname <new-hostname>`
+
+> ⚠️ No dash between "set" and "hostname"
+
+---
+
+## 🗂️ Hostname Configuration Files
+
+- **Linux 7 and newer**:
+  - `/etc/hostname` — stores the current hostname
+- **Linux 6 and older**:
+  - `/etc/sysconfig/network` — older method of storing hostname settings
+
+You can either:
+- Modify the file directly, or
+- Use the `hostnamectl` command, which updates the file automatically
+
+---
+
+## 👨‍💻 Demonstration Recap
+
+- Current hostname was displayed using the `hostname` command.
+- File `/etc/hostname` was viewed using `cat` to confirm the stored name.
+- Hostname was changed to `NYCHost1` using `hostnamectl set-hostname NYCHost1`.
+- Confirmed the new name was saved in `/etc/hostname`.
+- The `hostname` command showed the updated name.
+- However, the terminal prompt still displayed the **old** hostname because the shell session had not been restarted.
+
+---
+
+## 🔄 Applying the Change
+
+To fully apply and reflect the new hostname in the shell prompt:
+
+- Either restart the shell session, or
+- **Reboot the system** using one of the following:
+  - `reboot`
+  - `init 6` (legacy command)
+
+After reboot, the terminal prompt displayed the new hostname successfully.
+
+---
+
+## 🧪 Reverting the Hostname
+
+- To change the hostname back:
+  - Edited `/etc/hostname` file directly and restored the original name.
+  - Rebooted the system again for the change to take effect.
+
+---
+
+## 🪟 Bonus: Windows Hostname Change (GUI)
+
+- Go to **My Computer** → Right-click → **Properties** → **Change settings**
+- Hostname can be changed from the system properties window.
+- Simple graphical interface, no command line needed.
+
+---
+
+## ✅ Important Reminders
+
+- You must be **root** to change the hostname.
+- Changes made using `hostnamectl` take effect immediately, but may not reflect in the current shell until reboot.
+- Manual file edits require a system restart to apply.
+- Always verify hostname changes using:
+  - `hostname` (current active name)
+  - `cat /etc/hostname` (stored name)
+
+---
+
+## 🎯 Practice Tip
+
+Try both methods of hostname change:
+1. Using `hostnamectl`
+2. Editing `/etc/hostname` manually  
+Then reboot and observe the effect.
