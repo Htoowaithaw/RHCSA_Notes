@@ -1,0 +1,70 @@
+🧾 Log Monitoring in Linux
+==========================
+
+✅ Overview:
+Log monitoring is an essential part of system administration. Think of logs as the "medical history" of a system, helping administrators trace and diagnose issues. Logs store critical information about system behavior, errors, processes, and user activities.
+
+---
+
+📁 Location of Logs:
+- The primary directory for logs on Linux systems is: `/var/log`
+- Most logs are stored here by default unless applications are configured to store them elsewhere.
+
+---
+
+📚 Important Log Files to Know:
+
+1. **boot.log**
+   - Records events during system boot and reboot.
+   - Shows which services started successfully or failed.
+   - Automatically overwritten each time the system reboots.
+
+2. **chronyd**
+   - Logs related to the Chrony daemon (modern replacement for NTP).
+   - Records time synchronization activities.
+
+3. **cron**
+   - Logs all cron job activities.
+   - Each entry includes the date, time, hostname, daemon, process ID, user, and the executed command.
+
+4. **maillog**
+   - Contains logs for the sendmail daemon or other mail services.
+   - Useful for troubleshooting email sending/receiving issues.
+
+5. **secure**
+   - Records all authentication-related events:
+     - User logins
+     - Failed login attempts
+     - SSH login details and originating IP addresses
+   - Critical for security auditing and intrusion detection.
+   - Use tailing methods to monitor real-time login attempts.
+
+6. **messages**
+   - One of the most comprehensive and critical logs.
+   - Includes system-wide hardware, software, application, and kernel-level messages.
+   - First place to check when troubleshooting unknown system issues.
+
+7. **audit**
+   - Contains audit subsystem logs.
+   - Useful for security auditing and compliance monitoring.
+
+---
+
+🔎 Practical Monitoring Tips:
+
+- Regularly inspect log files to identify potential issues before they become critical.
+- Use tailing to monitor logs live, especially during user logins or daemon restarts.
+- Count total lines in a log file to get a sense of how active the log is.
+- Search logs for errors using case-insensitive filtering to catch all relevant entries.
+- Know log ownership and permissions; some logs require root access to read.
+
+---
+
+🎯 Interview Tip:
+Be prepared to explain how you monitor logs. Mention specific files like `messages`, `secure`, `cron`, and how they help in diagnosing system or user-related issues. Emphasize your ability to trace events and errors using real log examples.
+
+📝 Suggested Practice:
+- Explore each log file in `/var/log` on your own system.
+- Try to find log entries for reboots, failed logins, and cron executions.
+- Familiarize yourself with the structure and format of each log entry.
+
