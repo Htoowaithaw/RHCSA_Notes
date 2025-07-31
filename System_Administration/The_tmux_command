@@ -1,0 +1,130 @@
+🧱 TMUX - Terminal Multiplexer in Linux
+📚 What is TMUX?
+
+    TMUX stands for Terminal MUltipleXer.
+
+    It is a modern replacement for the outdated screen utility.
+
+    Useful in Red Hat Enterprise Linux (RHEL) 8 and CentOS 8, where screen is no longer available.
+
+    Allows multiple terminal sessions inside a single window.
+
+    You can split the screen, run commands in parallel, detach from a session and reattach later without losing your work.
+
+    Especially useful for remote server management and multitasking.
+
+📜 History of TMUX
+
+    2007: Created by Nicholas Marriott to improve upon limitations of screen.
+
+    2009: TMUX version 1.0 released with window splitting and better customization.
+
+    2019: TMUX 3.0 added plugin support and improved external control.
+
+    Now: TMUX is widely adopted in modern Linux distributions, including RHEL and CentOS.
+
+🚀 Installation (on RHEL/CentOS)
+
+    Use the command dnf install tmux -y to install without confirmation prompts.
+
+    You can verify the installation with rpm -qa | grep tmux.
+
+▶️ Starting a TMUX Session
+
+    Run the tmux command to begin a new session.
+
+    A bottom bar will appear showing:
+
+        Session number, like [0]
+
+        Window name, such as bash
+
+        Hostname and system time
+
+🔀 TMUX Keyboard Shortcuts
+
+TMUX shortcuts always start with Ctrl + B, followed by another key.
+
+    Split screen vertically: Ctrl + B, then %
+
+    Split screen horizontally: Ctrl + B, then "
+
+    Navigate between panes: Ctrl + B, then arrow keys
+
+    Create a new window: Ctrl + B, then C
+
+    Switch to next window: Ctrl + B, then N
+
+    Rename current window: Ctrl + B, then ,
+
+    Close current pane/window: Ctrl + D
+
+    Detach from session: Ctrl + B, then D
+
+🧪 Using TMUX in Practice
+
+    Start TMUX: type tmux
+
+    Split terminal vertically: Ctrl + B, %
+
+    Split terminal horizontally: Ctrl + B, "
+
+    Move between panes: use arrow keys with Ctrl + B
+
+    Run long commands in one pane like ping google.com
+
+    You will see window renamed temporarily from bash to ping
+
+📛 Creating and Naming Sessions
+
+    Create a named session: tmux new -s imran
+
+    Now instead of session [0], your session name is 'imran'
+
+➕ Working with Windows
+
+    Create additional windows: Ctrl + B, then C
+
+    Cycle through windows: Ctrl + B, then N
+
+    Close any window: Ctrl + D (only closes that window, not entire session)
+
+    Rename current window: Ctrl + B, then ,
+
+🧷 Detaching and Reattaching Sessions
+
+    Detach: Ctrl + B, then D (session continues running in background)
+
+    View active sessions: tmux ls
+
+    Reattach to session: tmux a or tmux attach -t session_name
+
+🧹 Killing Sessions
+
+    Kill session by ID: tmux kill-session -t 0
+
+    Kill named session: tmux kill-session -t imran
+
+    After killing, run tmux ls to verify all sessions are terminated
+
+🔚 Summary
+
+    TMUX is a powerful terminal multiplexer used to manage multiple terminal sessions efficiently.
+
+    Replaces the older screen command with a better interface and features.
+
+    Allows multitasking, session persistence, and flexible terminal layout.
+
+    Great for developers, sysadmins, and anyone working in the Linux CLI regularly.
+
+✅ Practice Suggestions
+
+    Try creating new TMUX sessions
+
+    Practice splitting panes and switching between them
+
+    Detach and reattach sessions to understand persistence
+
+    Rename windows for better navigation
+
+    Kill sessions when done to clean up your environment
