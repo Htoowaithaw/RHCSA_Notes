@@ -1,0 +1,87 @@
+# 📝 `script` Command - Session Logging (Lecture Notes)
+
+The `script` command is a powerful tool in Linux used to record all terminal activity into a log file. It’s especially helpful for troubleshooting, creating documentation, or keeping a record of commands used during administrative tasks.
+
+---
+
+## 🎯 Purpose
+
+- Automatically logs every command and its output from the terminal session.
+- Useful for:
+  - Debugging or troubleshooting sessions
+  - Keeping a historical reference of steps taken
+  - Creating training records or documentation
+  - Tracking automation or scripting steps
+
+---
+
+## 🛠 How It Works
+
+1. Start the session by running `script` followed by a desired file name, such as `logfile-activity.log`.
+2. The terminal will confirm that script recording has started and the file is being created.
+3. All commands and outputs after this point will be recorded into the log file until the session ends.
+
+---
+
+## 🧪 During the Logging Session
+
+While the script session is active, everything you type and every output shown on screen will be captured into the specified file.
+
+Example actions that get logged:
+- Navigating to other directories using `cd`
+- Listing directory contents using `ls -ltr`
+- Clearing the screen using `clear`
+- Showing the working directory using `pwd`
+- Running any other command you normally use in the terminal
+
+As you execute each command, the size of the log file increases, which you can observe using `ls -ltr`.
+
+---
+
+## 🛑 Ending the Session
+
+To stop the recording, simply type `exit`.
+
+You will see a message indicating the script is done and the session log has been saved to your specified file.
+
+---
+
+## 📂 Where is the Log Stored?
+
+The log file is created in the current working directory at the time the `script` command is executed. You can confirm its presence using `ls -ltr`.
+
+---
+
+## 🔍 Viewing the Log
+
+You can use commands like `more`, `less`, or `cat` to view the log file. The log will include:
+
+- Every command you typed
+- All output displayed in the terminal
+- A complete timeline of the session
+
+For example, viewing the file with `more logfile-activity.log` will show all the activity captured during the session.
+
+---
+
+## 🧠 Why Use `script`?
+
+- It acts like a recording tool for terminal sessions.
+- Great for revisiting work done weeks or months ago.
+- Useful for replicating steps without relying on memory.
+- Serves as a logbook of all your terminal-based activity.
+
+---
+
+## ✅ Summary
+
+- `script` creates a full record of terminal activity.
+- Use it before beginning a session where tracking steps is important.
+- Stop it using `exit` when you are done.
+- View the file anytime to recall or reuse your previous work.
+
+---
+
+## 💡 Pro Tip
+
+Use meaningful file names for your log files, such as `install-log-2025-07-30.log` or `troubleshooting-network.log`, to easily track and identify them later.

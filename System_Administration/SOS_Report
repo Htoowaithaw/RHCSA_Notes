@@ -1,0 +1,78 @@
+# 🧾 SOS Report (Lecture Notes)
+
+An **SOS Report** is a diagnostic tool used on Red Hat-based systems like RHEL and CentOS. It collects vital system information—configuration files, logs, and diagnostic data—into a single compressed archive that can be shared with Red Hat support engineers to troubleshoot issues efficiently.
+
+---
+
+## ❓ What is SOS?
+
+- The term "SOS" historically comes from the international distress signal, often said to mean:
+  - **Save Our Ship**
+  - **Save Our Souls**
+- In Linux, `sosreport` follows this theme—used when the system is in trouble and you need to "call for help."
+
+---
+
+## 🎯 Purpose of SOS Report
+
+- To **collect and package diagnostic and support data** in one file.
+- Helps Red Hat support teams avoid asking for individual logs or configuration files repeatedly.
+- Speeds up issue resolution by offering a full snapshot of system state.
+
+---
+
+## 📦 Package and Command
+
+- The tool comes pre-installed on most RHEL and CentOS systems.
+- Package: `sos` (version may vary, e.g., `sos-3.5`)
+- Command to run: `sosreport` (must be run as root)
+
+---
+
+## 🧪 How SOS Report Works (Step-by-Step)
+
+1. Log into your Linux system.
+2. Switch to root user.
+3. Run the command: `sosreport`
+4. It will:
+   - Display the version (e.g., 3.5)
+   - Inform you about data collection and file storage location (`/var/tmp`)
+   - Prompt for:
+     - **Name/initials**
+     - **Case ID** (provided by Red Hat when you open a support ticket)
+5. It starts collecting:
+   - Configuration files (`/etc`)
+   - Logs (`/var/log`)
+   - System info (hardware, network, services, etc.)
+6. Takes 1–5 minutes depending on system resources.
+
+---
+
+## 📁 Output File Details
+
+- Location: `/var/tmp/`
+- File Name Format: `sosreport-<hostname>-<date>-<caseID>.tar.xz`
+- Additional file: `.md5` checksum (can be ignored unless needed for integrity check)
+
+---
+
+## 📤 How to Send to Red Hat
+
+- Use FTP to upload the `.tar.xz` file to the Red Hat Customer Portal.
+- If FTP is blocked, download the file to your local machine and upload it manually.
+- Once received, Red Hat support analyzes the archive to diagnose the issue.
+
+---
+
+## ✅ Key Points to Remember
+
+- Always run `sosreport` as **root**.
+- You don’t need to manually gather logs—`sosreport` handles it for you.
+- Used when creating a case with Red Hat or CentOS support.
+- Helps minimize back-and-forth with support teams.
+
+---
+
+## 🎯 Practice Tip
+
+Try running `sosreport` on a test CentOS or RHEL system. Explore the generated archive in `/var/tmp` to see what data gets included. It’s a great way to understand what your system reveals to support engineers.

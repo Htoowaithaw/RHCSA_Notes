@@ -1,0 +1,41 @@
+# 🖥️ Finding System Information (Lecture Notes)
+
+Every time you log into a Linux machine, it's important to verify what system you're on — including the OS version, kernel, hardware specs, and hostname.
+
+---
+
+## 📌 Key Commands
+
+### `cat /etc/redhat-release`
+- Shows the OS version (e.g., CentOS 7.4, update 1708).
+- Reads a simple text file containing release info.
+
+### `uname -a`
+- Displays system information:
+  - Kernel name and version
+  - Architecture (e.g., x86_64)
+  - Hostname
+  - OS build date and time
+
+### `dmidecode`
+- Shows detailed hardware info (BIOS, CPU, RAM, manufacturer).
+- Requires root privileges.
+- To read it page by page:  
+  Use `dmidecode | more`
+
+---
+
+## 🧠 Extra Tip
+
+- Always run `hostname` after login to verify which machine you're on.
+- This helps prevent accidents like rebooting the wrong system.
+
+---
+
+## ✅ Practice Tip
+
+As soon as you log in:
+1. Run `uname -a` to check OS and kernel.
+2. Run `hostname` to confirm the machine.
+3. Use `cat /etc/redhat-release` for distro version.
+4. Use `dmidecode` as root for hardware specs.
