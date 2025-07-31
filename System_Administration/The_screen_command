@@ -1,0 +1,129 @@
+# 🖥️ Screen Command – Terminal Multiplexing (Lecture Notes)
+
+The `screen` command, also known as GNU Screen, is a terminal multiplexer. It allows users to manage multiple terminal sessions within a single window, continue running tasks after disconnection, and even reconnect to previously active sessions. It is a vital tool for Linux system administrators, especially for working on remote systems or managing long-running tasks.
+
+---
+
+## 🧠 What is the Screen Command?
+
+- A utility that manages **multiple virtual terminal sessions**.
+- Allows background task execution even after network interruptions.
+- Helps **reconnect to running processes** after disconnection or PuTTY closure.
+- Originally developed in the 1980s and integrated into the GNU project.
+- Still widely used in 2024 for its reliability and simplicity.
+
+---
+
+## ✅ Benefits of Using Screen
+
+- Maintain remote sessions even after closing the terminal.
+- Run multiple shell sessions within one terminal window.
+- Reattach to a screen session at any time.
+- Use split screens to view multiple tasks simultaneously.
+- Useful during large file transfers, software builds, or remote administration.
+
+---
+
+## 🔍 Installation Steps
+
+1. **Check if Screen is Installed**
+   - Use the RPM command to search for it.
+   - If not found, install it using the DNF package manager.
+
+2. **Enable EPEL Repository**
+   - If `screen` is not in the default repository, enable the EPEL repository:
+     - Install `epel-release` using `dnf install epel-release`.
+     - Then install `screen` with `dnf install screen`.
+
+---
+
+## ▶️ Starting and Using Screen
+
+- To start screen: type `screen` and press enter.
+- A new session named **screen 0** is created by default.
+- You are now inside a new terminal session inside the screen environment.
+
+---
+
+## 🪟 Managing Multiple Windows and Splits
+
+### Create Splits
+
+- **Vertical Split**: Press `Ctrl + A`, then press `|` (pipe key).
+- **Horizontal Split**: Press `Ctrl + A`, then press `S` (uppercase S).
+
+### Navigate Between Screens
+
+- Switch focus: Press `Ctrl + A`, then press `Tab`.
+
+### Create New Sessions in Each Split
+
+- Press `Ctrl + A`, then press `C` to create a new terminal session inside the focused screen area.
+
+Each session is independent but runs within the same screen instance.
+
+---
+
+## 🖧 Connect to Different Machines
+
+- After splitting your screen:
+  - In one split, connect to a different remote machine using SSH:
+    - Example: `ssh root@192.168.100.162`
+  - Confirm the fingerprint if connecting for the first time.
+  - Once connected, verify the IP and hostname to ensure you’re on the right server.
+
+This allows simultaneous monitoring or management of multiple systems.
+
+---
+
+## 🧩 Reconnecting to Lost Sessions
+
+- If your terminal disconnects or is closed accidentally, your screen session will continue running in the background.
+- To reconnect:
+  - Open a new terminal and type `screen -r`.
+  - If multiple sessions exist, you will see a list of detached sessions.
+  - Copy the session ID and run `screen -r <session_id>` to reconnect.
+
+This brings you right back to where you left off, even inside a file you were editing.
+
+---
+
+## 📄 Example Use Case: Editing a File with Screen
+
+1. Start screen in a new session.
+2. Open a file using `vi` and start typing.
+3. Simulate accidental disconnection by closing the terminal.
+4. Reconnect using `screen -r`.
+5. Your session and the file content will still be available.
+
+This ensures that no progress is lost, even during a disconnection.
+
+---
+
+## 📌 Key Shortcuts in Screen
+
+| Action                         | Shortcut               |
+|--------------------------------|------------------------|
+| Start screen                   | `screen`               |
+| Split screen vertically        | `Ctrl + A`, then `|`   |
+| Split screen horizontally      | `Ctrl + A`, then `S`   |
+| Switch between splits          | `Ctrl + A`, then `Tab` |
+| Create new session in split    | `Ctrl + A`, then `C`   |
+| Detach from session            | `Ctrl + A`, then `D`   |
+| Reattach to session            | `screen -r`            |
+
+---
+
+## ✅ Summary
+
+- `screen` keeps your tasks running even after terminal disconnects.
+- You can split terminals and run multiple sessions in one window.
+- It is essential for working with remote servers and long-running tasks.
+- You can connect to different machines within each session split.
+- Use `screen -r` to resume any interrupted sessions.
+
+---
+
+## 🎯 Practice Tip
+
+Install screen in your lab VM, try creating multiple sessions, split the terminal, SSH into different machines, and then test reconnecting after closing the terminal. This will give you hands-on experience with one of the most practical tools in a Linux sysadmin’s toolkit.

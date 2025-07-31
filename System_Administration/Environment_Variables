@@ -1,0 +1,120 @@
+# 🌐 Environment Variables (Lecture Notes)
+
+Environment variables in Linux are dynamic named values that define the environment in which processes run. They influence how software behaves and are automatically assigned when a user logs in. These variables can be temporary or permanently defined and can be user-specific or system-wide.
+
+---
+
+## 🧠 What Are Environment Variables?
+
+An environment variable is a key-value pair that:
+- Defines runtime settings for the shell and other programs.
+- Sets paths for commands, defines user information, language settings, terminal colors, and more.
+- Is inherited by processes started by the shell.
+
+---
+
+## 🏠 Simple Analogy
+
+Think of your house. It has rooms like a kitchen for cooking, a bedroom for sleeping, a dining room for eating. These spaces are created for specific purposes. You wouldn’t sleep in a kitchen or cook in a bedroom. Similarly, environment variables define spaces, paths, and behaviors in your Linux environment.
+
+For example:
+- `HOME` = user’s home directory
+- `PATH` = directories the system searches for commands
+- `SHELL` = type of shell assigned (bash, zsh, etc.)
+
+---
+
+## 📄 Viewing Environment Variables
+
+To list all environment variables, use the command `env` or `printenv`. Both display the same result.
+
+To view a specific environment variable, use the `echo` command followed by the variable name, prefixed with a dollar sign.
+
+Examples:
+- `echo $SHELL` → shows the shell assigned to the user (e.g., /bin/bash)
+- `echo $PATH` → lists all directories used for finding executable commands
+- `echo $HOME` → displays the user’s home directory
+- `echo $MAIL` → shows where system mail is stored
+
+To make output easier to read, you can use a pager like `more`:
+- `printenv | more` shows one page at a time.
+
+---
+
+## 🔧 Setting Environment Variables
+
+### Temporary (Session-only)
+
+You can create a temporary environment variable using `export`. It will remain active only during your session.
+
+Example:
+- `export TEST=1`
+- `echo $TEST` → Output: 1
+
+As soon as you log out, the variable is gone.
+
+---
+
+### Permanent (User-Specific)
+
+To set the environment variable permanently for the current user:
+1. Navigate to the user’s home directory.
+2. Open the `.bashrc` file using a text editor like `vi`.
+3. Add the following lines at the end:
+   - `TEST='123'`
+   - `export TEST`
+4. Save and exit the file.
+5. Open a new terminal session or re-login to activate the changes.
+6. `echo $TEST` → Output: 123
+
+Tip: Use `ls -la` to view hidden files like `.bashrc`.
+
+It’s a good practice to back up `.bashrc` before editing:
+- Copy `.bashrc` to `.bashrc.backup` so you can restore it if needed.
+
+---
+
+### Permanent (Global for All Users)
+
+To set environment variables for all users:
+- Edit system-wide files like `/etc/profile` or `/etc/bashrc`.
+- Add the export statements the same way you would in `.bashrc`.
+
+⚠️ Warning: Making global changes can affect all users and system behavior. Do this only in controlled environments and after testing.
+
+---
+
+## 🎨 Customization via Environment Variables
+
+Some examples of environment variables that affect user experience:
+- `LS_COLORS` → defines colors used when running `ls --color=auto`
+- `HISTSIZE` → determines how many commands are stored in history
+- `LANG` or `LC_ALL` → controls system language and locale
+
+You can customize these variables to change how your terminal behaves or how output is displayed.
+
+---
+
+## 🧪 Testing Your Variables
+
+- Set a variable: `export MYVAR='hello'`
+- Confirm it works: `echo $MYVAR`
+- Log out and back in: `echo $MYVAR` will now be empty unless you set it permanently.
+- Set it permanently in `.bashrc`, re-login, and it will persist.
+
+---
+
+## ✅ Summary
+
+- Environment variables define user and system behavior.
+- Use `env`, `printenv`, and `echo $VAR` to view them.
+- Use `export` to create temporary variables.
+- Use `.bashrc` for permanent user-specific variables.
+- Use `/etc/profile` or `/etc/bashrc` for permanent global variables.
+- Always test in a safe environment before applying system-wide changes.
+
+---
+
+## 🎯 Practice Tip
+
+Try listing environment variables using `env`. Set a temporary variable with `export` and test it with `echo`. Then add it to your `.bashrc` file and log out and back in to verify it persists.
