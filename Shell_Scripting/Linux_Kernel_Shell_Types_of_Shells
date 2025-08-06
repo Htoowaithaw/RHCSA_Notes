@@ -1,0 +1,181 @@
+# 🐧 Linux Kernel, Shell, Shell Types & Shell Scripting
+
+---
+
+## 🧠 1. Linux Kernel
+
+- Every Linux distribution includes a **kernel**.
+- The kernel acts as a **bridge between hardware and software**.
+- It's a continuously running program within the OS that:
+  - Accepts commands from the shell.
+  - Talks to the hardware (CPU, RAM, disks, peripheral devices).
+  - Returns results or actions back up the chain.
+
+### 🔧 Hardware Components
+- **CPU** – Executes processes.
+- **Memory (RAM)** – Stores data temporarily for fast access.
+- **Hard Disk** – Stores data persistently.
+- **Peripheral Devices** – USB, keyboard, mouse, printer, etc.
+
+### 🏗️ Kernel Layer Diagram
+
+[ Users ]
+↑
+[ Applications (Browser, Mail, Office) ]
+↑
+[ Shell (Terminal or GUI) ]
+↑
+[ Kernel ]
+↑
+[ Hardware (CPU, RAM, Disk, Devices) ]
+
+- The **shell** takes your input, passes it to the **kernel**.
+- The **kernel** interfaces with the **hardware** to execute commands.
+- Together, **kernel + shell = Operating System**.
+- All OSes (Linux, UNIX, macOS, Windows) follow this architecture.
+
+---
+
+## 🧠 2. Shell
+
+- A **shell** is the interface between **user** and **kernel**.
+- Think of a **Tupperware** — a container that holds your environment.
+- Provides a **platform to run commands** and manage your environment.
+
+### 🔍 Shell Types
+- **GUI Shells**:
+  - Windows GUI
+  - Linux GNOME
+  - Linux KDE
+
+- **CLI Shells**:
+  - `sh` (Bourne Shell)
+  - `bash` (Bourne Again Shell)
+  - `csh` (C Shell)
+  - `tcsh` (Turbo C Shell)
+  - `ksh` (Korn Shell)
+
+### 📋 Check Your Shell
+- Show current shell:
+- List all installed shells:
+- Check user-assigned shell:
+→ Look at the last field on your user’s line (e.g., `/bin/bash`).
+
+---
+
+## 🧠 3. Shell Types in Linux
+
+### 🖼️ GUI Shells
+- **GNOME** – Graphical desktop environment for Linux.
+- **KDE** – Another popular Linux GUI.
+- During OS installation, you can choose between GNOME or KDE.
+
+🖱️ These allow command execution via mouse and keyboard (clicking, dragging, etc.).
+
+### 💻 Command Line Shells
+
+#### 🔸 `sh` – Bourne Shell
+- One of the oldest shells.
+- Developed in 1977 by Stephen Bourne at AT&T Bell Labs.
+- Offers:
+- Input/output redirection
+- Variables and conditionals
+- Shell scripting
+- Widely known and foundational to many Linux systems.
+
+#### 🔸 `bash` – Bourne Again Shell
+- Enhanced version of `sh`.
+- Default in most Linux distributions.
+- Backward-compatible with `sh`, but includes:
+- Better scripting support
+- More control structures
+- User-friendly features
+- This is the **main shell used in this course**.
+
+#### 🔸 `csh` – C Shell
+- Syntax resembles C language.
+- Developed by Bill Joy at Berkeley in the late 1970s.
+- Not compatible with `bash` scripts.
+
+#### 🔸 `tcsh` – Turbo C Shell
+- Improved version of `csh`.
+- Created by Ken Greer at Carnegie Mellon University.
+- Adds command-line editing and other features.
+- **Not widely used** unless you're experienced in C/C++.
+
+#### 🔸 `ksh` – Korn Shell
+- Developed by David Korn.
+- Adds:
+- Floating-point arithmetic
+- Job control
+- Common in UNIX systems (e.g., Solaris).
+- Compatible with `bash`.
+
+### 📎 Notes
+- You can switch shells if needed, but it’s best to stay consistent.
+- Shells may interpret scripts differently — be cautious.
+- Always verify the shell your script is written for (e.g., bash vs ksh).
+
+---
+
+## 🧠 4. Shell Scripting
+
+### 📜 What is a Shell Script?
+- A shell script is a **text file** containing multiple commands.
+- Used to **automate** repetitive tasks.
+- Commands run **sequentially**, top to bottom.
+
+### 🧱 Structure of a Shell Script
+
+1. **Shebang Line** (first line defines the shell):
+- `#!` is called **shebang** or **bang**.
+- Specifies the shell that should interpret the script.
+
+2. **Comments** (start with `#`):
+This script shows current user info
+
+3. **Commands**:
+whoami
+hostname
+pwd
+
+4. **Conditionals / Loops** (covered later):
+- if, then, while, for loops, etc.
+
+### 🧪 Example Script: `login.sh`
+#!/bin/bash
+whoami
+hostname
+pwd
+
+### 🔓 Making Script Executable
+- By default, a script is just a plain file.
+- To make it executable:
+- To run:
+./login.sh
+- Alternatively (without execution permission):
+sh login.sh
+
+
+### 🛡️ Security Note
+- Removing `x` permission prevents `./script.sh` from running.
+- But `sh script.sh` still works if the file is **readable**.
+- To fully block:
+
+chmod 000 script.sh
+
+
+### 📌 Shell Script Path
+- Scripts must be called with either:
+- **Absolute path** (`/home/user/script.sh`)
+- **Relative path** (`./script.sh`)
+
+### 📎 Summary:
+- Shell scripting is powerful for automation.
+- Scripts execute line-by-line.
+- Always start scripts with a shebang.
+- Assign execution permission using `chmod`.
+- Be aware of the shell you're writing for (`bash`, `sh`, etc.).
+
+---
+
