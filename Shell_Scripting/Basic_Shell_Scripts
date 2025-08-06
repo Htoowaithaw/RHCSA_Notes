@@ -1,0 +1,151 @@
+Here is a complete GitHub-style Markdown (.md) note based on Imran Afzal’s shell scripting lecture. Everything is combined into one block so you can copy once and paste into your .md file:
+
+# 🐧 Linux Shell Scripting – Beginner Notes (Imran Afzal)
+
+## 📚 Introduction
+Shell scripting is fun, powerful, and a great way to start programming on Linux. In this session, we’ll:
+- Write simple shell scripts
+- Use basic shell commands like `echo`, `whoami`, `pwd`, `hostname`
+- Automate tasks using variables and logic
+- Learn troubleshooting techniques
+
+---
+
+## 📁 Step 1: Create a Script Folder
+
+```bash
+# Check your current directory
+pwd
+
+# Make a new directory
+mkdir myscripts
+
+# Move into the directory
+cd myscripts
+
+# Confirm it's empty
+ls
+
+✏️ Step 2: Your First Shell Script (Output to Screen)
+
+# Create a file using vi
+vi output-screen
+
+Inside vi, press i and type:
+
+#!/bin/bash
+echo "Hello World"
+
+Press Esc, then type :wq to save and exit.
+
+Make it executable:
+
+chmod +x output-screen
+
+Run it:
+
+./output-screen
+
+Expected output:
+
+Hello World
+
+✅ Congrats — you just ran your first shell script!
+🧪 Step 3: Another Script with Multiple Commands
+
+Create a new file:
+
+vi run-commands
+
+Insert the following:
+
+#!/bin/bash
+
+# This script runs small tasks
+# Written by Imran Afzal
+# Date: 2018
+
+whoami
+echo
+pwd
+hostname
+ls -ltr
+
+Save and exit. Then:
+
+chmod +x run-commands
+./run-commands
+
+📝 Why use echo? → It creates a blank line for better output readability.
+💡 Step 4: Using Variables in Shell Script
+
+Create a file:
+
+vi variable-command
+
+Insert this content:
+
+#!/bin/bash
+
+# Variable Example Script
+a="Imran"
+b="Afzal"
+c='Linux class'
+
+echo "My first name is $a"
+echo "My surname is $b"
+echo 'My class is' $c
+
+Make it executable and run:
+
+chmod +x variable-command
+./variable-command
+
+Expected output:
+
+My first name is Imran
+My surname is Afzal
+My class is Linux class
+
+🧩 Troubleshooting Tip:
+If you see an error like line 6: command not found, check:
+
+    Quotation marks (" vs ')
+
+    Spacing in variables (use quotes if values contain spaces)
+
+    Line numbers mentioned in errors
+
+🔁 Bonus: Run Script from Absolute Path
+
+/home/username/myscripts/output-screen
+
+✅ No need for ./ if using absolute path.
+🧠 Recap
+
+You’ve just learned:
+
+    How to create and run shell scripts
+
+    How to use chmod +x to make them executable
+
+    How to print to screen with echo
+
+    How to use variables inside scripts
+
+    How to troubleshoot basic errors
+
+🧪 Challenge: Try Creating Scripts That…
+
+    Print system info (IP, uptime, CPU, RAM)
+
+    Create multiple files/directories
+
+    Search logs using grep, awk, cut, sort, uniq
+
+    Backup a directory into a .tar file
+
+🧑‍💻 Happy scripting!
+
+
+Let me know if you'd like the same format turned into a downloadable `.md` file.
