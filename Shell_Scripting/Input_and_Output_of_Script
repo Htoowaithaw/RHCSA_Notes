@@ -1,0 +1,209 @@
+# 🧾 Linux Shell Scripting – Input & Output (Full Lecture Note)
+
+## 📌 Objective
+
+Learn how to:
+- Prompt user input using `read`
+- Display output using `echo`
+- Store command results in variables
+- Build interactive scripts that behave like simple wizards
+
+---
+
+## 🧱 Basic Input/Output Script
+
+The script will:
+- Print a greeting
+- Ask for the user’s name
+- Wait for input using `read`
+- Display a personalized message
+
+echo "Hello, my name is Imran Afzal"
+echo
+echo "What is your name?"
+read name_container
+echo
+echo "Hello $name_container"
+
+
+👆 This script will:
+- Greet the user
+- Wait for input
+- Echo back a personalized greeting
+
+---
+
+## 🧪 Running the Script
+
+When run:
+
+Hello, my name is Imran Afzal
+
+What is your name?
+Jerry Seinfeld
+
+Hello Jerry Seinfeld
+
+
+📝 The script pauses until the user types something and presses Enter.
+
+---
+
+## ⚙️ Adding System Info (hostname)
+
+Goal: Show the server’s hostname before asking for the name.
+
+Wrong version:
+
+A=hostname
+echo "Hello, my server name is $A"
+
+❌ This stores the string `hostname`, not the result.
+
+Correct version:
+
+A=hostname
+echo "Hello, my server name is $A"
+
+✅ Now `A` stores the actual hostname output.
+
+---
+
+## 🧱 Script with Hostname and Name
+
+A=hostname
+echo "Hello, my server name is $A"
+echo
+echo "What is your name?"
+read B
+echo
+echo "Hello $B"
+echo "Bye"
+
+
+📝 Explanation:
+- `A` stores the hostname using command substitution
+- `read B` collects the user’s name
+- The script then uses both `$A` and `$B` to print output
+
+---
+
+## 🧪 Output
+
+Hello, my server name is my-first-linux-vm
+
+What is your name?
+Imran Afzal
+
+Hello Imran Afzal
+Bye
+
+
+---
+
+## 🧠 Why Use Backticks?
+
+If you do:
+
+A=hostname
+
+then `$A` becomes "hostname" — just plain text.
+
+But if you do:
+
+A=hostname
+
+then `$A` becomes something like "my-linux-vm" — the actual hostname.
+
+✅ Use backticks or `$(...)` to store command output in variables.
+
+---
+
+## 🔁 Using Multiple `read` Inputs
+
+We can collect more than one piece of information.
+
+server_name=hostname
+echo "Hello, my server name is $server_name"
+echo
+echo "What is your name?"
+read B
+echo
+echo "What is your profession?"
+read C
+echo
+echo "What is your favorite show?"
+read D
+echo
+echo "Hello $B, your profession, $C, is awesome."
+echo "$D is a good show."
+
+
+---
+
+## 🧪 Output Example
+
+Hello, my server name is my-linux-vm
+
+What is your name?
+Imran Afzal
+
+What is your profession?
+Engineer
+
+What is your favorite show?
+Seinfeld
+
+Hello Imran Afzal, your profession, Engineer, is awesome.
+Seinfeld is a good show.
+
+
+---
+
+## 🎯 Real-World Comparison
+
+This is just like an installer wizard that asks you:
+- What’s your name?
+- What’s your company name?
+- Do you accept the license?
+
+The answers are collected and used to customize the install process — just like variables in your script.
+
+---
+
+## 🧪 Bonus Practice
+
+Extend your script with more questions:
+
+echo "What is your age?"
+read AGE
+
+echo "Where are you from?"
+read CITY
+
+echo
+echo "Hello $B, age $AGE, from $CITY."
+
+
+---
+
+## ✅ Key Takeaways
+
+- Use `read` to collect user input.
+- Use `echo` to print output.
+- Store command output with backticks: `` VAR=`command` ``
+- Variable names can be anything — A, B, name, job, etc.
+- Interactive scripts are like little wizards.
+- You can output data, write to files, send emails, or store to DB.
+
+---
+
+## 📬 Final Words from Instructor
+
+- Try longer scripts with multiple `read` prompts.
+- Don’t worry about errors — trial and error is how we learn.
+- If you make a cool script, feel free to share it.
+- Keep practicing — there's so much you can do with simple input/output scripts.
+
+---
+

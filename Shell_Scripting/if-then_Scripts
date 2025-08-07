@@ -1,0 +1,170 @@
+# 🧾 Linux Shell Scripting – If-Then Scripts (Full Lecture Note)
+
+## 📌 Objective
+
+Learn how to:
+- Use `if`, `then`, `else`, and `fi` to control script flow
+- Compare variables and perform actions based on conditions
+- Check for file existence using conditional expressions
+- Automate decision-making inside shell scripts
+
+---
+
+## 🧱 Basic If-Then Example (Variable Check)
+
+We define a variable and check if it meets a specific condition.
+
+```
+count=100
+
+if [ $count -eq 100 ]
+then
+  echo "Count is 100"
+else
+  echo "Count is not 100"
+fi
+```
+
+📝 Explanation:
+- `if [ condition ]` evaluates the condition
+- `-eq` means “equal to” for numbers
+- `then` runs the block if the condition is true
+- `else` runs if the condition is false
+- `fi` ends the `if` block
+
+---
+
+## 🧪 Running the Script
+
+Set count to 100:
+
+```
+Count is 100
+```
+
+Change count to 1:
+
+```
+Count is not 100
+```
+
+Change output message:
+
+```
+else
+  echo "Sorry, the count is not 100"
+```
+
+Result:
+
+```
+Sorry, the count is not 100
+```
+
+✅ You can modify both variable and output as needed.
+
+---
+
+## 🔁 Reminder: fi
+
+- `fi` means the end of the `if` block.
+- It is required or your script won’t run properly.
+
+---
+
+## 📂 File Existence Check with `if -e`
+
+Useful for checking if a file exists before continuing.
+
+```
+clear
+if [ -e /home/iafzal/error.txt ]
+then
+  echo "File exists"
+else
+  echo "File does not exist"
+fi
+```
+
+📝 Explanation:
+- `-e` checks if the file exists
+- `clear` clears the terminal before running
+
+---
+
+## 🧪 Run the Script (File Absent)
+
+Before creating the file:
+
+```
+File does not exist
+```
+
+Create the file:
+
+```
+touch /home/iafzal/error.txt
+```
+
+Run again:
+
+```
+File exists
+```
+
+✅ This is useful in automated scripts to detect logs or trigger actions.
+
+---
+
+## 📅 Real-World Use Case
+
+System administrators use such scripts in `cron` jobs to:
+- Check if application-generated files are present
+- Trigger alerts if something is missing
+- Automate daily checks
+
+---
+
+## 🧪 Practice Script – Yes/No Interaction
+
+```
+echo "What is your name?"
+read NAME
+
+echo "Do you like working in IT? (yes/no)"
+read ANSWER
+
+if [ "$ANSWER" = "yes" ]
+then
+  echo "You are cool!"
+else
+  echo "You should try IT, it's just a good field."
+fi
+```
+
+📝 Explanation:
+- Takes two user inputs
+- Checks if the answer is `yes`
+- Responds accordingly
+
+---
+
+## ✅ Key Takeaways
+
+- Use `if`, `then`, `else`, `fi` for decision-making
+- Use `-eq`, `-ne`, `-lt`, `-gt`, `=`, `!=` to compare numbers or strings
+- Always close an `if` block with `fi`
+- Use `[ -e filepath ]` to check if a file exists
+- Conditional scripts are powerful for automation and maintenance
+
+---
+
+## 📬 Final Words from Instructor
+
+- Try writing these scripts yourself
+- Modify values and observe outputs
+- Practice makes perfect
+- Use scripts to automate checks and logic
+- Everything you need is in the resource files and handouts
+
+---
