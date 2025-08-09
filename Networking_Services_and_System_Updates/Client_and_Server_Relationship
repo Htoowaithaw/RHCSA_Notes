@@ -1,0 +1,64 @@
+# 🌐 Client-Server Relationship
+
+## 📖 Concept Overview
+- **Client** → The entity (computer or software) making a request.
+- **Server** → The entity (computer or software) fulfilling the request.
+- Both can be **physical machines** or **software programs** running on any operating system.
+- Communication happens over a network (Internet or local) using specific protocols like **HTTP** or **TCP/IP**.
+
+---
+
+## 🍔 Real-Life Analogy (McDonald's Example)
+- **You** order: "I would like a chicken sandwich, please." → **Client** (request maker)
+- **McDonald's** replies: "Here is your sandwich, sir." → **Server** (request fulfiller)
+- Servers can fulfill multiple types of requests (e.g., burgers, fries, shakes, cookies).
+
+---
+
+## 💻 Computer Science Perspective
+- **Client examples**:
+  - Web browsers (Chrome, Firefox)
+  - Mobile apps
+  - Software requesting data/services
+- **Server examples**:
+  - Web server
+  - Database server
+  - File server
+- **Services provided**:
+  - Web hosting
+  - Database management
+  - File sharing
+
+---
+
+## 📚 Wikipedia Definition
+- **Client**: A computer/program that sends requests to another program or hardware to access a service.
+- **Server**: Hardware/software that provides functionality to clients.
+- Relationship:  
+  - Client requests data/services.
+  - Server processes request and returns results.
+  - Uses **protocols** (e.g., HTTP, TCP/IP) for communication.
+
+---
+
+## 🌍 Example: Web Browsing Workflow
+1. **Client action**:
+   - User opens browser and enters a website URL.
+   - Browser sends an **HTTP request** to the server hosting the site.
+2. **Server processing**:
+   - Server receives the request.
+   - Retrieves the webpage and associated resources (images, videos, etc.).
+3. **Response**:
+   - Server sends back an **HTTP response** with the requested data.
+4. **Client rendering**:
+   - Browser displays the webpage to the user.
+5. **Interaction cycle**:
+   - Clicking links, submitting forms → New requests → Process repeats.
+
+---
+
+## 🗝️ Key Takeaways
+- **Client = Requester** | **Server = Provider**
+- Can be hardware or software.
+- Operate over networks using defined communication protocols.
+- Client-server interaction is the backbone of **distributed computing**.
