@@ -1,0 +1,99 @@
+# 📝 Linux Aliases – Shortcuts for Commands
+
+## 📌 What is an Alias?
+- An alias in Linux is a shortcut or nickname for a longer, repetitive command.
+- Makes commands easier to remember and faster to type.
+- Real-life analogy:
+  - **50 Cent** → Real name: Curtis James
+  - **Pitbull** → Real name: Armando Perez
+  - Aliases in Linux work the same way: short, memorable names for long commands.
+
+---
+
+## 🎯 Why Use Aliases?
+- Save time when running frequently used commands.
+- Avoid typing long, complex command strings repeatedly.
+- Combine multiple commands into one shortcut.
+
+---
+
+## 🛠 Creating and Using Aliases
+
+### Example 1: Simple Alias
+1. Without alias:  
+   `ls -al` → Shows all files (including hidden ones) in long listing format.
+2. Create alias:  
+   `alias l="ls -al"`
+3. Run `l` → Same output as `ls -al`.
+
+---
+
+### Example 2: Two Commands in One
+1. Without alias:  
+   `pwd` (print working directory)  
+   `ls` (list files)
+2. Create alias:  
+   `alias pl="pwd; ls"`
+3. Run `pl` → Executes both commands in sequence.
+
+---
+
+### Example 3: Three Commands
+- Suggested practice: Create an alias to run:
+  - `whoami`
+  - `hostname`
+  - `pwd`
+- Syntax:  
+  `alias whp="whoami; hostname; pwd"`
+
+---
+
+### Example 4: List Only Directories
+1. Command:  
+   `ls -l | grep ^d`  
+   - `grep ^d` → Filters output to only show entries starting with `d` (directories).
+2. Alias:  
+   `alias dir="ls -l | grep ^d"`
+3. Run `dir` → Lists only directories in the current location.
+
+---
+
+### Example 5: Complex Command with Variables
+1. Command sequence:
+   - `df -h` → Shows disk partitions, size, usage, and mount points.
+   - `awk '{print $6}'` → Prints the 6th column (mount points).
+   - `cut -c1-4` → Shows only the first 4 characters of each line.
+2. Problem: `$6` is treated as a shell variable in aliases — needs escaping with `\$6`.
+3. Alias:  
+   `alias d="df -h | awk '{print \$6}' | cut -c1-4"`
+4. Run `d` → Displays shortened mount point names.
+
+---
+
+## 📋 Viewing Aliases
+- `alias` → Lists all aliases currently active in the session.
+
+---
+
+## ❌ Removing Aliases
+- `unalias <name>` → Removes the specified alias.
+- Example:  
+  - `unalias d`
+  - `unalias dir`
+- Run `alias` again to verify they are gone.
+
+---
+
+## 💡 Key Takeaways
+- Aliases = shortcuts for long or repetitive commands.
+- Can combine multiple commands in one alias.
+- Escape `$` when dealing with variables in alias definitions.
+- Aliases are temporary — they only last for the current session unless added to shell configuration files (`~/.bashrc`, `~/.zshrc`).
+- Removing aliases is as simple as using `unalias`.
+
+---
+
+## 🧠 Practice Ideas
+- Create a personal `ll` alias for `ls -lh`.
+- Make an alias to quickly navigate to your most-used directory.
+- Combine commands like backup + compress into one alias.

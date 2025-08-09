@@ -1,0 +1,80 @@
+📝 Linux Aliases – User & Global Aliases
+
+Aliases in Linux are shortcuts for commands (for example, typing ll instead of ls -al). By default, aliases created with the alias command are temporary — they last only for the current terminal session. Once you log out or close your terminal/SSH session, they disappear. To make aliases permanent, they need to be saved in configuration files that are loaded whenever a shell session starts.
+
+There are two types of persistent aliases:
+
+1. User Aliases – These apply only to a specific user account and are saved in that user’s ~/.bashrc file (the home directory). Only that user will have access to them.
+
+2. Global Aliases – These apply to all users on the system and are saved in /etc/bashrc. Any user who logs in will be able to use them.
+🔹 Creating a Temporary Alias (Session Only)
+
+Example: Create hh to run hostname
+alias hh="hostname"
+Checking aliases in the current session: alias
+Now running hh will display the system hostname. This alias will disappear after logging out or starting a new session.
+👤 Creating a User Alias (Persistent for One User)
+
+    Log in as the target user.
+
+    Open the ~/.bashrc file in the home directory using a text editor.
+
+    Add the alias at the end of the file, for example:
+    # Personal Aliases
+    alias hh="hostname"
+
+    Save and close the file.
+
+    Open a new terminal session or reload the file with source ~/.bashrc.
+
+    Now hh works in any session for this user.
+
+🌍 Creating a Global Alias (Persistent for All Users)
+
+    Log in as root (required to edit system configuration files).
+
+    Open /etc/bashrc in a text editor.
+
+    Add the alias at the end of the file, for example:
+    # Global Aliases
+    alias hh="hostname"
+
+    Save and close the file.
+
+    Open a new terminal session for changes to take effect.
+
+    Test by logging in as any user — the alias should work system-wide.
+
+🧪 Testing a Global Alias with a New User
+
+    Create a new user: useradd james and set their password.
+
+    Log in as james in a new terminal session.
+
+    Run hh — the hostname should display, showing that the global alias works for all accounts.
+
+📋 Viewing and Removing Aliases
+
+    View all active aliases: alias
+
+    Remove an alias: unalias hh
+
+💡 Key Points to Remember
+
+    Temporary aliases vanish after logout.
+
+    User aliases belong in ~/.bashrc for one account only.
+
+    Global aliases belong in /etc/bashrc for everyone.
+
+    Changes require either a new session or reloading the configuration file with source.
+
+    Use comments in .bashrc or /etc/bashrc to keep aliases organized.
+
+🧠 Practice Ideas
+
+    Create a dir alias for ls -l | grep ^d in your ~/.bashrc.
+
+    Make a sysinfo global alias for uname -a.
+
+    Add multiple aliases for commands you use frequently, such as updates, navigation, or backups.

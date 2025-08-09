@@ -1,0 +1,19 @@
+Read all the hand-outs
+
+Create every script listed in hand-outs
+
+Create a script to the output of ls -ltr to a file called golisting
+
+Create a script to output "First day of Spring is March 20th"
+
+Create a script to create 5 different files from a thru e
+
+Create a script that will run commands, who, dmidecode, cal, and free
+
+Create a script that will touch a new file and then change its permissions to read, write and execute for everyone
+
+Create a script that will ask you for your parents name and then output your parents name on the screen as, Your parents names are .....
+
+Create a new file called empty and then write if-then statement to see if it can find any empty files in your home directory.  If yes then it should say "Your file exist"  If it does not then it should say "Your file does not exist"
+
+Write a case script that will give the option to the user to run commands as, top, iostat, free, /proc/cpuinfo, dmesg
