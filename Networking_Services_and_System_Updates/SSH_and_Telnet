@@ -1,0 +1,72 @@
+SSH and Telnet are two main Linux services for remote access.
+
+    Telnet:
+
+        Old, insecure protocol.
+
+        Rarely used today except for troubleshooting network issues.
+
+        Not installed by default (telnet command will show "command not found").
+
+        Can be installed with:
+
+        yum install telnet
+
+    SSH:
+
+        Secure, modern replacement for Telnet.
+
+        Comes with two package types:
+
+            Client → initiates connections.
+
+            Server → accepts connections.
+
+        Example: SSH into another server → your machine is the client, remote is the server.
+
+        Reverse roles in other cases (e.g., NTP sync).
+
+Basic SSH usage
+
+ssh <ip-address>
+
+    Can connect to the same system for multiple sessions.
+
+    Use exit to return to the original session.
+
+Checking sshd process
+
+ps -ef | grep sshd
+systemctl status sshd
+
+    /usr/sbin/sshd is the process that listens for incoming SSH connections.
+
+Controlling SSH access
+
+    Stop SSH service:
+
+systemctl stop sshd
+
+    Blocks new SSH logins.
+
+    Existing sessions remain active.
+
+Start SSH service:
+
+    systemctl start sshd
+
+        Restores SSH access.
+
+Example scenario
+
+    Check IP:
+
+    ip a
+
+    e.g., 192.168.1.12
+
+    Stop sshd → attempt to connect via PuTTY → “Connection refused”.
+
+    Start sshd → connection works again.
+
+Key point: Stopping/starting sshd is a quick way to block or allow remote SSH access for security control.

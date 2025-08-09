@@ -1,0 +1,241 @@
+# 🔐 Configure and Secure SSH in Linux
+
+## 📌 What is SSH?
+- **SSH** = Secure Shell — a secure protocol for remote access to Linux systems.
+- Provides an **encrypted** communication channel between client and server.
+- Runs as a service (daemon) called **`sshd`**.
+- Default port: **22**.
+
+---
+
+## 🖥️ Understanding the Shell
+- **Shell**: Interface between the **kernel** (controls hardware) and the user.
+- Accepts commands and passes them to the kernel.
+- Examples: **Bash**, **KornShell**, **C Shell**.
+- Shell prompt:
+  - Regular user: `$`
+  - Root user: `#`
+
+---
+
+## 📦 OpenSSH Package
+- Software package providing SSH functionality.
+- Installed by default on most Linux systems (e.g., RHEL, CentOS, Fedora).
+- Daemon: **`sshd`** (runs in the background, listens for connections).
+- Manage daemon:
+  ```bash
+  systemctl start sshd
+  systemctl stop sshd
+  systemctl restart sshd
+  systemctl status sshd
+🔒 Securing SSH — Best Practices
+1️⃣ Set Idle Timeout Interval
+
+    Purpose: Auto-disconnect idle sessions to prevent unauthorized access.
+
+    Steps:
+
+        Backup config file:
+
+cp /etc/ssh/sshd_config /etc/ssh/sshd_config-orig
+
+Edit config:
+
+vi /etc/ssh/sshd_config
+
+Add at the end:
+
+# Setting Timeout Interval
+ClientAliveInterval 600
+ClientAliveCountMax 0
+
+    600 seconds = 10 minutes (adjust as needed)
+
+Restart SSH:
+
+        systemctl restart sshd
+
+2️⃣ Disable Root Login
+
+    Prevent direct login as root for security.
+
+    Steps:
+
+vi /etc/ssh/sshd_config
+
+Find:
+
+PermitRootLogin yes
+
+Change to:
+
+PermitRootLogin no
+
+Restart SSH:
+
+    systemctl restart sshd
+
+3️⃣ Disable Empty Passwords
+
+    Prevent login for accounts without a password.
+
+    Steps:
+
+vi /etc/ssh/sshd_config
+
+Find:
+
+#PermitEmptyPasswords no
+
+Remove # to uncomment:
+
+PermitEmptyPasswords no
+
+Restart SSH:
+
+    systemctl restart sshd
+
+4️⃣ Limit SSH Access to Specific Users
+
+    Only allow selected users to log in via SSH.
+
+    Steps:
+
+vi /etc/ssh/sshd_config
+
+Add at the end:
+
+# Allow only specific users
+AllowUsers user1 user2 user3
+
+Restart SSH:
+
+    systemctl restart sshd
+
+5️⃣ Change SSH Port
+
+    Avoid default port 22 to reduce automated attacks.
+
+    Steps:
+
+vi /etc/ssh/sshd_config
+
+Find:
+
+#Port 22
+
+Change to:
+
+Port 2224
+
+Restart SSH:
+
+systemctl restart sshd
+
+Important: When connecting, specify new port:
+
+    ssh -p 2224 user@hostname
+
+💡 Summary
+
+    Always backup config files before editing.
+
+    Apply idle timeout to close unused sessions.
+
+    Disable root login and empty passwords for added security.
+
+    Restrict SSH access to only necessary users.
+
+    Consider changing the default SSH port.
+
+    Restart SSH after every configuration change.
+
+    Test changes before applying them in production.
+
+🧪 Practice Ideas
+
+    Configure a lab VM and test all the above SSH security changes.
+
+    Try logging in after each setting to verify behavior.
+
+    Use grep to quickly locate config parameters:
+
+grep -i 'PermitRootLogin' /etc/ssh/sshd_config
+grep -i 'Port' /etc/ssh/sshd_config
+
+Experiment with different timeout intervals and port numbers.
+
+
+
+🐧 Linux — See Ports & Processes
+1️⃣ Using ss (modern, recommended)
+
+sudo ss -tulpn
+
+    -t: TCP connections
+
+    -u: UDP connections
+
+    -l: Listening sockets
+
+    -p: Show process using the port
+
+    -n: Show numerical ports (not service names)
+
+Example output:
+
+Netid State  Recv-Q Send-Q Local Address:Port  Peer Address:Port  Process
+tcp   LISTEN 0      128   0.0.0.0:22         0.0.0.0:*            users:(("sshd",pid=1234,fd=3))
+
+2️⃣ Using netstat (older but still common)
+
+sudo netstat -tulpn
+
+    Requires net-tools package on some distros:
+
+sudo apt install net-tools   # Debian/Ubuntu
+sudo yum install net-tools   # RHEL/CentOS
+
+3️⃣ Using lsof (list open files)
+
+sudo lsof -i -P -n
+
+    -i: Internet connections
+
+    -P: Show port numbers instead of names
+
+    -n: Skip hostname resolution
+
+🪟 Windows — See Ports & Processes
+1️⃣ Using netstat
+
+Open Command Prompt (cmd) as Administrator:
+
+netstat -ano
+
+    -a: Show all connections and listening ports
+
+    -n: Show addresses and ports in numeric form
+
+    -o: Show PID (Process ID)
+
+Example:
+
+Proto  Local Address      Foreign Address    State       PID
+TCP    0.0.0.0:22         0.0.0.0:0          LISTENING   1234
+
+Find the program name by PID:
+
+tasklist /FI "PID eq 1234"
+
+2️⃣ Using PowerShell
+
+Get-Process -Id (Get-NetTCPConnection | Where-Object {$_.LocalPort -eq 22}).OwningProcess
+
+3️⃣ Using GUI (Resource Monitor)
+
+    Press Ctrl+Shift+Esc (Task Manager)
+
+    Go to Performance → Open Resource Monitor
+
+    Under Network tab, see Listening Ports.
