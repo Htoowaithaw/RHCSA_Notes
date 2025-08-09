@@ -1,0 +1,89 @@
+# 🎯 Case Statement Scripts in Bash
+
+## 📘 What is a Case Statement?
+- A **case statement** allows you to run different blocks of code based on **user input or variable values**.
+- It's like a **menu system** where the user chooses A, B, C, etc.
+- Useful for **interactive scripts** with multiple command options.
+- Similar to `if-elif-else`, but cleaner when handling multiple choices.
+
+## 🧾 Script Example (`case-script.sh`)
+```bash
+#!/bin/bash
+# This script is created by Imran Afzal (2018)
+
+echo
+echo "Please choose one of the options below:"
+echo "A = Display date and time"
+echo "B = List files and directories"
+echo "C = List users logged in"
+echo "D = Check system uptime"
+echo
+
+read -p "Enter your choice: " choice
+
+case $choice in
+  A|a)
+    date
+    ;;
+  B|b)
+    ls
+    ;;
+  C|c)
+    who
+    ;;
+  D|d)
+    uptime
+    ;;
+  *)
+    echo "Invalid choice. Bye!"
+    ;;
+esac
+```
+
+## 💡 Explanation
+| Option | What it Does |
+|--------|--------------|
+| `A`    | Runs `date` to display date & time |
+| `B`    | Runs `ls` to list files/directories |
+| `C`    | Runs `who` to show logged in users |
+| `D`    | Runs `uptime` to show system uptime |
+| `*`    | Default fallback for invalid options |
+
+- `read -p` → Prompts user to enter a choice.
+- `case ... in` → Evaluates the user’s input.
+- `;;` → Ends each case block.
+- `*)` → Default case for unmatched input.
+
+## 🔧 How to Use
+```bash
+chmod +x case-script.sh
+./case-script.sh
+```
+
+**Sample Run:**
+```
+Please choose one of the options below:
+A = Display date and time
+B = List files and directories
+C = List users logged in
+D = Check system uptime
+
+Enter your choice: A
+Wed Aug  8 14:02:01 UTC 2025
+```
+
+## 🧠 Key Takeaways
+- Great for **user menus** in terminal scripts.
+- Easily **maps a user option to a system command**.
+- Simplifies long chains of `if` statements.
+- `case` is **case-sensitive**, unless you handle both `A|a`, `B|b`, etc.
+
+## 🔍 Practice Ideas
+- Modify the script to add your own commands:
+  - `E = Show calendar (cal)`
+  - `F = Disk usage (df -h)`
+  - `G = Memory usage (free -m)`
+- Replace echo text with fun prompts like:
+  - A = “What is today’s date?”
+  - B = “Show me what’s in this folder.”
+- Use this in real scripts where user choice matters.

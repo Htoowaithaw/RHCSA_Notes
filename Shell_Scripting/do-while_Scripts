@@ -1,0 +1,95 @@
+## 📘 What is a Do-While Script?
+
+- A **do-while script** continuously executes a block of commands **while a condition is true**.
+- Similar to `for` loops, but used when the **number of repetitions is not fixed**.
+- Often used for scripts that:
+  - Run until a specific **time** or **value** is reached
+  - Keep running in the background like **daemons**
+- Structure:
+  ```bash
+  while [ condition ]
+  do
+    command1
+    command2
+    ...
+  done
+  ```
+
+---
+
+## 🧪 Example Use Case
+
+> ⏳ **Countdown script that waits and stops a process after 10 seconds**
+
+### 🧾 Script Example (`script-dowhile.sh`):
+```bash
+#!/bin/bash
+# This script stops a process after 10 seconds
+# Created by Imran Afzal, 2018
+
+count=0
+number=10
+
+while [ $count -lt $number ]
+do
+  echo "$((number - count)) seconds left to stop this process: $1"
+  echo
+  sleep 1
+  ((count++))
+done
+
+echo "$1 process is stopped."
+echo
+```
+
+---
+
+### 💡 Explanation:
+- `count=0` → start counting from 0
+- `number=10` → stop after 10 seconds
+- `while [ $count -lt $number ]` → loop runs until `count` becomes 10
+- `sleep 1` → wait for 1 second on each loop
+- `((count++))` → increase count by 1
+- `$1` → the first argument passed (name of the process to stop)
+
+---
+
+## 🔧 How to Use
+
+```bash
+chmod +x script-dowhile.sh
+./script-dowhile.sh apache2
+```
+
+Output will look like:
+```
+10 seconds left to stop this process: apache2
+
+9 seconds left to stop this process: apache2
+
+...
+
+1 seconds left to stop this process: apache2
+
+apache2 process is stopped.
+```
+
+---
+
+## 🧠 Key Takeaways
+
+- Useful when you **don’t know how many times** the script should run ahead of time.
+- Perfect for **timed scripts**, **watchdog scripts**, or **automated shutdowns**.
+- Commonly used in **system administration**, **automation**, and **cron jobs**.
+
+---
+
+## 🔍 Practice Tips
+
+- Try writing your own `do-while` script (e.g., until a user guesses a number).
+- Explore online examples:  
+  `do while loop bash examples`
+- Experiment with different loop conditions like:
+  - Time check using `date`
+  - File existence using `[ -f filename ]`
+  - Process running using `ps`, `pgrep`
