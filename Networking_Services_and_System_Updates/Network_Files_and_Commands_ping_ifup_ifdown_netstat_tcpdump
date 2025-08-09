@@ -1,0 +1,72 @@
+# Network files and commands — notes
+
+Purpose:
+bring a Linux system online, detect a network interface,
+assign an IP address, and enable host-to-host
+communication. Know the core config files and the basic
+commands used to verify and troubleshoot.
+
+Files to know:
+
+- /etc/nsswitch.conf  
+  Tells the system where to resolve names. Lines starting
+  with “#” are comments. Typical order for hosts lookups:
+  “files dns” (check /etc/hosts first, then DNS). Swap to
+  “dns files” if you want DNS first. Also points passwd,
+  shadow, and group lookups to local files.
+
+- /etc/hosts  
+  Local static name mapping. Add your IP and hostname
+  (example idea: “192.168.1.14 myfirstlinuxos”). After
+  that, “ping myfirstlinuxos” resolves locally. Think of
+  it as a tiny DNS on your machine.
+
+- /etc/sysconfig/network  
+  Can hold the hostname and some global network settings.
+  It might be empty if hostname was hardcoded elsewhere,
+  but you can still change it here if needed.
+
+- /etc/sysconfig/network-scripts/ifcfg-<interface>  
+  Per-interface config (example: ifcfg-enp0s3). The name
+  matches what you see in “ifconfig” or “ip a”. Common:
+  “BOOTPROTO=dhcp” for dynamic IP, or change to “static”
+  and define IPADDR, NETMASK, GATEWAY. This makes your IP
+  persistent across reboots.
+
+- /etc/resolv.conf  
+  DNS resolver configuration. Define “nameserver” entries.
+  When you visit something like “www.google.com”, the
+  system asks the DNS server listed here to translate the
+  name to an IP address.
+
+Commands to remember:
+
+- ping <host>  
+  Test reachability (e.g., an external site like
+  “www.hotmail.com”).
+
+- ifconfig / ip a  
+  Show interfaces and their IP addresses. Loopback is not
+  counted as a real external interface; focus on your main
+  device (e.g., enp0s3).
+
+- ifdown <iface> / ifup <iface>  
+  Bring an interface down or up when you need to disable or
+  re-enable networking on that device.
+
+- netstat (e.g., options r, b)  
+  View routing and see how traffic flows, including
+  gateways and which interface is used.
+
+- tcpdump -i <iface>  
+  Packet sniffer. Shows traffic entering and leaving the
+  interface you specify.
+
+Key reminders:
+
+- All of these files exist on standard Linux systems; you
+  will see them often in system administration.
+- Memorize where they live, what they do, and how to read
+  them. These are common interview topics.
+- Use “man” pages (e.g., “man ping”, “man tcpdump”) to
+  learn options and deepen familiarity.

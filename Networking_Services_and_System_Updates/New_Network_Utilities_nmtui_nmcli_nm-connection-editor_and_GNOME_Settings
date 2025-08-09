@@ -1,0 +1,91 @@
+# 🌐 NetworkManager & Modern Network Configuration Tools in Linux
+
+NetworkManager is the default network management service  
+in Red Hat 8 and Rocky Linux.  
+It replaces the older `network` service  
+and removes the need for manual editing  
+of configuration files.  
+
+It provides multiple tools:  
+**nmtui** (text user interface),  
+**nmcli** (command line),  
+**nm-connection-editor** (GUI),  
+and **GNOME Settings**.  
+
+**nmtui** is a menu-based tool  
+that runs in any terminal.  
+It allows editing, activating,  
+and creating network connections  
+without touching configuration files.  
+
+In a lab, take a VM snapshot,  
+enable Adapter 2 in VirtualBox  
+as a Bridged Adapter to simulate multiple NICs,  
+and then use `nmtui`  
+to deactivate old connections  
+and create a new team  
+(modern replacement for bonding).  
+
+When creating a team,  
+select "Add" → "Team",  
+give it a name like Team1,  
+add slave NICs (e.g., enp0s3, enp0s8),  
+and choose DHCP or manual IP.  
+DHCP assigns automatically;  
+manual lets you set IP, gateway, and DNS.  
+
+After saving, the team gets the IP  
+and the slave NICs remain without IPs.  
+You can test connectivity via SSH  
+using the team's IP.  
+`nmtui` also supports adding  
+Wi-Fi, bridges, tunnels, and more.  
+
+**nmcli** is the CLI alternative  
+and works well for scripting.  
+Use `nmcli`, `nmcli con show`,  
+or `nmcli device status`  
+to see interfaces.  
+
+To assign a static IP to enp0s3:  
+`nmcli connection modify enp0s3 ipv4.addresses 10.253.1.211/24`  
+
+Set the gateway:  
+`nmcli connection modify enp0s3 ipv4.gateway 10.253.1.1`  
+
+Set DNS:  
+`nmcli connection modify enp0s3 ipv4.dns 8.8.8.8`  
+
+Switch to manual:  
+`nmcli connection modify enp0s3 ipv4.method manual`  
+
+Restart the interface:  
+`nmcli connection down enp0s3`  
+then  
+`nmcli connection up enp0s3`  
+
+To add a secondary IP without removing the first:  
+`nmcli connection modify enp0s3 +ipv4.addresses 10.0.0.211/24`  
+
+Reload the connection or reboot  
+to see both IPs.  
+
+**nm-connection-editor** is a graphical editor  
+with the same functions as `nmtui`  
+but in GUI form.  
+You can manage existing connections,  
+create teams, set IPs, and configure slaves.  
+It only works on GUI systems.  
+
+**GNOME Settings** offers basic network management  
+within the desktop settings panel.  
+You can add, remove, or configure connections here.  
+Like nm-connection-editor,  
+it needs a desktop environment  
+and is uncommon on servers.  
+
+In production, **nmtui** is preferred  
+for quick interactive work,  
+and **nmcli** for automation or scripting.  
+GUI tools are user-friendly for desktops  
+but less common in enterprise servers.

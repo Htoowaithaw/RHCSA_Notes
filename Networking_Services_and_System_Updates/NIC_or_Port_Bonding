@@ -1,0 +1,179 @@
+ChatGPT said:
+🖧 NIC Bonding in Linux – Lecture Notes
+📌 Overview
+
+    NIC (Network Interface Card): Hardware component providing a network port for your computer.
+
+    NIC Bonding (Network Bonding): Aggregation of multiple NICs into a single bonded interface.
+
+    Purpose:
+
+        High availability & redundancy: If one NIC fails, traffic continues on the other.
+
+        Increased throughput: Combine bandwidth (e.g., 1Gbps + 1Gbps = 2Gbps).
+
+    Common interview topic for Linux networking roles.
+
+🛠️ Concepts
+
+    Bond interface: Virtual interface representing the combined NICs.
+
+    Bonding modes: Different strategies for load balancing, redundancy, or aggregation.
+
+    Mode 5 (Transmit Load Balancing - TLB): Distributes outbound traffic across NICs; inbound handled by the currently active NIC.
+
+    MIIMON: MII (Media Independent Interface) link monitoring frequency in milliseconds (e.g., 100ms to check link status).
+
+🖥️ Lab Setup in VirtualBox
+
+    Snapshot the VM before starting (so you can revert after).
+
+    Enable 2 NICs:
+
+        Go to Settings → Network.
+
+        Enable Adapter 2 → set to Bridged Adapter.
+
+    Start VM, log in, open terminal.
+
+🔍 Verifying NICs
+
+    Check interfaces:
+    ifconfig or ip a (on newer RHEL/CentOS).
+
+    Example interfaces:
+
+        enp0s3 (existing NIC)
+
+        enp0s8 (added NIC)
+
+📦 Bonding Driver Check
+
+    Check if bonding module is available:
+
+modinfo bonding | more
+
+    If output shows Ethernet Channel Bonding Driver version, bonding is already available.
+
+Load module (if not loaded):
+
+    modprobe bonding
+
+📄 Creating Bond Configuration
+
+    Create bond0 config file:
+
+vi /etc/sysconfig/network-scripts/ifcfg-bond0
+
+Example content:
+
+    TYPE=Bond
+    NAME=bond0
+    BONDING_MASTER=yes
+    BOOTPROTO=none
+    ONBOOT=yes
+    IPADDR=192.168.1.80
+    NETMASK=255.255.255.0
+    GATEWAY=<your_gateway_ip>
+    BONDING_OPTS="mode=5 miimon=100"
+
+        Ensure chosen IP is unused (test with ping).
+
+        BOOTPROTO=none or static both mean static IP.
+
+📝 Configuring Slave Interfaces
+
+    Edit first NIC (enp0s3):
+
+vi /etc/sysconfig/network-scripts/ifcfg-enp0s3
+
+Content:
+
+TYPE=Ethernet
+BOOTPROTO=none
+DEVICE=enp0s3
+ONBOOT=yes
+HWADDR=<MAC_of_enp0s3>
+MASTER=bond0
+SLAVE=yes
+
+Edit second NIC (enp0s8):
+
+    Easiest: copy first NIC file, rename, update device & MAC:
+
+        cp ifcfg-enp0s3 ifcfg-enp0s8
+        vi ifcfg-enp0s8
+
+        Change:
+
+            DEVICE=enp0s8
+
+            HWADDR=<MAC_of_enp0s8>
+
+🔄 Restart Network
+
+    Apply configuration:
+
+systemctl restart network
+
+Verify:
+
+    ifconfig | more
+
+        bond0 should show assigned IP.
+
+        enp0s3 and enp0s8 should show as SLAVE.
+
+📡 Testing Bond
+
+    Test connectivity via SSH using bond0 IP.
+
+    View bond details:
+
+    cat /proc/net/bonding/bond0
+
+        Shows mode, active slave, link status, and all bonded interfaces.
+
+♻️ Reverting VM
+
+    Power off VM.
+
+    Disable Adapter 2 in Settings → Network.
+
+    Restore snapshot to return to pre-lab state.
+
+💡 Key Takeaways
+
+    NIC bonding enhances availability and performance.
+
+    Configuration requires:
+
+        Bond master config (ifcfg-bond0)
+
+        Slave NIC configs pointing to the bond
+
+        Correct MAC addresses for each NIC
+
+    Common bonding modes:
+
+        Mode 0: Round-robin
+
+        Mode 1: Active-backup
+
+        Mode 2: XOR
+
+        Mode 4: LACP (802.3ad)
+
+        Mode 5: TLB
+
+        Mode 6: ALB
+
+    Always snapshot VM before network experiments to avoid lockouts.
+
+🧪 Practice Ideas
+
+    Try bonding with different modes (0, 1, 4, 6) and observe behavior.
+
+    Test NIC failover by disconnecting one adapter in VirtualBox.
+
+    Monitor link status changes with cat /proc/net/bonding/bond0 while toggling interfaces.
