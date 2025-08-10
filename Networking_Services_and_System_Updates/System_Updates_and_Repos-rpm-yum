@@ -1,0 +1,116 @@
+# 📦 Linux System Updates & Repositories (CentOS/RHEL)
+
+## 🗂️ Understanding Repositories (Repos)
+- **Repos** = Repositories — storage locations for software packages.
+- Contain URLs pointing to package sources (online mirrors or local servers).
+- Config files stored in:  
+  `/etc/yum.repos.d/`  
+  → Used by both `yum` (old) and `dnf` (new).
+
+---
+
+## ⚙️ Package Management Commands
+
+### 1️⃣ `dnf` (CentOS 8+, RHEL 8+)
+- Replacement for `yum` (CentOS 7 or earlier still uses `yum`).
+- Common in **CentOS/RHEL**; similar to `apt-get` in Debian/Ubuntu.
+- Can:
+  - Search for packages in configured repos.
+  - Download and install packages (plus dependencies).
+  - Remove packages.
+- Needs **internet access** unless using a local repo.
+- Syntax:
+  ```bash
+  dnf install <package>
+  dnf remove <package>
+
+    Example:
+
+    dnf install chrony    # Installs NTP replacement
+    dnf install httpd     # Installs Apache
+
+2️⃣ rpm (Red Hat Package Manager)
+
+    Older tool, still supported.
+
+    Works with already downloaded .rpm files (local install).
+
+    Does NOT auto-install dependencies (you must install them manually).
+
+    Common in offline environments.
+
+    Syntax:
+
+    rpm -ihv /path/to/package.rpm   # Install
+    rpm -e <package_name>           # Remove
+    rpm -qa                         # List all installed packages
+    rpm -qa | grep <keyword>        # Search installed packages
+
+    Options:
+
+        -i = install
+
+        -h = show progress
+
+        -v = verbose
+
+        -e = erase (remove)
+
+        -q = query
+
+        -a = all
+
+🔍 Checking Installed Packages
+
+    List all:
+
+rpm -qa
+
+Count installed packages:
+
+rpm -qa | wc -l
+
+Search for a specific package:
+
+    rpm -qa | grep bind
+
+📥 Installing Packages – Example
+
+dnf install bind
+
+    dnf checks:
+
+        If package exists locally.
+
+        If not, goes to repos defined in /etc/yum.repos.d/.
+
+    Downloads + installs + verifies + cleans up.
+
+🗑️ Removing Packages
+
+    With rpm:
+
+rpm -e bind
+
+With dnf:
+
+    dnf remove bind
+
+📝 Key Differences: dnf vs rpm
+Feature	dnf	rpm
+Downloads package?	✅ Yes	❌ No (local files only)
+Installs deps?	✅ Yes (auto dependency resolution)	❌ No (manual install required)
+Repo aware?	✅ Yes (online/local repos)	❌ No (works offline)
+Cleans up files?	✅ Yes (saves space)	❌ No
+💡 Tips
+
+    Always check your hostname before installing packages to ensure you’re on the correct server:
+
+    hostname
+
+    dnf is smarter and more convenient for online systems.
+
+    Use rpm mainly for offline or special package installs.
+
+    Dependencies = extra packages required for the main package to work.
+
