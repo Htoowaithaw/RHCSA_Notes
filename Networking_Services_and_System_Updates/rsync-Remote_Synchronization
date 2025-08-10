@@ -1,0 +1,117 @@
+# 🔄 rsync (Remote Synchronization) – Efficient File & Directory Transfer
+
+## 🌐 What is rsync?
+- **Definition**: Utility to efficiently transfer and synchronize files/directories between systems or locally.
+- **Efficiency**: Copies only the differences (changes) between source and destination (based on modification time & size).
+- **Uses**: Common for backups, mirroring, and incremental file transfers.
+- **Protocol**: Uses **SSH (port 22)** — no separate rsync server needed for basic usage.
+- **Speed Advantage**: Transfers only changed portions after the first full copy.
+
+---
+
+## 🖥️ Lab Setup
+- **Client**: `MyFirstLinuxVM` (source machine)
+- **Server**: `LinuxCentOS7` (destination machine)
+- **Both**: CentOS-based, same specs, SSH service running on server.
+
+---
+
+## 📦 rsync Syntax
+```sh
+rsync [options] source destination
+
+Common Options:
+
+    -a → archive mode (preserve permissions, timestamps, symlinks, etc.)
+
+    -v → verbose output
+
+    -z → compress during transfer
+
+    -h → human-readable numbers
+
+🛠️ Step-by-Step Examples
+1️⃣ Check & Install rsync
+
+rpm -qa | grep rsync    # Check if installed
+sudo yum install rsync  # Install if missing
+
+2️⃣ rsync a File Locally
+
+    Create a backup archive of home directory:
+
+cd /home/iafzal
+tar cvf backup.tar .
+
+Create destination folder:
+
+sudo mkdir -p /tmp/backups
+
+Copy file with rsync:
+
+rsync -zvh backup.tar /tmp/backups/
+
+Verify:
+
+    ls -ltr /tmp/backups/
+
+3️⃣ rsync a Directory Locally
+
+rsync -azvh /home/iafzal/ /tmp/backups/
+
+    Trailing slash (/) after source ensures contents are copied, not the directory itself.
+
+4️⃣ rsync a File to a Remote Server
+
+    On remote server: Create destination folder:
+
+mkdir -p /tmp/backups
+
+From client: Transfer file over SSH:
+
+rsync -avz backup.tar iafzal@192.168.1.58:/tmp/backups/
+
+Verify on remote server:
+
+    ls -ltr /tmp/backups/
+
+5️⃣ rsync a File from a Remote Server
+
+    On server: Create test file:
+
+cd /home/iafzal
+echo "Server-side file" > serverfile
+
+From client: Pull file from server:
+
+rsync -avzh iafzal@192.168.1.58:/home/iafzal/serverfile /tmp/backups/
+
+Verify locally:
+
+    ls -ltr /tmp/backups/
+
+📝 Key Points
+
+    Incremental Transfer: First run copies everything; subsequent runs copy only changes.
+
+    Default Port: 22 (via SSH).
+
+    Authentication: Uses SSH user accounts & credentials.
+
+    Versatility:
+
+        Local ↔ Local
+
+        Local → Remote
+
+        Remote → Local
+
+    Backup Friendly: Common in cron jobs for daily backups.
+
+    Trailing Slash Behavior:
+
+        /src/ → copies contents of src dir.
+
+        /src → copies the src dir itself.
+
+✅ rsync is ideal when you need fast, repeatable, and incremental file transfers or backups, especially over SSH.
