@@ -1,0 +1,158 @@
+# 📂 FTP (File Transfer Protocol) – Linux Server & Client Setup
+
+## 🌐 What is FTP?
+- **Definition**: Standard network protocol for transferring files between a client and a server over a network.
+- **Model**: Client-Server architecture with separate control and data connections.
+- **Purpose**: Moves files from **Server A → Server B** (or vice versa) following a set of predefined rules (ports, encryption, commands).
+- **Default Port**: `21` (like SSH uses `22`, DNS uses `53`).
+
+---
+
+## 🖥️ Lab Setup
+- **Two Linux VMs** (CentOS)
+  - Example names: `MyFirstLinuxVM` (client) & `LinuxCentOS7` (server)
+  - Specs: 1 GB RAM, 10 GB disk, same OS version
+- One will act as **FTP Server**, the other as **FTP Client**.
+
+---
+
+## 🛠️ FTP Server Setup (VSFTPD)
+
+1. **Login as root**  
+   ```sh
+   su -
+   whoami
+
+    Check if VSFTPD is installed
+
+rpm -qa | grep vsftpd
+
+Check internet connection
+
+ping www.google.com
+
+Install FTP server package
+
+yum install vsftpd -y
+
+Backup configuration file
+
+cd /etc/vsftpd
+cp vsftpd.conf vsftpd.conf.orig
+
+Edit configuration (vi vsftpd.conf)
+
+    anonymous_enable=NO (disable anonymous login)
+
+    Uncomment ASCII settings:
+
+ascii_upload_enable=YES
+ascii_download_enable=YES
+
+Edit banner (optional):
+
+ftpd_banner=Welcome to my FTP server
+
+At the end, add:
+
+    # Local time
+    use_localtime=YES
+
+Start & enable service
+
+systemctl start vsftpd
+systemctl enable vsftpd
+systemctl status vsftpd
+
+Disable firewall for lab (⚠️ not for production)
+
+systemctl stop firewalld
+systemctl disable firewalld
+
+(For production, add a firewall rule to allow port 21 instead)
+
+Ensure user exists
+
+    id yourusername || useradd yourusername
+
+💻 FTP Client Setup
+
+    Login as root
+
+su -
+
+Check internet
+
+ping www.google.com
+
+Install FTP client
+
+yum install ftp -y
+
+Verify FTP command works
+
+ftp
+bye
+
+Return to normal user
+
+exit
+
+Create a test file
+
+    touch Kruger
+    ls -ltr > Kruger   # Add some content
+    cat Kruger
+
+📤 File Transfer (Client → Server)
+
+    Find server IP (on server)
+
+ifconfig  # or ip a
+
+Example: 192.168.1.58
+
+Connect via FTP (from client)
+
+ftp 192.168.1.58
+
+    Enter username (default: current user)
+
+    Enter password
+
+Set transfer mode
+
+bin   # binary mode
+hash  # show progress with hashes
+
+Upload file
+
+put Kruger
+
+Exit FTP
+
+bye
+
+Verify on server
+
+    ls -ltr  # Should see Kruger file
+
+📝 Key Points to Remember
+
+    Port: FTP uses 21 by default.
+
+    Server Software: vsftpd package.
+
+    Client Software: ftp package.
+
+    Anonymous Access: Disabled for security (anonymous_enable=NO).
+
+    Always use binary mode for file transfers to prevent corruption.
+
+    Firewalls: Open port 21 or disable in a lab.
+
+    Testing: Create a small text file to confirm transfer works.
+
+    Roles: Sender acts as client, receiver acts as server.
+
+✅ After following these steps, you’ll have a fully functional FTP setup between two Linux machines for file transfers.
