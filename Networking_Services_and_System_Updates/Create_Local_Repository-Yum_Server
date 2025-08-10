@@ -1,0 +1,116 @@
+# 📀 Creating a Local Repository from DVD in Linux
+
+## 📌 What is a Repository?
+- A repository is a storage location for software packages (RPMs) that you can install on your system.
+- Normally, Linux systems fetch packages from online repositories via the internet.
+- If **no internet** is available, you can use a **local repository**.
+- Some companies use a **Red Hat Satellite Server** to host local repos, but if that's not available, you can create one yourself using a DVD/ISO.
+
+---
+
+## 🛠 Why Create a Local Repository?
+- To install software without internet access.
+- To avoid depending on external servers.
+- Useful for secure or isolated environments.
+
+---
+
+## 🛠 Tool for Creating Local Repo
+- **Command:** `createrepo_c` (CentOS 8+; must be installed manually).
+- **Older CentOS (≤7):** use `createrepo` (installed by default).
+- Install:
+  ```bash
+  dnf install createrepo_c
+
+📋 Steps to Create a Local Repository from DVD
+1️⃣ Prepare the Environment
+
+    Create a snapshot of your VM (safety rollback point).
+
+    Mount the DVD/ISO:
+
+        Menu → Devices → Optical Drives → Choose CentOS ISO.
+
+        Auto-mount path: /run/media/<user>/CentOS-Stream-<version>
+
+        Verify:
+
+    df -h
+
+        Look for /dev/sr0 or /dev/cdrom.
+
+Manual mount (if needed):
+
+    mount /dev/cdrom /mnt
+
+2️⃣ Create a Local Directory for Repo
+
+mkdir /localrepo
+ls -ltr /       # verify
+
+3️⃣ Copy RPM Packages from DVD to Local Repo
+
+    Navigate to DVD’s Packages directory:
+
+cd /run/media/<user>/CentOS-Stream-<version>/AppStream/Packages
+
+Check size & count:
+
+du -sh .
+ls -ltr | wc -l
+
+Ensure enough disk space:
+
+df -h
+
+Copy all packages to local repo:
+
+    cp /run/media/<user>/CentOS-Stream-<version>/AppStream/Packages/* /localrepo/
+
+4️⃣ Remove Existing Repo Configurations
+
+rm -f /etc/yum.repos.d/*
+
+⚠ Caution: This will remove internet-based repos; ensure you have a snapshot.
+5️⃣ Create New Local Repo Configuration
+
+    Create /etc/yum.repos.d/local.repo with:
+
+    [CentOS9]
+    name=CentOS9
+    baseurl=file:///localrepo
+    enabled=1
+    gpgcheck=0
+
+6️⃣ Generate Repo Metadata
+
+createrepo_c /localrepo
+
+    Scans the folder & prepares it as a repository.
+
+7️⃣ Clean & Verify Repo
+
+dnf clean all
+dnf repolist all
+
+    Should show:
+
+    repo id      : CentOS9
+    repo name    : CentOS9
+    status       : enabled
+
+8️⃣ Test Installation from Local Repo
+
+dnf install httpd
+
+    Should install directly from /localrepo without internet.
+
+📌 Summary
+
+    DVD/ISO → Copy Packages → Configure Local Repo → Generate Metadata → Test
+
+    No internet is needed after setup.
+
+    Useful in secure environments or isolated networks.
+
+    Always verify disk space before copying.

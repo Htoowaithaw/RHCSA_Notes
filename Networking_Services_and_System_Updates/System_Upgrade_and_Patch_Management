@@ -1,0 +1,95 @@
+# 🖥️ System Upgrade & Patch Management in Linux
+
+## 📌 Overview
+Upgrading and patching your Linux system is an essential maintenance task.  
+- Companies often perform upgrades or apply patches quarterly, based on policy.  
+- Two main types of upgrades:  
+  1. **Major version upgrade** → e.g., 7 → 8, 8 → 9  
+  2. **Minor version upgrade** → e.g., 9.0 → 9.1 → 9.2 → 9.3  
+
+---
+
+## 🔹 Checking Your Linux Version
+You should **always know what version you’re running** before upgrading.  
+Common commands:  
+```sh
+cat /etc/redhat-release
+uname -a
+
+Example:
+
+    CentOS Stream 9 → follows a rolling release model (no minor versions like 9.1 or 9.2).
+
+    CentOS 8 & older → have minor versions (8.1, 8.2, etc.).
+
+    RHEL (Red Hat Enterprise Linux) → also has minor versions (9.1, 9.2, etc.).
+
+📌 Major vs Minor Upgrades
+Upgrade Type	Example	How to Do It	Notes
+Major	7 → 8, 8 → 9	Cannot be done with dnf. Usually requires full backup, build new server, migrate data.	Cumbersome; better to plan carefully.
+Minor	9.0 → 9.1, 9.2, 9.3	Can be done with dnf update or dnf upgrade	Easier & stays in same channel.
+⚙️ dnf update vs dnf upgrade
+Command	Behavior
+dnf update	Updates packages but preserves old versions (keeps older package files). Useful for rollback.
+dnf upgrade	Updates and removes old versions. Completely replaces with new package.
+
+Example:
+
+# Preserve old packages
+sudo dnf update
+
+# Replace old packages completely
+sudo dnf upgrade
+
+🚀 Updating Your System
+
+Basic command:
+
+sudo dnf update -y
+
+    -y → automatically answers “yes” to all prompts.
+
+Steps During Update:
+
+    Dependency Check → Ensures required packages are also updated.
+
+    Download Packages → Retrieves new/updated versions from repositories.
+
+    GPG Key Verification → Confirms packages are from trusted sources.
+
+    Install Updates → Applies changes to system.
+
+    Cleanup → Removes unnecessary cached files.
+
+🌐 Internet Access Check
+
+Before running updates, make sure your system can access repositories:
+
+ping google.com
+
+    If you get replies (64 bytes from ...), you have internet access.
+
+    Without internet, dnf cannot connect to the repository.
+
+📝 Key Points to Remember
+
+    Always check version before upgrading.
+
+    Major upgrades require a rebuild; minor upgrades are easy with dnf.
+
+    Use dnf update if you want to keep old packages for rollback.
+
+    Use dnf upgrade if you want a complete replacement of packages.
+
+    Always verify internet access before running updates.
+
+    GPG verification ensures package authenticity and prevents installing malicious software.
+
+💡 Tip
+
+System updates can take a long time depending on the number of packages.
+If you want it to run unattended:
+
+sudo dnf update -y
+
+This skips prompts and updates everything automatically.
