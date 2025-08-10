@@ -1,0 +1,90 @@
+# 🌐 wget – Download Files from the Web in Linux
+
+## 📖 What is wget?
+- **Definition**: Command-line tool in Linux for downloading files from the internet using a given URL.
+- **Name meaning**:  
+  - **W** → World Wide Web  
+  - **get** → retrieve a file
+- **Usage**: Ideal when a package is not available in your default repositories and must be fetched from a third-party source.
+
+---
+
+## 🖥️ Why use wget instead of `yum`?
+- Normally, `yum install <package>` downloads from configured repositories (mirrors).
+- If the package **does not exist** in those repositories, yum will fail with:
+
+No package <name> available
+
+- Some packages are hosted only on **third-party vendor websites**.
+- **Solution**: Use `wget` to directly download the file from its full URL.
+
+---
+
+## ⚙️ wget Syntax
+```sh
+wget <full_file_URL>
+
+    <full_file_URL>: Must be the complete direct download link (ending with .tar, .zip, .rpm, .msi, etc.).
+
+🛠️ Example Scenario – Download PuTTY Source for Linux
+1️⃣ Attempt install via yum (fails)
+
+sudo yum install putty
+# Result: No package putty available
+
+2️⃣ Find direct download link
+
+    Search online (e.g., “Download PuTTY”).
+
+    Locate the Unix source archive link.
+
+    Right-click → Copy Link Location.
+
+Example URL:
+
+https://the.official.site/path/to/putty-0.x.y.tar.gz
+
+3️⃣ Download using wget
+
+wget https://the.official.site/path/to/putty-0.x.y.tar.gz
+
+    Connects to server and downloads file.
+
+    Output shows progress, size, and speed.
+
+4️⃣ Verify download
+
+pwd          # Check current directory
+ls -ltr      # Should see the downloaded file
+
+Example:
+
+putty-0.x.y.tar.gz
+
+📝 Key Points
+
+    Default behavior: Saves file in the current working directory.
+
+    Advantages:
+
+        Works without GUI.
+
+        Can download from any accessible web server.
+
+        Supports large files and resumes downloads (-c flag).
+
+    Common options:
+
+        -c → Continue incomplete downloads.
+
+        -O <filename> → Save as a specific filename.
+
+        --limit-rate=<speed> → Limit download speed.
+
+✅ Use wget when:
+
+    The software/package is not in yum/apt repositories.
+
+    You have a direct download link.
+
+    You want to download files straight into your server without needing a browser.
