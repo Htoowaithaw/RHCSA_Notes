@@ -1,0 +1,104 @@
+🌐 Curl and Ping Commands in Linux
+📌 Purpose
+
+curl and ping are two basic but essential commands for troubleshooting network issues.
+They help verify if a host, service, or webpage is reachable from your system.
+🧠 Why They’re Important
+
+    Scenario: A user says, “The server is down” or “I can’t access a website.”
+
+    As a sysadmin, first step is to check connectivity yourself.
+
+    If Linux has no GUI browser, curl and ping are quick command-line tools to check reachability.
+
+🔍 Curl Overview
+
+    Name meaning: c + URL → works with URLs.
+
+    Purpose: Access and retrieve data from a URL.
+
+    Use case:
+
+        Check if a webpage is up (returns HTML source code).
+
+        Download files when wget is not available.
+
+    Examples:
+
+        Check webpage status:
+
+curl http://www.google.com
+
+    If HTML source code appears, the page is reachable.
+
+Download file:
+
+        curl -O https://example.com/file.tar.gz
+
+            Saves file in the current directory.
+
+            -O = output to a file with the same name as on the server.
+
+📡 Ping Overview
+
+    Purpose: Check if a host is reachable at the network level.
+
+    How it works:
+
+        Sends ICMP echo requests to the target host.
+
+        Displays reply times and packet loss.
+
+    Examples:
+
+        Ping by hostname:
+
+ping www.google.com
+
+    Resolves to IP and sends packets until stopped with Ctrl+C.
+
+Ping by IP:
+
+    ping 216.58.217.68
+
+Windows difference:
+
+    By default, Windows pings only 4 times.
+
+    Use:
+
+        ping -t www.google.com
+
+        to ping continuously.
+
+📂 Practical Use Cases
+
+    Check server availability:
+
+        ping → is the host up?
+
+    Check webpage availability:
+
+        curl → is the web service up?
+
+    Download files without browser:
+
+        curl -O → get files via direct link.
+
+💡 Troubleshooting Tips
+
+    If ping works but curl fails → host is reachable, but the web service may be down.
+
+    If both fail → possible network issue or firewall blocking traffic.
+
+    Combine with nslookup to verify DNS resolution:
+
+    nslookup www.google.com
+
+✅ Summary
+
+    Ping → Checks network connectivity (host up/down).
+
+    Curl → Checks service/webpage availability and can download files.
+
+    Together, they are first-line tools in network troubleshooting.

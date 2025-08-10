@@ -1,0 +1,107 @@
+# 📡 SS Command in Linux
+
+## 📌 What is `ss`?
+- **`ss`** = Socket Statistics command.
+- Shows active network connections, listening ports, and socket details.
+- Useful for troubleshooting network issues and monitoring performance.
+- Installed by default in most Linux distros (comes with `iproute2` package).
+- Replaces older tool `netstat` (more efficient, more detailed).
+
+---
+
+## 🧠 Simple Analogy
+- Think of **sockets** like phone lines between computers/programs.
+- `ss` lets you “look inside” these lines to see who’s talking to whom, on what port, and how.
+- Helps spot slowdowns, unwanted connections, or network issues.
+
+---
+
+## 🔌 Types of Sockets
+- **TCP (Transmission Control Protocol)**  
+  Reliable, connection-oriented, used for web, email, file transfers.
+- **UDP (User Datagram Protocol)**  
+  Faster, connectionless, no delivery check, used for streaming, gaming, VoIP.
+- **UNIX Sockets**  
+  Communication between processes on the same machine (local IPC).
+
+---
+
+## 📜 Output Columns
+When you run `ss`, you’ll see:
+1. **Netid** → Protocol (TCP, UDP, UNIX, etc.)
+2. **State** → Connection status (e.g., ESTAB, LISTEN)
+3. **Recv-Q** → Packets waiting to be received
+4. **Send-Q** → Packets waiting to be sent
+5. **Local Address:Port** → Your system’s IP/port
+6. **Peer Address:Port** → Remote system’s IP/port
+7. **Process** → Which process owns the connection
+
+---
+
+## 🛠 Common `ss` Options
+- **Show all connections**  
+  ```bash
+  ss
+  ss | more
+
+    TCP only
+
+ss -t
+
+UDP only
+
+ss -u
+
+UNIX sockets only
+
+ss -x
+
+Listening sockets only
+
+    ss -l
+
+    Combine filters
+
+        TCP + Listening: ss -tl
+
+        TCP + Listening + Numeric output: ss -tln
+
+📝 Examples
+
+    Show TCP listening ports in numeric form:
+
+ss -tln
+
+Show UDP listening ports:
+
+ss -uln
+
+Show UNIX domain sockets:
+
+ss -x
+
+Show which process is using a port:
+
+    ss -tulpn
+
+💡 Tips
+
+    Use man ss to explore all options.
+
+    Combine with filters like grep to find specific ports:
+
+    ss -tln | grep -w ':22'
+
+    ss is fast and can be scripted for monitoring.
+
+    Knowing ss well is essential for Linux system admins and network engineers.
+
+✅ Summary
+
+    ss = Modern replacement for netstat, shows socket/network connection info.
+
+    Useful for diagnosing slow network or unknown connections.
+
+    Supports filtering by protocol, state, port, and more.
+
+    Essential tool for both day-to-day admin work and troubleshooting.
