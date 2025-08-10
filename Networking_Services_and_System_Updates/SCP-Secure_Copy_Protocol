@@ -1,0 +1,105 @@
+# 🔐 SCP (Secure Copy Protocol) – Secure File Transfer in Linux
+
+## 🌐 What is SCP?
+- **Definition**: SCP transfers computer files securely between hosts over a network.
+- **Security**: Encrypts transfer and authentication (unlike FTP, which is plain text by default).
+- **Protocol**: Uses **SSH (port 22)** — no separate protocol, piggybacks on SSH.
+- **Usage**: Works for:
+  - **Client → Server** (upload)
+  - **Server → Client** (download)
+
+---
+
+## 🖥️ Lab Setup
+- **Two Linux machines**:
+  - Client: `MyFirstLinuxVM`
+  - Server: `LinuxCentOS7`
+- **Client**: Machine where the file originates.
+- **Server**: Destination machine where the file will be copied.
+
+---
+
+## 📦 SCP Workflow (Client → Server)
+1. **Prepare file on client**
+   ```sh
+   cd ~
+   touch Jack
+   vi Jack
+   # Add some content, e.g.:
+   Jack is Jerry's uncle
+
+Verify:
+
+ls -ltr
+cat Jack
+
+    Get server’s IP
+
+        On the server:
+
+ifconfig enp0s3   # or: ip a
+
+Example output:
+
+    inet 192.168.1.58
+
+Run SCP command from client
+
+scp Jack iafzal@192.168.1.58:/home/iafzal
+
+    Jack → file to transfer.
+
+    iafzal → existing user on the remote server.
+
+    192.168.1.58 → server’s IP.
+
+    /home/iafzal → destination directory on server.
+
+First-time connection prompt:
+
+    Accept server fingerprint by typing yes.
+
+    Enter the remote user’s password.
+
+Transfer output:
+
+    Jack                            100%   22     0.0KB/s   00:00
+
+📥 Verify on Server
+
+    Log in as the target user:
+
+    whoami     # Should be iafzal
+    pwd        # Should be /home/iafzal
+    ls -ltr    # Should see Jack file
+    cat Jack   # Verify file content
+
+🔄 Reverse Transfer (Server → Client)
+
+From client, run:
+
+scp iafzal@192.168.1.58:/home/iafzal/Jack /home/youruser/
+
+📝 Key Points
+
+    Default Port: 22 (same as SSH)
+
+    Authentication: Uses SSH user accounts/passwords or keys.
+
+    Security: Data and credentials encrypted during transfer.
+
+    Direction:
+
+        Upload: scp localfile user@remote:/path/
+
+        Download: scp user@remote:/path/file localpath/
+
+    First-time connection: Requires fingerprint acceptance.
+
+    File paths:
+
+        If omitted, defaults to the user’s home directory.
+
+        Use absolute paths for clarity.
+
+✅ SCP is ideal when you already have SSH access to a server and want a quick, secure file transfer without setting up extra services.
