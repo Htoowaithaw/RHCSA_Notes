@@ -1,0 +1,204 @@
+# 🌐 DNS (Domain Name System) – Installation & Configuration in RHEL/CentOS/Rocky
+
+DNS is a service that translates **hostnames ↔ IP addresses** so humans can use readable names instead of remembering numbers.
+
+---
+
+## 📖 What is DNS?
+- **Purpose**: Translate hostnames to IP addresses and vice versa.
+- **Key Record Types**:
+  - **A Record** – Hostname → IP address.
+  - **PTR Record** – IP address → Hostname (reverse lookup).
+  - **CNAME Record** – Hostname → Another hostname (alias).
+
+💡 Example:  
+`google.com` can point to multiple actual servers with different hostnames via CNAME.
+
+---
+
+## 📂 Important DNS Files & Directories
+- `/etc/named.conf` – Main configuration file for `named` (DNS daemon).
+- `/var/named/` – Contains zone files (forward and reverse lookup definitions).
+- Package name: `bind` (DNS server) and `bind-utils` (tools like `dig`).
+
+---
+
+## ⚙️ Service & Process Names
+- **DNS** → The concept/system.
+- **bind** → The package providing DNS service.
+- **named** → The daemon (service) that runs DNS.
+
+---
+
+## 🖥 Lab Setup
+- **Domain Name**: `lab.local`
+- **IP**: Example `192.168.100.153` (assigned to `enp0s3`)
+- **Server Role**: Master DNS server + client on same machine.
+- **Forward Lookup Zone**: Hostname → IP (forward.lab)
+- **Reverse Lookup Zone**: IP → Hostname (reverse.lab)
+- **Static IP** recommended (DHCP IP may break config after reboot).
+- **Optional**: Set up a secondary/slave server for redundancy.
+
+---
+
+## 🛠 Installation Steps
+
+### 1️⃣ Check Existing Bind Packages
+```sh
+rpm -qa | grep bind
+
+2️⃣ Install DNS Server & Tools
+
+dnf install bind bind-utils -y
+
+3️⃣ Verify Installation
+
+rpm -qa | grep bind
+
+📝 Configuration Steps
+4️⃣ Edit /etc/named.conf
+
+vi /etc/named.conf
+
+    In options block:
+
+listen-on port 53 { 192.168.100.153; };
+
+Add forward lookup zone:
+
+zone "lab.local" IN {
+    type master;
+    file "forward.lab";
+    allow-update { none; };
+};
+
+Add reverse lookup zone:
+
+    zone "1.168.192.in-addr.arpa" IN {
+        type master;
+        file "reverse.lab";
+        allow-update { none; };
+    };
+
+5️⃣ Create Zone Files
+
+cd /var/named
+touch forward.lab reverse.lab
+
+6️⃣ Forward Zone File (/var/named/forward.lab)
+
+$TTL 86400
+@   IN  SOA masterdns.lab.local. root.lab.local. (
+        1        ; Serial
+        3600     ; Refresh
+        1800     ; Retry
+        1209600  ; Expire
+        86400    ; Minimum TTL
+)
+    IN  NS  masterdns.lab.local.
+masterdns   IN  A   192.168.100.153
+clienta     IN  A   192.168.1.240
+clientb     IN  A   192.168.1.241
+
+7️⃣ Reverse Zone File (/var/named/reverse.lab)
+
+$TTL 86400
+@   IN  SOA masterdns.lab.local. root.lab.local. (
+        1
+        3600
+        1800
+        1209600
+        86400
+)
+    IN  NS  masterdns.lab.local.
+240 IN  PTR clienta.lab.local.
+241 IN  PTR clientb.lab.local.
+153 IN  PTR masterdns.lab.local.
+
+🔒 Permissions & SELinux
+
+chown root:named /var/named/forward.lab
+chown root:named /var/named/reverse.lab
+restorecon /var/named/forward.lab
+restorecon /var/named/reverse.lab
+
+🚀 Start & Enable DNS Service
+
+systemctl start named
+systemctl enable named
+
+🔥 Firewall & Port 53
+
+    Disable firewall (lab only):
+
+systemctl stop firewalld
+
+Or allow DNS port in firewall (production):
+
+    firewall-cmd --permanent --add-port=53/tcp
+    firewall-cmd --permanent --add-port=53/udp
+    firewall-cmd --reload
+
+✅ Validate Config & Zones
+
+named-checkconf /etc/named.conf
+named-checkzone lab.local /var/named/forward.lab
+named-checkzone 1.168.192.in-addr.arpa /var/named/reverse.lab
+
+🌐 Configure Network to Use New DNS
+
+Edit:
+
+vi /etc/NetworkManager/system-connections/enp0s3.nmconnection
+
+Add:
+
+dns=192.168.100.153;
+
+Restart NetworkManager:
+
+systemctl restart NetworkManager
+
+🖋 Edit /etc/resolv.conf
+
+nameserver 192.168.100.153
+
+🔍 Testing
+Forward Lookup
+
+dig masterdns.lab.local
+nslookup masterdns.lab.local
+
+Reverse Lookup
+
+dig -x 192.168.1.240
+nslookup 192.168.1.240
+
+➕ Adding New Hosts
+
+    Edit /var/named/forward.lab:
+
+clientc IN A 192.168.1.242
+
+Edit /var/named/reverse.lab:
+
+242 IN PTR clientc.lab.local.
+
+Increment serial number in both zone files.
+
+Restart DNS:
+
+    systemctl restart named
+
+📌 Key Notes
+
+    Always increment the Serial in zone files after changes.
+
+    Use static IP for DNS server in real environments.
+
+    For DHCP IP labs, revert snapshot after testing.
+
+    dig gives more detail than nslookup.
+
+    In production: secure with firewall rules, restrict allow-update.
+

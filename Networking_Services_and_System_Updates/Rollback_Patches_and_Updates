@@ -1,0 +1,98 @@
+# 🔄 Rolling Back Updates & Patches in CentOS/RHEL
+
+As a system administrator/engineer, you must keep systems updated with security patches and software updates. Sometimes updates cause **compatibility issues** with applications or databases, requiring a rollback.
+
+---
+
+## 🛡 Best Practices Before Updates
+- **If using a Virtual Machine (VM)**:
+  - Always take a **snapshot** before updates or package installs.
+  - If issues occur, **revert to snapshot** for a quick recovery.
+- **If using a Physical Machine**:
+  - No snapshot option — rely on package rollback methods or reinstall the OS.
+  - Rolling back full system updates on physical machines is risky.
+
+---
+
+## 📌 Key Differences: `yum update` vs `yum upgrade`
+- **`yum update`**  
+  - Updates packages but **preserves older versions**.  
+  - Allows rollback.
+- **`yum upgrade`**  
+  - Updates packages and **removes obsolete ones**.  
+  - Rollback usually **not possible**.
+
+---
+
+## 🔙 Rolling Back a Single Package
+1. **Install a package** (example: `screen`):
+```sh
+yum install screen
+rpm -qa | grep screen   # Verify installation
+
+    Check yum history:
+
+yum history
+
+    Note the transaction ID for the install.
+
+    Undo the transaction:
+
+yum history undo <ID>
+
+    Verify removal/downgrade:
+
+rpm -qa | grep screen
+
+🔙 Rolling Back a Full System Update
+
+    ⚠ Not recommended — may leave system unstable. Use only if absolutely necessary and preferably with VM snapshots.
+
+    Run update:
+
+yum update
+
+    Example: 159 packages updated.
+
+    Check history:
+
+yum history
+
+    Find transaction ID for the update.
+
+    Undo update:
+
+yum history undo <ID>
+
+    Will list all downgrades/removals.
+
+    y to confirm.
+
+    If rollback fails:
+
+    Revert to VM snapshot or
+
+    Reinstall the OS with compatible version.
+
+💡 Red Hat/CentOS Recommendation
+
+    Downgrading between minor versions (e.g., RHEL 7.1 → 7.0) is NOT recommended on a running system.
+
+    For stability:
+
+        Use VM snapshot revert if possible.
+
+        For physical systems, reinstall to desired version instead of downgrading.
+
+📝 Summary
+
+    Always snapshot VMs before changes.
+
+    Prefer yum update over yum upgrade if rollback may be needed.
+
+    Use yum history undo <ID> for both package and full update rollbacks.
+
+    Rolling back major/minor OS versions without a snapshot is unsafe — reinstall instead.
+
+    Enterprise support (e.g., Red Hat) is recommended for production rollback scenarios.
+

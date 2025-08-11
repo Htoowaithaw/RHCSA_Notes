@@ -1,0 +1,142 @@
+# 📦 Advanced Package Management in CentOS/Red Hat
+
+This lesson covers advanced package management using **DNF** and **RPM** in CentOS/RHEL. You'll learn how to install, upgrade, remove, query, and find configuration files or source information for packages.
+
+---
+
+## 🛠 Tools Covered
+- **DNF** – Preferred modern package manager for CentOS/RHEL.
+- **RPM** – Low-level Red Hat Package Manager.
+- Focus is on CentOS/RHEL (not Ubuntu's `apt-get`).
+
+---
+
+## 📋 Topics Covered
+1. Installing packages (via `dnf` and `rpm`).
+2. Upgrading packages.
+3. Deleting packages.
+4. Viewing package details.
+5. Identifying which package a command belongs to.
+6. Listing package configuration files.
+
+---
+
+## 🌐 Checking Internet Connection
+```sh
+ping www.facebook.com
+ip a
+
+    Confirms system is online and has an IP address.
+
+📥 Installing a Package (Preferred Method: DNF)
+
+Example: KornShell (ksh)
+
+# Check if package exists
+rpm -qa | grep ksh
+
+# Install from repo
+dnf install ksh*
+
+    Shows package name, architecture, dependencies, and size.
+
+    y to confirm installation.
+
+    Verify installation:
+
+rpm -qa | grep ksh
+
+❌ Removing a Package (DNF)
+
+dnf remove ksh*
+rpm -qa | grep ksh  # Verify removal
+
+📦 Installing Without Internet (Using RPM)
+
+    Download .rpm file from a machine with internet.
+
+        Example site: package.org
+
+        Find .rpm link → copy link.
+
+    Transfer to target system (via FTP, SCP, etc.).
+
+    Install:
+
+# Using wget (if internet is available)
+wget <package_url>
+
+# Install with RPM
+rpm -ivh ksh-<version>.rpm
+
+    Options:
+
+        i → install
+
+        v → verbose
+
+        h → hash progress
+
+    Verify:
+
+rpm -qa | grep ksh
+
+ℹ Viewing Package Information
+
+rpm -qi ksh
+
+Displays:
+
+    Name, version, release, architecture
+
+    Install date, group
+
+    Summary & description
+
+🗑 Removing a Package (RPM)
+
+# Find exact package name
+rpm -qa | grep ksh
+
+# Remove
+rpm -e ksh-<full_package_name>
+
+# Verify removal
+rpm -qa | grep ksh
+
+⚙ Listing Package Configuration Files
+
+rpm -qc ksh
+
+    Shows config file locations (usually in /etc/...).
+
+    Helps locate specific config files without guessing paths.
+
+🔍 Finding Package of a Command
+
+    Find full path of command:
+
+which ksh
+
+    Identify package:
+
+rpm -qf /usr/bin/ksh
+
+    Works for any command.
+
+    Example:
+
+which pwd
+rpm -qf /usr/bin/pwd   # Belongs to coreutils
+
+💡 Key Takeaways
+
+    DNF is preferred for installing/removing packages.
+
+    RPM is used for manual .rpm file installs and low-level queries.
+
+    You can identify a package from any installed command.
+
+    Configuration files can be listed directly without searching manually.
+
+    Removing core packages (like coreutils) will break basic commands — reinstall if removed.
