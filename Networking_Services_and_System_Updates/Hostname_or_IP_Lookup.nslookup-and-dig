@@ -1,0 +1,115 @@
+# 🌐 Hostname & IP Address Lookup — Lecture Notes
+
+## 📖 Concept Overview
+- **Hostname ↔ IP Address Resolution**  
+  - **Forward lookup**: Hostname → IP address.  
+  - **Reverse lookup**: IP address → Hostname.
+- DNS (Domain Name System) handles the translation between hostnames and IPs.
+- Some protocols (e.g., HTTP in a browser, ping) **automatically** perform DNS resolution before sending data.
+- Without those protocols, you can manually query DNS using tools like:
+  - `nslookup` (available on Linux & Windows)
+  - `dig` (default on Linux, available on Windows with extra packages)
+
+---
+
+## 🛠 Commands for Manual Lookup
+### 🔍 `nslookup`
+- Interactive or one-shot mode:
+  ```bash
+  nslookup
+  > www.google.com
+
+or
+
+nslookup www.google.com
+
+    Output sections:
+
+        Server: Your current DNS resolver (often your modem/router).
+
+        Address: IP address of the resolver.
+
+        Non-authoritative answer: DNS resolver had to query external servers for the result (did not have cached/authoritative data).
+
+    Authoritative answer: Comes directly from the DNS server responsible for that domain.
+
+Example:
+
+nslookup hotmail.com
+
+Returns:
+
+Server:  <DNS server address>
+Non-authoritative answer:
+Name:    hotmail.com
+Address: 204.79.197.212
+
+📡 dig
+
+    More modern and feature-rich than nslookup.
+
+    Syntax:
+
+    dig hotmail.com
+
+    Provides detailed DNS query results:
+
+        QUESTION SECTION: What was asked.
+
+        ANSWER SECTION: Resolved records.
+
+        AUTHORITY SECTION: Authoritative name servers.
+
+        ADDITIONAL SECTION: Extra info like IPs of name servers.
+
+Example:
+
+dig www.facebook.com
+
+Will show IP address(es) for Facebook.
+🌍 Practical Examples
+
+    Get the IP address for Facebook:
+
+    nslookup www.facebook.com
+
+    Take the returned IP (e.g., 31.13.71.36) and type it into your browser’s address bar:
+
+        The browser will open Facebook directly via the IP.
+
+    This demonstrates that:
+
+        Internet infrastructure communicates using IP addresses.
+
+        DNS is a convenience for humans to use names instead of remembering numbers.
+
+📝 Key Points
+
+    DNS Port: 53 (UDP for most queries, TCP if response > 512 bytes).
+
+    Resolver: The DNS server your system queries first (often set via DHCP from your ISP/modem).
+
+    Non-authoritative answer: DNS resolver fetched the data from another server, not from its own authoritative data.
+
+    Tools:
+
+        nslookup: Older, simple syntax, still widely available.
+
+        dig: Preferred by many admins today, offers more detail.
+
+    Testing: Use man nslookup or man dig for full usage options.
+
+🧪 Practice Ideas
+
+    Run nslookup and dig on:
+
+        www.google.com
+
+        www.facebook.com
+
+        hotmail.com
+
+    Try reverse lookups:
+
+nslookup 31.13.71.36
+dig -x 31.13.71.36
