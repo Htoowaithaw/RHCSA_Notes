@@ -1,0 +1,93 @@
+# Nginx Install, Configure & Reverse Proxy – Quick Notes
+
+## 1. What is Nginx?
+- High-performance web server; can act as reverse proxy, load balancer, mail proxy, HTTP cache.
+- Created 2002 by Igor Sysoev to solve C10K problem.
+- Popular for speed, scalability, static content serving.
+- Reverse proxy = middleman between client and backend servers.
+
+## 2. Install & Start Nginx (CentOS/RHEL)
+```bash
+# Check if installed
+rpm -qa | grep nginx
+
+# Install (with auto-yes)
+dnf install nginx -y
+
+# Stop Apache if using port 80
+lsof -i:80
+systemctl stop httpd
+systemctl disable httpd
+
+# Start & enable Nginx
+systemctl start nginx
+systemctl enable nginx
+systemctl status nginx
+
+3. Firewall
+
+    Lab: systemctl stop firewalld; systemctl disable firewalld
+
+    Production: open Nginx port instead of disabling firewall.
+
+4. Configure
+
+    Main config: /etc/nginx/nginx.conf (don’t edit directly for site config).
+
+    Create site config: /etc/nginx/conf.d/myfirstlinuxos.conf
+    Example:
+
+server {
+    listen 80;
+    server_name 192.168.100.161;
+    root /var/www/myfirstlinuxos/html;
+    index index.html;
+    location / {
+        try_files $uri $uri/ =404;
+    }
+}
+
+5. Create Website Files
+
+mkdir -p /var/www/myfirstlinuxos/html
+echo "Hello from MyFirstLinuxOS" > /var/www/myfirstlinuxos/html/index.html
+
+6. Test & Reload
+
+nginx -t
+systemctl restart nginx
+
+Access: http://<VM-IP>
+7. Second Server Setup
+
+    Repeat steps on second server (different IP, dir /var/www/centosserver/html).
+
+    If SELinux blocks access:
+
+semanage fcontext -a -t httpd_sys_content_t "/var/www/centosserver/html(/.*)?"
+restorecon -Rv /var/www/centosserver/html
+
+8. Reverse Proxy Setup
+
+/etc/nginx/conf.d/myfirstlinuxos.conf:
+
+server {
+    listen 80;
+    server_name 192.168.100.161;
+    location / {
+        proxy_pass http://192.168.100.162;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+
+    Allow Nginx to connect to upstream with SELinux:
+
+setsebool -P httpd_can_network_connect 1
+
+    Test & restart.
+
+Result: Accessing 192.168.100.161 serves content from 192.168.100.162 via reverse proxy.
+
