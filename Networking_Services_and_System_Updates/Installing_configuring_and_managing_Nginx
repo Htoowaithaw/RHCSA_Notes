@@ -91,3 +91,137 @@ setsebool -P httpd_can_network_connect 1
 
 Result: Accessing 192.168.100.161 serves content from 192.168.100.162 via reverse proxy.
 
+
+
+
+
+
+
+
+--------------------------------------------------------------
+Specific 
+# Nginx & Web Server Setup (MyFirstLinuxOS & MySecondLinuxOS)
+
+## 1. Check Installed Packages
+```bash
+rpm -qa | grep nginx
+
+    If Nginx not installed:
+
+yum install nginx
+
+    If Apache (httpd) is running on port 80, stop & disable it:
+
+lsof -i :80
+systemctl stop httpd.service
+systemctl disable httpd
+
+2. Start & Enable Nginx
+
+systemctl start nginx.service
+systemctl enable nginx.service
+systemctl status nginx.service
+
+3. Disable Firewall for Testing (Training Purpose Only)
+
+systemctl stop firewalld
+systemctl disable firewalld
+
+(In production, adjust firewall rules instead.)
+4. Configure Nginx
+
+    Main config file: /etc/nginx/nginx.conf
+
+    Custom site config: /etc/nginx/conf.d/<yoursite>.conf
+
+    Example for MyFirstLinuxOS:
+
+server {
+    listen 80;
+    server_name myfirstlinuxos;
+
+    root /var/www/myfirstlinuxos/html;
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+}
+
+    Example for MySecondLinuxOS:
+
+server {
+    listen 80;
+    server_name mysecondlinuxos;
+
+    root /var/www/mysecondlinuxos/html;
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+}
+
+5. Create Web Root & Test Page
+
+MyFirstLinuxOS:
+
+mkdir -p /var/www/myfirstlinuxos/html
+cd /var/www/myfirstlinuxos/html
+vi index.html
+
+Example index.html:
+
+<!DOCTYPE html>
+<html>
+<body style="background-color:lightgrey;">
+<h1 style="text-align:center;">Welcome to MyFirstLinuxOS</h1>
+<p>This is my first Nginx-hosted page.</p>
+</body>
+</html>
+
+MySecondLinuxOS:
+
+mkdir -p /var/www/mysecondlinuxos/html
+cd /var/www/mysecondlinuxos/html
+vi index.html
+
+Example index.html:
+
+<!DOCTYPE html>
+<html>
+<body style="background-color:lightblue;">
+<h1 style="text-align:center;">Welcome to MySecondLinuxOS</h1>
+<p>This is my second Nginx-hosted page.</p>
+</body>
+</html>
+
+6. Error Fixes During Setup
+
+    Had a config syntax issue — fixed by correcting the Nginx config file.
+
+    SELinux blocked outbound HTTP from Nginx when reverse proxying — fixed with:
+
+setsebool -P httpd_can_network_connect 1
+
+    For serving content with SELinux enabled:
+
+chcon -R -t httpd_sys_content_t /var/www/mysecondlinuxos/html
+
+7. Test Configuration
+
+nginx -t
+systemctl restart nginx.service
+
+8. Access the Website
+
+    From the same machine:
+
+curl http://localhost
+
+    From host machine (with port forwarding configured in VM settings):
+
+http://127.0.0.1:<forwarded_port>
+
+(Replace <forwarded_port> with the NAT rule mapping to guest’s port 80.)
+
