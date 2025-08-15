@@ -1,0 +1,114 @@
+# 🌐 HTTPD (Apache Web Server) – Quick Notes
+
+## 1️⃣ Purpose of HTTPD
+- **HTTPD (Apache)** is the service/software that serves web pages over HTTP.
+- Used for hosting websites (personal, business, profile, etc.).
+- Instead of paying for hosting (GoDaddy, Wix, etc.), you can host on your own server.
+
+---
+
+## 2️⃣ Main Components & Files
+
+| Path / Command | Purpose |
+|----------------|---------|
+| `/etc/httpd/conf/httpd.conf` | Main **Apache configuration file** (port, docroot, user dirs, etc.) |
+| `/var/www/html/index.html` | Default **homepage** file |
+| `/var/log/httpd/` | Apache log directory (error & access logs) |
+| `systemctl start|stop|restart httpd` | Start/stop/restart the Apache service |
+| `systemctl enable httpd` | Auto-start Apache on boot |
+
+---
+
+## 3️⃣ Installation
+```bash
+# Install Apache (RHEL/CentOS)
+sudo yum install httpd -y
+# or
+sudo dnf install httpd -y
+
+    Dependencies like httpd-tools get installed automatically.
+
+4️⃣ Config File Basics (httpd.conf)
+
+    Comments start with #.
+
+    Listen → defines port (default HTTP = 80, HTTPS = 443).
+
+    DocumentRoot → default directory for site files (default /var/www/html).
+
+    Can customize many settings (ports, permissions, virtual hosts, etc.).
+
+5️⃣ Creating Your First Page
+
+cd /var/www/html
+
+# Create or edit homepage
+vi index.html
+
+Example:
+
+<!DOCTYPE html>
+<html>
+<body style="background-color:lightgrey;">
+<br>
+<h1 style="text-align:center;">Welcome to my first page</h1>
+<h4>My name is Your Name</h4>
+</body>
+</html>
+
+6️⃣ Start & Enable Service
+
+sudo systemctl start httpd
+sudo systemctl enable httpd
+sudo systemctl status httpd
+
+7️⃣ Access the Page
+
+    Use your server’s IP in a browser:
+
+    http://<server-ip>
+
+    No DNS? Access directly via IP (e.g., 192.168.1.12).
+
+8️⃣ Firewall Considerations
+
+    Apache listens on port 80 by default.
+
+    Allow traffic or temporarily disable firewall for testing:
+
+# Stop firewall (testing only!)
+sudo systemctl stop firewalld
+
+# OR allow port 80 (permanent, safer)
+sudo firewall-cmd --permanent --add-service=http
+sudo firewall-cmd --reload
+
+9️⃣ Logs & Troubleshooting
+
+    Error log: /var/log/httpd/error_log
+
+    Access log: /var/log/httpd/access_log
+
+    Check if service is running:
+
+sudo systemctl status httpd
+
+    Confirm firewall allows port 80.
+
+🔟 Quick Workflow Recap
+
+    Install httpd.
+
+    Edit /etc/httpd/conf/httpd.conf if needed.
+
+    Put your index.html in /var/www/html.
+
+    Open port 80 in firewall.
+
+    Start and enable httpd.
+
+    Test via browser using server’s IP.
+
+💡 Tip: Every time you change HTML, refresh browser (F5). For config changes, restart Apache:
+
+sudo systemctl restart httpd
