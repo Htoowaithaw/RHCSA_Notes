@@ -1,0 +1,86 @@
+# Postfix Mail Server Notes
+
+## 1. What is a Mail Server?
+- **Mail server**: System that sends/receives emails (like a digital post office).
+- Handles storage, processing, and delivery of messages between users/domains.
+
+## 2. Common Linux Mail Servers
+- **Postfix** → Popular, secure, simple, preferred for CentOS 8+ / RHEL 8+.
+- **Sendmail** → Old, complex, used in CentOS 7 and older (deprecated).
+- **Exim** → Flexible, configurable.
+- **qmail** → Secure, reliable, performant.
+- **OpenSMTPD** → Lightweight, easy to configure.
+- **Dovecot** / **Courier** → IMAP/POP3 services.
+- **Zimbra** → Full collaboration suite (not in CentOS repo).
+- **SpamAssassin** → Spam filter.
+- **Amavis** → Interfaces MTA with content checkers.
+- **ClamAV** → Malware detection.
+
+## 3. Why Postfix?
+- Strong security, easy config, high performance, large community.
+- Commonly used to send local server notifications (jobs completed, errors, etc.).
+
+## 4. Key Postfix Info
+- Config directory: `/etc/postfix/`
+- Main config file: `/etc/postfix/main.cf`
+- Service name: `postfix` (no “d” at end, but runs as a daemon).
+- Related package for sending mail via CLI: **s-nail** (provides `mail` command).
+
+## 5. Installation
+```bash
+# Check if installed
+rpm -qa | grep postfix
+
+# Install Postfix
+sudo dnf install postfix -y
+
+# Install s-nail for CLI mail sending
+sudo dnf install s-nail -y
+
+6. Configuring Relay Host
+
+    In /etc/postfix/main.cf, find #relayhost and uncomment.
+
+    Options:
+
+        Local domain: $mydomain
+
+        FQDN: mail.yourdomain.com
+
+        IP: [192.168.1.100]
+
+        Hostname: myuucphost
+
+    Save changes.
+
+7. Starting / Managing Service
+
+sudo systemctl restart postfix
+sudo systemctl enable postfix
+sudo systemctl status postfix
+
+    Check processes:
+    ps -ef | grep postfix
+
+    Kill process if needed:
+    sudo kill <PID>
+
+8. Sending Email
+
+mail -s "mail setup" you@example.com
+
+    Type your message.
+
+    Press CTRL+D to send.
+
+    Confirm send with Y.
+
+9. Admin Responsibilities
+
+    Ensure Postfix runs correctly.
+
+    Monitor logs & service status.
+
+    Keep configs backed up.
+
+    Use for server alerts & notifications when monitoring tools aren’t available.
