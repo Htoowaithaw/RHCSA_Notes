@@ -1,0 +1,75 @@
+# Chronyd – Modern Replacement for NTP Daemon
+
+## Purpose
+- Chronyd is a modern time synchronization daemon, replacing the older `ntpd`.
+- Synchronizes system clock with external or internal NTP servers.
+- Offers enhanced features over the traditional NTP service.
+
+---
+
+## Package & Configuration
+- **Package name:** `chrony`
+- **Configuration file:** `/etc/chrony.conf`
+- **Log directory:** `/var/log/chrony/`
+- **Main service:** `chronyd` (systemd managed)
+
+---
+
+## Workflow
+1. **Check Installation**
+   ```bash
+   rpm -qa | grep chrony
+
+    If not installed:
+
+    sudo dnf install chrony -y
+
+    Configure chrony.conf
+
+        Open:
+
+sudo vi /etc/chrony.conf
+
+Define NTP servers:
+
+    server pool.ntp.org iburst
+
+    (Can temporarily test with 8.8.8.8 for demo, though it's a DNS server, not real NTP)
+
+Avoid Running NTP & Chrony Together
+
+sudo systemctl stop ntpd
+sudo systemctl disable ntpd
+
+Start & Enable Chronyd
+
+    sudo systemctl start chronyd
+    sudo systemctl enable chronyd
+    sudo systemctl status chronyd
+
+Monitoring & Commands
+
+    Interactive tool: chronyc
+
+    Common commands inside chronyc:
+
+        help → list available commands
+
+        sources → show connected NTP sources and sync status
+
+        quit → exit
+
+    Direct (non-interactive) usage:
+
+    chronyc sources -v
+
+Key Points
+
+    Chronyd = new standard in RHEL/CentOS for time sync.
+
+    Do not run ntpd and chronyd at the same time.
+
+    Always restart the service after modifying /etc/chrony.conf:
+
+    sudo systemctl restart chronyd
+

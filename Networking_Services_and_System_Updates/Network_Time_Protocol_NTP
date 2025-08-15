@@ -1,0 +1,99 @@
+# ⏱️ Network Time Protocol (NTP) — Lecture Notes
+
+## 📖 Overview
+- **NTP** = **Network Time Protocol**.
+- Purpose: Synchronize a computer’s clock with a time server to avoid **time drift**.
+- **Why important?**
+  - In multi-server or clustered environments, unsynchronized clocks can cause issues in workflows, logging, authentication, and transaction ordering.
+  - Corporate systems often require **all servers to have the same time source**.
+
+---
+
+## 📂 Key Files & Services
+- **Main config file**: `/etc/ntp.conf`
+- **Service name**: `ntpd`  
+  - `d` = daemon → runs continuously in the background, listening for requests.
+- **Default port**: 123/UDP.
+
+---
+
+## 🛠 Installation & Setup
+1. **Check if NTP is installed**:
+   ```bash
+   rpm -qa | grep ntp
+
+    If not installed:
+
+    yum install ntp -y
+
+    Edit configuration:
+
+        Open /etc/ntp.conf.
+
+        Ignore comment lines starting with #.
+
+        Locate the server line and set preferred time server.
+
+        Example: Add Google’s public server:
+
+    server 8.8.8.8
+
+    (8.8.8.8 is mainly a Google DNS server but can be used for NTP in this example)
+
+Save and start the service:
+
+systemctl start ntpd
+systemctl enable ntpd
+
+Check service status:
+
+systemctl status ntpd
+
+    Or check process directly:
+
+        ps -ef | grep ntp
+
+🔍 Monitoring & Verification
+
+    Interactive mode:
+
+ntpq
+peers
+
+    Lists connected time servers and their status.
+
+    Confirms the server is syncing with configured sources.
+
+Stopping service:
+
+    systemctl stop ntpd
+
+📝 Key Points
+
+    Always run NTP on all workflow servers to avoid inconsistencies.
+
+    You can configure multiple time servers for redundancy.
+
+    Using reliable external servers (e.g., pool.ntp.org, vendor-provided, or internal corporate NTP) is best practice.
+
+    Killing the process manually:
+
+    kill <PID>
+
+    (Only for troubleshooting — normally use systemctl stop)
+
+🧪 Practice
+
+    Install NTP and configure /etc/ntp.conf with:
+
+        server 8.8.8.8
+
+        server 0.centos.pool.ntp.org (default)
+
+    Start and verify service.
+
+    Use ntpq and peers to confirm syncing.
+
+    Try changing to a different public NTP server and check results.
+
+✅ Summary: NTP keeps server clocks synchronized. Essential for any sysadmin managing multiple systems in production.
