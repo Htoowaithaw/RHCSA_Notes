@@ -1,0 +1,99 @@
+# timedatectl – Modern Date/Time Management in systemd
+
+## Purpose
+- `timedatectl` is a systemd utility for viewing & configuring:
+  - Date
+  - Time
+  - Time zones
+  - NTP synchronization
+- Replaces the older `date` command (both coexist for now).
+- Works with:
+  - `chronyd` (modern NTP daemon)
+  - `ntpd` (older NTP daemon)
+  - `systemd-timesyncd` (lightweight systemd time sync daemon – not in default RHEL/CentOS repos)
+
+---
+
+## Basic Usage
+- **Check system time & sync status**
+  ```bash
+  timedatectl
+  timedatectl status
+
+Shows:
+
+    Local time
+
+    Universal time (UTC)
+
+    RTC (hardware clock)
+
+    Time zone
+
+    NTP enabled & synchronized status
+
+    DST (Daylight Saving Time) info
+
+Time Zone Management
+
+    List available time zones
+
+timedatectl list-timezones
+
+(Press space to scroll, q to quit)
+
+Set time zone
+
+sudo timedatectl set-timezone "Region/City"
+
+Example:
+
+    sudo timedatectl set-timezone "America/New_York"
+
+Setting Date & Time
+
+    Set date only
+
+sudo timedatectl set-time YYYY-MM-DD
+
+Set date & time
+
+    sudo timedatectl set-time "YYYY-MM-DD HH:MM:SS"
+
+    (24-hour format recommended)
+
+NTP Synchronization
+
+    Enable automatic time sync
+
+sudo timedatectl set-ntp true
+
+Disable automatic time sync
+
+    sudo timedatectl set-ntp false
+
+Integration with NTP Daemons
+
+    Check if NTP daemon is running
+
+systemctl status chronyd
+systemctl status ntpd
+
+If inactive, start & enable
+
+    sudo systemctl enable --now chronyd
+
+    timedatectl will sync to the active daemon.
+
+Key Points
+
+    timedatectl is part of systemd (CentOS 7+, RHEL 7+).
+
+    Eventually replaces date command for system time control.
+
+    systemd-timesyncd is lightweight but not shipped by default in RHEL/CentOS.
+
+    Always verify NTP daemon status if sync fails.
+
+    Restart NTP service after configuration changes.
+
