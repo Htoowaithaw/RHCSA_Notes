@@ -1,0 +1,122 @@
+Cockpit (Server Administration Tool)
+
+## 1. Introduction to Cockpit
+- Cockpit: server administration tool sponsored by **Red Hat**.  
+- Provides a **modern, user-friendly, web-based interface** for managing Linux servers.  
+- Available on **CentOS, Red Hat, Ubuntu, Fedora**.  
+- **Default in RHEL 8**, optional in RHEL/CentOS 7.  
+- Functions:  
+  - Monitor system resources & usage  
+  - Add/remove accounts  
+  - Shut down/restart system  
+  - Manage services & logs  
+  - Access built-in terminal  
+
+👉 Benefit: GUI + remote access via web, but CLI remains available.
+
+---
+
+## 2. Pre-Installation Check
+- Ensure **network connectivity** before downloading packages.  
+- Command:  
+  ```bash
+  ping www.google.com
+
+    Example: Both RHEL 8 and CentOS 7 machines had internet connectivity confirmed.
+
+3. Installation of Cockpit
+
+    Check if Cockpit already installed:
+
+rpm -qa | grep cockpit
+
+On RHEL 8 → Cockpit preinstalled.
+
+On CentOS 7 → Not installed, so:
+
+    yum install cockpit -y
+
+        -y automatically accepts dependency prompts.
+
+Verification after install:
+
+rpm -qa | grep cockpit
+
+4. Start & Enable Cockpit Service
+
+    Check service status:
+
+systemctl status cockpit
+
+Start service if inactive:
+
+systemctl start cockpit
+
+Enable on boot:
+
+    systemctl enable cockpit
+
+5. Access Cockpit Web Interface
+
+    Default port: 9090
+
+    Access format:
+
+https://<IP_of_server>:9090
+
+Find IP:
+
+ip a
+
+If firewall blocks access:
+
+    Option 1: Disable firewall (temporary)
+
+        systemctl stop firewalld
+
+        Option 2: Access via localhost browser on the server.
+
+    First login shows certificate warning → accept risk to proceed.
+
+6. Cockpit Web UI Overview
+
+    Dashboard/Home: System info, health status, CPU/memory usage, updates.
+
+    Logs: View error, warning, critical, or info logs.
+
+    Storage: Disk usage (similar to df -h), mount points, performance data.
+
+    Networking: Manage interfaces, create bond/team/bridge/VLAN.
+
+    Accounts: Add/remove users.
+
+    Services: Manage system services (systemctl equivalent).
+
+    Applications: Installed apps list, option to add/remove.
+
+    Diagnostic Reports: Generate troubleshooting logs (like sosreport).
+
+    Kernel Dump & SELinux: Configure crash dump & SELinux modes.
+
+    Software Updates: Install available updates.
+
+    Subscription: Manage Red Hat subscription info.
+
+    Terminal: Built-in web terminal (like SSH/putty).
+
+7. Differences Between RHEL 8 & CentOS 7
+
+    RHEL 8: Cockpit preinstalled, more features (updates, subscriptions).
+
+    CentOS 7: Needs manual installation, fewer integrated options.
+
+8. Key Takeaways
+
+    Cockpit simplifies server monitoring & management with a browser-based GUI.
+
+    Useful for admins who prefer web access, but fully complements CLI usage.
+
+    Port 9090 is essential for remote access.
+
+    Works across RHEL 7/8, CentOS 7/8, Ubuntu, Fedora.
+
