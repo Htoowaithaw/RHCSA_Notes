@@ -54,7 +54,7 @@ systemctl start cockpit
 
 Enable on boot:
 
-    systemctl enable cockpit
+    systemctl enable cockpit (or) systemctl enable cockpit.socket 
 
 5. Access Cockpit Web Interface
 
@@ -120,3 +120,13 @@ If firewall blocks access:
 
     Works across RHEL 7/8, CentOS 7/8, Ubuntu, Fedora.
 
+
+
+    (For some VM with NAT Port Forwarding Enabled)
+
+From your host machine
+
+run:
+ssh -p 2223 -L 9090:127.0.0.1:9090 htoo@127.0.0.1 #2223 can be anything connected from your host to VM port 22 ssh port. In my case.it's 2223. 9090 is the default port for cockpit. -L flag make port forwarding from ssh to cockpit. So what this command basically do is, "If you log in successfully from your host port 2223 to VM ssh, that ssh tunnel will do port forwarding for cockpit for 9090. Then you can log in with cockpit from your host to VM by typing on browser
+
+https://127.0.0.1:9090

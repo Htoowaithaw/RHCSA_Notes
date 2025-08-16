@@ -1,0 +1,38 @@
+Central Logger is a server that collects logs from all clients or devices into a single location. It runs the **Rsyslog** service, which is responsible for handling and storing logs. The configuration file for Rsyslog is `/etc/rsyslog.conf`.  
+
+Rsyslog service management:  
+- Start/stop/restart with: `systemctl restart rsyslog`  
+- Enable at boot: `systemctl enable rsyslog`  
+
+Purpose of Central Logger:  
+- Centralized location for logs from multiple systems (Linux, Windows, printers, modems, etc.).  
+- Simplifies troubleshooting in large environments with many servers.  
+- Avoids the tedious task of logging into each server individually.  
+
+Port and communication:  
+- Rsyslog communicates over **UDP port 514** by default.  
+- To forward logs from one system to the Central Logger, edit `/etc/rsyslog.conf`:  
+  - Uncomment the relevant lines (remove `#`) to enable receiving or sending.  
+  - Specify the hostname or IP address of the central server.  
+
+Configuration process:  
+1. Verify installation:  
+   ```bash
+   rpm -qa | grep rsyslog
+
+If missing, install with:
+
+yum install rsyslog
+
+    Edit /etc/rsyslog.conf, enable the correct module and define the central logger.
+
+    Save changes, restart Rsyslog:
+
+systemctl restart rsyslog
+
+Check status:
+
+    systemctl status rsyslog
+
+Benefit: All logs from different devices are aggregated into one central place, improving efficiency and simplifying monitoring.
+

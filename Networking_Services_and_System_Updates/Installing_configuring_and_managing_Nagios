@@ -1,0 +1,194 @@
+# 🖥️ Nagios Monitoring Tool – Lecture Notes
+
+## 🌟 What is Nagios?
+- **Nagios** is a powerful open-source monitoring tool.
+- It monitors **servers, networks, applications, and services**.
+- Provides **alerts** when issues occur and notifies again when resolved.
+- Alerts can be sent via **email, SMS, or phone call**.
+- Supports **alert escalation** if the first responder does not act.
+- Keeps **logs of all alerts** for troubleshooting and auditing.
+
+### ✅ Benefits:
+- Quickly identifies failing hosts or services.
+- Keeps history for recurring problems.
+- Helps in interviews/job roles (common question: *Do you know a monitoring tool?*).
+
+---
+
+## 🕰️ Quick History
+- **1999** – Created by Ethan Galstad as **NetSaint**.
+- **2002** – Renamed to **Nagios** due to trademark issues.
+- **2006** – **Nagios Enterprises** formed to provide commercial support.
+- **2009** – **Nagios XI** enterprise version released.
+- **Nagios Core** remains **free & open-source**.
+
+---
+
+## ⚙️ Installation & Configuration Steps
+
+### **Step 1 – Install Required Packages**
+Install web server, compiler, and libraries:
+
+dnf install httpd php gcc glibc glibc-common gd gd-devel make net-snmp unzip wget -y
+
+- `httpd` + `php`: Web interface.
+- `gcc`, `glibc`: Compiling Nagios.
+- `gd`, `gd-devel`: Graphical elements.
+- `make`, `net-snmp`, `unzip`, `wget`: Utilities.
+
+---
+
+### **Step 2 – Create User & Group**
+
+useradd nagios
+groupadd nagcmd
+usermod -aG nagcmd nagios
+usermod -aG nagcmd apache
+
+- `nagios` user runs Nagios.
+- `nagcmd` group controls command execution.
+- Add Apache user to group for web commands.
+
+---
+
+### **Step 3 – Download Nagios Core**
+Navigate to `/tmp`:
+
+cd /tmp
+wget -O nagios-4.5.4.tar.gz <nagios_download_link>
+tar xzf nagios-4.5.4.tar.gz
+cd nagios-4.5.4
+
+
+---
+
+### **Step 4 – Configure Nagios Core**
+
+./configure --with-command-group=nagcmd
+
+- Prepares build with proper permissions.
+- May need SSL headers:
+
+dnf install openssl-devel -y
+
+
+---
+
+### **Step 5 – Compile & Install**
+
+make all
+make install
+make install-commandmode
+make install-init
+make install-config
+make install-webconf
+
+- Installs Nagios binaries, configs, init scripts, and Apache web config.
+
+---
+
+### **Step 6 – Install Nagios Plugins**
+
+cd /tmp
+wget <nagios_plugins_link>
+tar xzf nagios-plugins-2.4.11.tar.gz
+cd nagios-plugins-2.4.11
+./configure --with-nagios-user=nagios --with-nagios-group=nagcmd
+make install
+
+⚠️ For lab work, stop firewall:
+
+systemctl stop firewalld
+systemctl disable firewalld
+
+
+---
+
+### **Step 7 – Web Interface Login**
+Create `nagiosadmin` user:
+
+htpasswd -c /usr/local/nagios/etc/htpasswd.users nagiosadmin
+
+Enable services:
+
+systemctl start httpd
+systemctl enable httpd
+systemctl start nagios
+systemctl enable nagios
+
+
+---
+
+### **Step 8 – Define Hosts & Services**
+- Default config: `/usr/local/nagios/etc/objects/localhost.cfg`
+- Example new host (`host.cfg`):
+```cfg
+define host{
+    use             linux-server
+    host_name       CentOS-Server
+    alias           My First Server
+    address         192.168.100.162
+}
+define service{
+    use                     generic-service
+    host_name               CentOS-Server
+    service_description     PING
+    check_command           check_ping!100.0,20%!500.0,60%
+}
+
+Step 9 – Update Main Config
+
+Edit nagios.cfg:
+
+cfg_file=/usr/local/nagios/etc/objects/host.cfg
+
+Step 10 – Verify & Restart
+
+/usr/local/nagios/bin/nagios -v /usr/local/nagios/etc/nagios.cfg
+systemctl restart nagios
+
+If no errors → ✅ Configuration valid.
+🌐 Access Nagios Web Interface
+
+Open browser:
+
+http://<Nagios_Server_IP>/nagios
+
+Login → nagiosadmin + password.
+
+Dashboard shows:
+
+    Hosts (Up/Down/Unreachable).
+
+    Services (OK, Warning, Critical).
+
+    Logs & performance metrics.
+
+📝 Key Interview Points
+
+    Nagios Core vs XI: Core = free/open-source; XI = enterprise edition.
+
+    Nagios uses plugins to monitor services.
+
+    Notifications can escalate if unacknowledged.
+
+    Configuration stored in .cfg files (hosts, services).
+
+    Access via web interface (Apache + PHP).
+
+    Logs & history help in troubleshooting.
+
+🎯 Summary
+
+Nagios is:
+
+    Free and open-source.
+
+    Extensible with plugins.
+
+    Web-accessible (via Apache).
+
+    Highly useful for IT infra monitoring.
+
+    A must-know tool for job interviews in IT/DevOps.
+

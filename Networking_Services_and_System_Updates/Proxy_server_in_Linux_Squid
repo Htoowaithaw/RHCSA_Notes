@@ -1,0 +1,126 @@
+Squid Proxy Server in Linux
+
+## 1. Introduction
+- **Proxy Server**: Acts as a middleman between client and internet.
+  - Hides real location, adds privacy, security, control.
+  - Can bypass blocked content, improve browsing speed with caching.
+- **Squid Proxy**: A specialized proxy for caching, controlling access, and managing bandwidth.
+
+---
+
+## 2. Key Features of Squid
+- Stores copies of frequently accessed sites → faster response, saves bandwidth.
+- Can block or allow websites based on rules.
+- Default port: **3128**.
+- Config file: **/etc/squid/squid.conf**.
+- Uses **ACL (Access Control Lists)** for rules.
+
+---
+
+## 3. Real-Life Example
+- Office IT uses Squid to block **Facebook** during work hours.
+- User request → Proxy checks rules → denies access → displays restriction message.
+- Ensures productivity by filtering traffic.
+
+---
+
+## 4. History of Squid
+- **1996**: Developed at NLANR (National Lab for Applied Network Research).
+- **1998**: Released as open source.
+- **2020**: Squid 5.x introduced (better SSL handling, bug fixes).
+- **Present**: Continues to evolve with performance/security improvements.
+
+---
+
+## 5. Practical Setup Steps
+
+### Preparation
+- Snapshot VM (for rollback if errors).
+- Confirm:
+  - User: `whoami` → root
+  - Hostname: `hostname`
+  - IP address: `ip a`
+
+### Installation
+```bash
+rpm -qa | grep squid      # check if installed
+sudo dnf install squid*   # install all squid packages
+
+Start & Enable Service
+
+systemctl start squid
+systemctl enable squid
+systemctl status squid
+
+6. Configuration
+
+    File: /etc/squid/squid.conf
+
+HTTP Port
+
+    Default: http_port 3128
+
+    Listens on all interfaces unless specified.
+
+ACL Rules
+
+    Default ACLs → comment out.
+
+    Add local subnet rule:
+
+    acl local_net src 192.168.100.0/24
+    http_access allow local_net
+
+Blocked Sites
+
+    Create file: /etc/squid/block_sites
+
+        Example:
+
+    .facebook.com
+
+Update config:
+
+    acl block_sites_regx dstdomain "/etc/squid/block_sites"
+    http_access deny block_sites_regx
+
+7. Firewall
+
+    Allow port 3128:
+
+    firewall-cmd --permanent --add-port=3128/tcp
+    firewall-cmd --reload
+
+8. Apply Changes
+
+systemctl restart squid
+
+9. Client Setup
+
+    Example client: another Linux VM (192.168.100.175).
+
+    Firefox → Settings → Network → Manual Proxy.
+
+    HTTP Proxy: 192.168.100.174 (server IP), Port: 3128.
+
+    Select “Use proxy for all protocols”.
+
+10. Testing
+
+    Allowed site: google.com → works fine.
+
+    Blocked site: facebook.com → blocked (no page load).
+
+11. Conclusion
+
+    Squid Proxy:
+
+        Controls & filters internet access.
+
+        Saves bandwidth via caching.
+
+        Provides privacy & security.
+
+    Interview Tip: Say you have experience securing Linux with Squid Proxy.
+
+    Next Steps: Explore more ACLs, blocklists, and performance optimizations.
