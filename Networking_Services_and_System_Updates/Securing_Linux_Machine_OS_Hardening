@@ -1,0 +1,154 @@
+# 🛡️ Linux Operating System Hardening Notes
+
+This note summarizes key methods to secure (harden) a Linux system against attacks, misconfigurations, or vulnerabilities. These practices are commonly asked in interviews and are essential in production environments.
+
+---
+
+## 👤 1. User Account Management
+- **Avoid common usernames**: Don’t use predictable names like `admin` or `oracle`. Use variations (e.g., `tadmin`, `oracle123`).
+- **User IDs**: Default UIDs usually start from 1000. Best practice is to assign IDs starting from **10000+**.
+- **Password Policies**:
+  - Use `chage -l <username>` to check password expiry details.
+  - Update password policies (expiry, warning days, inactivity).
+  - Configure in `/etc/shadow`, `/etc/login.defs`, or via `chage`.
+  - Example fields:
+    - `MAX_DAYS`: Maximum password age.
+    - `MIN_LEN`: Minimum password length (recommend at least 12–13).
+- **PAM (Pluggable Authentication Modules)**:
+  - Configured in `/etc/pam.d/` (e.g., `system-auth`).
+  - Enforce stronger password complexity, retries, lockouts.
+
+---
+
+## 📦 2. Remove Unwanted Packages
+- List all installed packages:
+  ```bash
+  rpm -qa
+
+    Count installed packages:
+
+rpm -qa | wc -l
+
+Remove unnecessary packages:
+
+    rpm -e <package_name>
+
+⚠️ Be careful with dependencies — removing a package may break others.
+🔧 3. Stop Unused Services
+
+    List services:
+
+    systemctl -a
+
+    Stop and disable services not required (e.g., nfs, cups if not used).
+
+🌐 4. Check Listening Ports
+
+    Show open ports:
+
+    netstat -tunlp
+
+    Common ports:
+
+        22 → SSH
+
+        53 → DNS
+
+        25 → SMTP
+
+        111 → RPC
+
+    Disable/close ports for services not needed.
+
+🔑 5. Secure SSH Configuration
+
+File: /etc/ssh/sshd_config
+
+    Change default port (e.g., from 22 → 1022).
+
+    Disable root login:
+
+PermitRootLogin no
+
+Enforce users to log in with personal accounts, then escalate with sudo. This ensures accountability and logging.
+
+Restart SSH after changes:
+
+    systemctl restart sshd
+
+🚧 6. Enable Firewall
+
+    Old versions (RHEL 6 and below): iptables
+
+    New versions (RHEL 7+): firewalld
+
+    GUI tool: firewall-config
+
+    CLI tool:
+
+    firewall-cmd --add-port=22/tcp --permanent
+    firewall-cmd --reload
+
+    Config files:
+
+        iptables: /etc/sysconfig/iptables
+
+        firewalld: /etc/firewalld/firewalld.conf
+
+🔐 7. SELinux (Security-Enhanced Linux)
+
+    Check status:
+
+    sestatus
+
+    Config file: /etc/selinux/config
+
+    Modes:
+
+        Enforcing → Enforces policies (recommended).
+
+        Permissive → Logs violations, doesn’t block.
+
+        Disabled → Turns SELinux off.
+
+    SELinux applies security contexts to users, processes, applications, and files.
+
+    Useful commands:
+
+        chcon → Change file security context.
+
+        semanage → Manage SELinux policies.
+
+        setsebool → Set boolean values.
+
+        newrole → Change SELinux role.
+
+🔀 8. Change Service Port Numbers
+
+    Change default ports of services (e.g., SSH from 22 → 1022, DNS from 53 → custom).
+
+    Helps avoid common automated attacks targeting default ports.
+
+🔄 9. Keep System Updated
+
+    Update security patches regularly:
+
+    yum update
+
+    Subscribe to vendor alerts (e.g., Red Hat, CentOS) for new patches and vulnerabilities.
+
+    Prioritize security-related updates, not just all packages blindly.
+
+📝 Key Takeaways
+
+    Accounts → Unique usernames, password policies, and PAM rules.
+
+    Packages & Services → Remove unnecessary ones.
+
+    Ports & SSH → Close unused ports, secure SSH.
+
+    Firewall & SELinux → Always enable, configure properly.
+
+    Updates → Keep system patched with latest security fixes.
+
+👉 Following these steps significantly reduces attack surface and makes Linux systems more resilient.
