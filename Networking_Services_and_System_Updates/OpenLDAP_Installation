@@ -1,0 +1,111 @@
+# 📒 OpenLDAP Installation & Basics Note
+
+## 🏷️ What is OpenLDAP?
+- **OpenLDAP** = Open-source implementation of **LDAP** (Lightweight Directory Access Protocol).  
+- Developed by the **OpenLDAP Project** (community-driven, free alternative to Microsoft AD).  
+- Protocol mainly used by **email, authentication, and access services** to look up user/contact information.  
+- Licensed under **OpenLDAP Public License**.  
+- Supported on: Linux, AIX, Android, HP-UX, macOS, Solaris, and even Windows.  
+- Popular in Linux environments with **thousands of users** that need centralized authentication across servers.  
+
+---
+
+## ⚙️ Service & Management
+- OpenLDAP runs as the **`slapd`** service.
+- Commands:
+  ```bash
+  systemctl start slapd      # Start service
+  systemctl stop slapd       # Stop service
+  systemctl restart slapd    # Restart service
+  systemctl enable slapd     # Enable on boot
+  systemctl status slapd     # Check status
+
+📂 Configuration Files
+
+    Main config directory:
+
+/etc/openldap/slapd.d
+
+Client authentication config:
+
+/etc/nsswitch.conf
+
+    Example line (default):
+
+passwd: files
+
+Change to include LDAP:
+
+        passwd: files ldap
+
+        This means:
+
+            First check local /etc/passwd
+
+            If not found → check LDAP server
+
+📥 Installation
+
+    Verify internet access:
+
+ping google.com
+
+✅ If ICMP replies → you can reach internet.
+
+Install OpenLDAP:
+
+yum install *openldap*
+
+    The * ensures all packages with "openldap" in their name are installed.
+
+    Installs server + client utilities.
+
+Verify installation:
+
+    Check service:
+
+systemctl status slapd
+
+Verify process:
+
+        ps -ef | grep slapd
+
+🔑 Authentication Flow
+
+    Local authentication:
+
+        Checks /etc/passwd file for users.
+
+    LDAP authentication:
+
+        If user not found locally, system queries LDAP server.
+
+    Typical environment:
+
+        Dedicated LDAP server (on separate Linux machine).
+
+        Other client machines configured to authenticate against it.
+
+🛠️ Notes
+
+    OpenLDAP Server = central directory service (like free Active Directory).
+
+    Clients = authenticate users by querying the LDAP server.
+
+    Configuration is complex (schemas, domains, replication, access rules). Full setup may take hours.
+
+    For practice: installation + service management is enough for RHCSA-level exposure.
+
+✅ Summary
+
+    OpenLDAP provides centralized authentication similar to Active Directory.
+
+    Install with yum install *openldap*.
+
+    Managed by slapd service.
+
+    Configs in /etc/openldap/slapd.d.
+
+    Authentication order set in /etc/nsswitch.conf.
+
+    Commonly used in enterprises with large user bases across multiple servers.

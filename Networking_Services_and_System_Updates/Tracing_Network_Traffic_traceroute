@@ -1,0 +1,88 @@
+# 🌐 Traceroute Command in Linux  
+
+## 📖 What is Traceroute?
+- **Traceroute** is a network diagnostic tool used to **trace the journey of packets** from a source machine to a destination (IP, hostname, or URL).  
+- It helps identify:  
+  - **Where packets travel** (all hops/routers along the path).  
+  - **Where issues occur** (data loss or delays).  
+  - **Slow points in the network** affecting performance.  
+
+- Equivalent commands:  
+  - **Windows** → `tracert`  
+  - **Linux/Unix** → `traceroute`  
+  - **Mac** → `traceroute` (same as Linux)  
+
+---
+
+## 🛠️ Why Use Traceroute?
+- Detects **where traffic is being dropped**.  
+- Identifies **faulty routers/servers** causing delays.  
+- Helps troubleshoot **DNS resolution** and **gateway routing issues**.  
+
+---
+
+## 🔑 How It Works
+- Each step (hop) = a router or gateway between source and destination.  
+- Displays:  
+  - Hop number (1, 2, 3, …).  
+  - Device IP/hostname.  
+  - Time (ms) for response per hop.  
+- First hop is usually your **default gateway (modem/router)**.  
+
+---
+
+## 💻 Basic Syntax
+```bash
+traceroute <hostname_or_IP>
+
+Examples:
+
+traceroute google.com
+traceroute 8.8.8.8
+
+📝 Example Walkthrough
+
+    ping google.com → check connectivity first.
+
+    Run:
+
+    traceroute google.com
+
+    Output shows hops:
+
+        1st hop → Local gateway (e.g., 192.168.1.1).
+
+        2nd hop → ISP NAT gateway / external IP.
+
+        Next hops → Internet backbone routers.
+
+        Final hop → Destination server (Google IP).
+
+If any hop shows * * * or very high time → possible issue at that hop.
+📌 Related Command
+
+Check your default gateway:
+
+netstat -rnv
+
+Output shows:
+
+    0.0.0.0 or default → your gateway IP (e.g., 192.168.1.1).
+
+⚡ Key Takeaways
+
+    Traceroute maps the path packets take.
+
+    Useful for troubleshooting network issues (latency, packet loss, misconfigured gateway).
+
+    Works best when DNS resolution is successful — otherwise, use IP directly.
+
+    Combined with ping, it’s one of the most important Linux network troubleshooting tools.
+
+✅ Practice:
+
+    Run traceroute google.com from your Linux VM.
+
+    Compare hops from home Wi-Fi vs office network.
+
+    Identify which hop belongs to your router vs ISP.
