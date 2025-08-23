@@ -1,0 +1,70 @@
+# 🖼️ Opening an Image File from the Linux Command Line  
+
+## 📖 Problem
+- Opening **text files** is easy (using `cat`, `more`, `less`, `head`, `vi`, etc.).  
+- But **image files** cannot be opened with these commands because they contain binary data, not plain text.  
+
+## 🛠️ Solution: Use ImageMagick
+- **ImageMagick** is a software suite that allows manipulation and viewing of images.  
+- Provides the **`display`** command to open images from the terminal (in GUI environments).  
+
+⚠️ **Note**: This only works if you are in a **GUI session**.  
+- If using **SSH / PuTTY / plain terminal**, it will **not work** because images require graphical output.  
+
+---
+
+## 📦 Step 1: Install ImageMagick
+On RHEL/CentOS (yum):
+```bash
+sudo yum install ImageMagick -y
+
+On Ubuntu/Debian (apt):
+
+sudo apt install imagemagick -y
+
+Verify installation:
+
+rpm -qa | grep ImageMagick      # RHEL-based
+dpkg -l | grep imagemagick      # Debian-based
+
+📂 Step 2: Download an Image
+
+Example:
+
+    Open browser → Google Images → Save an image (e.g., penguin.png) to Desktop.
+
+    Navigate to directory:
+
+    cd ~/Desktop
+    ls -l
+
+    You should see your image file.
+
+🖥️ Step 3: Open the Image
+
+Use the display command:
+
+display penguin.png
+
+This will launch a GUI window showing the image.
+❌ What Won’t Work
+
+    Running cat image.png → outputs unreadable binary characters.
+
+    SSH-only environment → cannot open images without X11 forwarding or GUI.
+
+⚡ Key Takeaways
+
+    Image files ≠ text files → need dedicated viewers.
+
+    Use ImageMagick (display command) to open images from terminal in GUI mode.
+
+    Not commonly used in corporate environments but good for learning Linux capabilities.
+
+✅ Practice:
+
+    Install ImageMagick.
+
+    Save an image to your Desktop.
+
+    Run display <image-file> to open it.

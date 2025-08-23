@@ -1,0 +1,212 @@
+# 🚀 Linux System Performance Tuning Notes  
+
+## 🎯 Overview  
+Linux systems come pre-optimized, but performance can be further tuned using:  
+1. **Tuned Daemon (`tuned`)** – applies system-wide performance profiles.  
+2. **Nice & Renice** – adjusts process priorities.  
+
+---
+
+## 🔧 Tuned Daemon  
+
+### 📌 What is Tuned?  
+- Pronounced **“tune-D”** (D = daemon).  
+- A **systemd service** that tunes performance dynamically.  
+- Installed by default on **RHEL/CentOS 7 & 8**.  
+- Package name: `tuned`.  
+- Continuously runs in background and adjusts settings (e.g., network, I/O).  
+
+### 📂 Predefined Profiles  
+- **balanced** – compromise between power saving & performance.  
+- **desktop** – responsive desktop experience.  
+- **throughput-performance** – maximize throughput.  
+- **latency-performance** – optimize for low latency.  
+- **network-latency** – improve network latency.  
+- **network-throughput** – maximize network throughput.  
+- **powersave** – minimize power usage.  
+- **oracle** – tuned for Oracle DB workloads.  
+- **virtual-guest** – optimize system as a VM.  
+- **virtual-host** – optimize system as a VM host.  
+
+(Vendors can provide custom profiles, e.g., for SAP.)  
+
+---
+
+# 🛠️ Understanding Tuned Profiles in Linux
+
+## 📌 What is a Tuned Profile?
+- A **profile** is a set of **predefined system settings** bundled together for a specific goal (e.g., save power, maximize performance, reduce latency).
+- These settings affect things like:
+  - CPU governor (performance vs powersave)
+  - Disk I/O scheduler
+  - Kernel parameters
+  - Network stack tuning
+  - Power management features
+- Instead of tweaking all configs manually, you just select one profile.
+
+---
+
+## 🔑 Important Point
+👉 **Only one profile can be active at a time.**  
+When you switch profiles, tuned disables the old one and applies the new one.  
+
+Example:
+- If you set `powersave` → tuned adjusts CPU, disk, and network to **minimize energy usage** (lower performance).  
+- If you set `throughput-performance` → tuned configures system for **max throughput** (high performance, higher power usage).  
+- You cannot have both at once, because their settings conflict.
+
+---
+
+## 🗂️ Common Profiles Explained
+- **balanced** → Default, general-purpose. Balanced between performance & power saving.  
+- **desktop** → Faster response for apps, better interactivity (good for desktops).  
+- **throughput-performance** → Max throughput, good for heavy I/O or server workloads.  
+- **latency-performance** → Reduce latency at cost of more power (good for apps where timing matters).  
+- **network-latency** → Low-latency networking (good for trading/real-time apps).  
+- **network-throughput** → Maximize network throughput (e.g., file servers, streaming).  
+- **powersave** → Optimize for low power consumption (e.g., laptops).  
+- **oracle** (sometimes available) → Tuned specifically for Oracle DB workloads.  
+- **virtual-guest** → Optimize when running inside a VM (your current active profile).  
+- **virtual-host** → Optimize for KVM hosts running many VMs.  
+
+---
+
+## ⚡ Example Workflow
+1. See current profile:  
+   `tuned-adm active`
+2. Switch to powersave (good for laptops):  
+   `tuned-adm profile powersave`
+3. Switch to performance (good for servers):  
+   `tuned-adm profile throughput-performance`
+
+---
+
+
+### 🛠️ Tuned Commands  
+- Check if installed:  
+  `rpm -qa | grep tuned`  
+
+- Install if missing:  
+  `yum install tuned` (RHEL 7)  
+  `dnf install tuned` (RHEL 8)  
+
+- Manage service:  
+  ```bash
+  systemctl status tuned
+  systemctl start tuned
+  systemctl enable tuned
+
+    Check active profile:
+    tuned-adm active
+
+    List all profiles:
+    tuned-adm list
+
+    Switch profile:
+    tuned-adm profile <profile-name>
+
+    Get recommendation:
+    tuned-adm recommend
+
+    Disable tuned:
+    tuned-adm off
+
+🌐 Web Console (Cockpit Integration)
+
+    Access via: https://<IP>:9090
+
+    Login → Overview → Configuration → Performance Profile
+
+    Change profile directly via GUI.
+
+    If blocked, allow port 9090 in firewall (firewalld) or stop firewall for lab use:
+    systemctl stop firewalld
+
+⚡ Process Prioritization (Nice & Renice)
+📌 Concept
+
+    Linux schedules processes based on priority levels.
+
+    Nice values (NI): range -20 (highest priority) → 19 (lowest).
+
+    Default nice: 0.
+
+    System priority (PR): kernel-mapped from 0–139 (0–99 for RT, 100–139 for users).
+
+🛠️ Commands
+
+    View priorities:
+
+        top → shows PR and NI columns.
+
+        ps axo pid,comm,nice,cls --sort=-nice → sorted priorities.
+
+    Run process with custom nice:
+    nice -n -15 top
+
+        Launches top with higher priority (NI = -15).
+
+    Change priority of existing process:
+
+    renice -n 12 -p <PID>
+
+    Example:
+    renice -n 12 -p 9360
+
+📊 Example Workflow
+
+    Run top → see process NI = 0, PR = 20.
+
+    Start process with higher priority:
+    nice -n -15 top → NI = -15, PR = 5.
+
+    Change priority while running:
+    renice -n 12 -p 9360 → NI = 12, PR = 32.
+
+
+
+    ⚡ Can Tuned Switch Profiles Automatically?
+1. Default Behavior
+
+No — tuned does not switch profiles by itself out of the box.
+
+You set one profile active at a time (tuned-adm profile …) and it stays that way until you change it.
+
+2. But There Is a Way → Tuned Profiles with Plugins
+
+Tuned supports dynamic plugins inside some profiles.
+
+Example: The balanced profile will already adjust things like CPU governor based on system load.
+
+Low load → CPU goes into low-power states.
+
+High load → CPU speeds up.
+
+This is limited to what the profile defines (mostly CPU/power tuning).
+
+It won’t automatically switch from powersave → throughput-performance unless you script it.
+
+3. Custom Automation
+
+If you want true automatic switching (e.g., battery <20% → powersave), you can:
+
+Write a systemd service or script that:
+
+Checks battery level or CPU load.
+
+Runs tuned-adm profile <name> accordingly.
+
+Example (pseudo-script):
+
+📝 Key Takeaways
+
+    Tuned daemon = whole-system optimization (profiles).
+
+    Nice/Renice = process-level prioritization.
+
+    Use tuned profiles for broad tuning, nice/renice for fine-grained control.
+
+    Always choose profiles/process priorities based on workload needs.
+
+
+

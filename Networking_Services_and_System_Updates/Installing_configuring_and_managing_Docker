@@ -1,0 +1,122 @@
+# 🐳 Docker on Linux – Notes
+
+## 🚢 Container Recap
+- Concept came from **shipping containers**:
+  - Same size → fits anywhere (trucks, ships, warehouses).
+  - Easy & consistent transport worldwide.
+- **IT containers**:
+  - Package = Application code + Libraries + Configs (⚠️ no OS).
+  - Portable across systems → "runs on my computer" issue solved.
+  - Multiple containers can run on one OS.
+
+---
+
+## 👩‍💻 Role of Containers
+- **Developers** → build apps, package code inside containers.
+- **Sysadmins** → install, configure & manage containers (not build them).
+
+---
+
+## 🐳 What is Docker?
+- **Open platform** for developing, shipping, and running apps.
+- Lets you separate **apps from infrastructure** → deliver software quickly.
+- Provides:
+  - **Docker Engine** → runs containers.
+  - **Docker Hub** → registry (cloud fridge for images).
+- Runs on **Linux & Windows**.
+
+---
+
+## 📦 Docker Components
+- **Docker CE** (Community Edition – free, open-source).
+- **Docker EE** (Enterprise Edition – paid, advanced features).
+- **Docker Engine includes**:
+  - `docker-ce` → Core engine.
+  - `docker-ce-cli` → Command line client.
+  - `containerd.io` → Runtime for containers.
+  - `docker-buildx-plugin` → Advanced build features.
+  - `docker-compose-plugin` → Multi-container apps.
+
+---
+
+## 🗓 Docker History
+- **2010** → Started as internal project at dotCloud.
+- **2013** → Released as open-source.
+- **2015** → Introduced Docker Swarm (orchestration).
+- **2020+** → Focus on Docker Desktop, Hub, cloud-native workflows.
+
+---
+
+## 🍱 Analogy
+- Docker Image = **lunchbox** with food, utensils, napkins.
+- Once packed → anyone can eat without extra prep.
+- Docker Hub = **fridge** storing lunchboxes (images).
+
+---
+
+## ⚙️ Install Docker on CentOS (Steps)
+
+### 1. Prerequisites
+- Use latest CentOS Stream 9.
+- Remove old Docker if present:
+  ```bash
+  rpm -qa | grep docker
+
+2. Install yum-utils
+
+dnf install -y yum-utils
+
+3. Add Docker repo
+
+dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+
+4. Install Docker Engine & Tools
+
+dnf install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+5. Start & Enable Docker
+
+systemctl start docker
+systemctl enable docker
+systemctl status docker
+
+6. Verify Version
+
+docker --version
+
+🚀 Test Docker
+
+    Run hello world container:
+
+    docker run hello-world
+
+        Checks local image → if missing, pulls from Docker Hub.
+
+        Runs container → prints "Hello from Docker!".
+
+        Confirms Docker installed & working.
+
+🛠 Next Steps (Practice)
+
+    Run Ubuntu container:
+
+docker run -it ubuntu bash
+
+Try pulling other images from Docker Hub:
+
+    docker search nginx
+    docker run -d -p 8080:80 nginx
+
+✅ Key Takeaways
+
+    Docker = tool to create & manage containers.
+
+    Containers = lightweight, portable environments.
+
+    Docker Hub = central place to store/share images.
+
+    Install requires repo + packages → enable service with systemctl.
+
+    First test: docker run hello-world.
+
+🚀 With Docker, you can build → ship → run apps anywhere consistently.

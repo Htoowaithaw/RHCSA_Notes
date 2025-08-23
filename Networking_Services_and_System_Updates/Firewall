@@ -1,0 +1,195 @@
+# 🔥 Firewall Basics & Tools (iptables & firewalld)
+
+## 🌐 What is a Firewall?
+- **Definition**: A security barrier that filters network traffic based on predefined rules.  
+- **Analogy**: Like a **watchman/bouncer** — checks who can enter/leave based on rules.  
+- **Purpose**: Protects servers by controlling incoming/outgoing packets.  
+- **Types**:
+  - **Software Firewall**: Runs on OS (Linux, Windows, etc.).  
+  - **Hardware Firewall**: Dedicated appliance, usually managed by network teams.  
+
+## 📥 How Firewall Works
+- Server A → wants to connect to Server B.  
+- Firewall checks rules:  
+  - If **allowed**, traffic passes (e.g., SSH on port 22).  
+  - If **denied**, traffic is rejected/dropped (e.g., FTP on port 21).  
+- Both client and server can have their own firewalls filtering in/out traffic.  
+
+---
+
+# 🛠 iptables
+
+## ✅ Key Points
+- Classic Linux firewall tool (packet filter).  
+- Still widely used across Linux distributions.  
+- Cannot run **iptables** and **firewalld** at the same time.  
+
+## ⚙️ Setup
+```bash
+# Stop/disable firewalld before using iptables
+systemctl stop firewalld
+systemctl disable firewalld
+systemctl mask firewalld
+
+# Check if iptables service package exists
+rpm -qa | grep iptables-services
+
+# Install if missing
+yum install iptables-services
+
+# Start & enable iptables
+systemctl start iptables
+systemctl enable iptables
+systemctl status iptables
+
+🔍 Rules Management
+
+# List current rules
+iptables -L
+
+# Flush all rules (start fresh)
+iptables -F
+
+📦 iptables Structure
+
+    Tables → organize how packets are processed. Types:
+
+        filter (mainly used)
+
+        mangle
+
+        nat
+
+        raw
+
+    Chains → points where traffic is inspected:
+
+        INPUT → incoming traffic
+
+        FORWARD → traffic routed through
+
+        OUTPUT → outgoing traffic
+
+    Rules → conditions (protocol, source, destination).
+
+    Targets → what to do when a rule matches:
+
+        ACCEPT → allow
+
+        REJECT → block with response
+
+        DROP → block silently
+
+🛡 firewalld
+✅ Key Points
+
+    Modern firewall tool for RHEL, CentOS, Fedora.
+
+    Managed via firewall-cmd.
+
+    Works with zones and predefined services (XML files).
+
+    Cannot run alongside iptables.
+
+⚙️ Setup
+
+# Stop iptables first
+systemctl stop iptables
+systemctl disable iptables
+systemctl mask iptables
+
+# Check firewalld package
+rpm -qa | grep firewalld
+
+# Install if missing
+yum install firewalld
+
+# Start & enable firewalld
+systemctl unmask firewalld
+systemctl start firewalld
+systemctl enable firewalld
+systemctl status firewalld
+
+🔍 Basic Commands
+
+# Show all rules
+firewall-cmd --list-all
+
+# List predefined services
+firewall-cmd --get-services
+
+# Reload after changes
+firewall-cmd --reload
+
+🗂 Zones
+
+    Define trust levels (public, home, work, dmz, trusted, etc.).
+
+    Check zones:
+
+firewall-cmd --get-zones
+firewall-cmd --get-active-zones
+
+⚙️ Managing Rules in firewalld
+📌 Add/Remove Services
+
+# Add service (temporary)
+firewall-cmd --add-service=http
+
+# Add service permanently
+firewall-cmd --add-service=http --permanent
+firewall-cmd --reload
+
+# Remove service
+firewall-cmd --remove-service=http
+
+📌 Add/Remove Ports
+
+# Open port
+firewall-cmd --add-port=8080/tcp
+
+# Permanently open port
+firewall-cmd --add-port=8080/tcp --permanent
+
+# Remove port
+firewall-cmd --remove-port=8080/tcp
+
+📌 Custom Services
+
+    Predefined services stored in /usr/lib/firewalld/services/*.xml.
+
+    To add a custom one (e.g., SAP on TCP 32):
+
+    cp /usr/lib/firewalld/services/ssh.xml /usr/lib/firewalld/services/sap.xml
+    vi /usr/lib/firewalld/services/sap.xml   # edit name, description, port
+    systemctl restart firewalld
+    firewall-cmd --get-services | grep sap
+    firewall-cmd --add-service=sap
+
+📌 Rich Rules
+
+    Advanced rules for IP filtering.
+
+# Block traffic from specific IP
+firewall-cmd --add-rich-rule='rule family="ipv4" source address="192.168.0.25" reject'
+
+# Block pings (ICMP)
+firewall-cmd --add-icmp-block-inversion
+
+# Block outgoing traffic to specific IP (e.g., Facebook)
+firewall-cmd --add-rich-rule='rule family="ipv4" destination address="31.13.71.36" drop'
+
+🧾 Summary
+
+    Firewall = filter for network packets (software or hardware).
+
+    iptables = older tool, rule/chain/target based.
+
+    firewalld = modern tool, zone/service based, easier to manage.
+
+    Both cannot run at the same time.
+
+    Always restart/reload firewall after adding/removing rules.
+
+    Use permanent flag for rules that should persist reboots.
+

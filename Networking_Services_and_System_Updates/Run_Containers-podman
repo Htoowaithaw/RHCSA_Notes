@@ -1,0 +1,155 @@
+# 📦 Linux Containers with Podman – Notes
+
+## 🚢 Container Concept (Analogy)
+- Inspired by **shipping containers**:
+  - Standardized size → works everywhere (ships, trucks, ports).
+  - Easy to transport & store without modification.
+- **IT containers** follow same idea:
+  - Package = Application code + Libraries + Config files (⚠️ no OS).
+  - Runs anywhere, consistently — “works on my machine” problem solved.
+
+---
+
+## 💻 Containers in IT
+- Old problem: app runs on dev laptop but not on production server.
+- Container = self-contained environment:
+  - Includes all dependencies.
+  - Portable across machines.
+- One OS can run **multiple containers** simultaneously.
+
+---
+
+## 🛠 Container Software
+- **Docker**:
+  - Created by *Solomon Hykes* (2013).
+  - Runs containers on Linux & Windows.
+- **Podman**:
+  - Created by *Red Hat* (2018).
+  - Alternative to Docker, supported on RHEL 8+.
+  - Daemonless, Linux-native, secure (supports rootless containers).
+- Other Red Hat container tools:
+  - **Podman** → Run/manage containers & pods.
+  - **Buildah** → Build container images.
+  - **Skopeo** → Copy, inspect, sign images.
+  - **RunC / CRun** → Container runtimes (low-level execution).
+
+---
+
+## 🧩 Key Terms
+- **Image**: Template for containers (like VM template).
+- **Container**: Running instance of an image.
+- **Pod**: Group of containers deployed together (Podman logo = 3 seals = pod).
+
+---
+
+## ⚙️ Podman Setup
+1. **Install Podman**  
+   ```bash
+   dnf install podman -y     # RHEL 8
+   yum install podman -y     # CentOS 7
+
+    Check version & help
+
+podman -v
+podman --help
+man podman
+
+Check environment info
+
+    podman info
+
+        Shows registries it searches (RedHat, Docker Hub).
+
+🔎 Working with Images
+
+    Search for image
+
+podman search httpd
+
+    Choose popular one (e.g., docker.io/library/httpd).
+
+Pull image
+
+podman pull docker.io/library/httpd
+
+List downloaded images
+
+    podman images
+
+▶️ Running Containers
+
+    Check running containers
+
+podman ps
+
+Run container (detached, with port mapping)
+
+podman run -dt -p 8080:80 docker.io/library/httpd
+
+    -d = detach
+
+    -t = terminal
+
+    -p = port mapping (host:container)
+
+Verify container
+
+    podman ps
+
+        Access via browser: http://localhost:8080 → "It works!"
+
+📜 Container Management
+
+    View logs
+
+podman logs -l
+
+Stop container
+
+podman stop <container_id>
+
+Run multiple containers from same image
+
+    podman run -dt -p 8081:80 docker.io/library/httpd
+    podman run -dt -p 8082:80 docker.io/library/httpd
+
+    → Now available at localhost:8081, localhost:8082.
+
+🏗 Create & Manage Containers
+
+    Create container (with name)
+
+podman create --name httpd docker.io/library/httpd
+podman start httpd
+
+Auto-start container on boot with systemd
+
+    Generate unit file:
+
+podman generate systemd --new --files --name httpd
+
+Move file to systemd directory (/etc/systemd/system).
+
+Enable service:
+
+systemctl enable container-httpd.service
+
+Start service:
+
+        systemctl start container-httpd.service
+        systemctl status container-httpd.service
+
+✅ Key Takeaways
+
+    Container = app + dependencies, portable & lightweight.
+
+    Docker = most popular, Podman = Red Hat’s secure alternative.
+
+    Podman commands mirror Docker (run, ps, stop, images, etc.).
+
+    Images → Containers → Pods are the building blocks.
+
+    Containers can be auto-managed with systemd for production use.
+
+🚀 With Podman, you can search → pull → run → manage → persist containers easily on RHEL/CentOS systems.
+
