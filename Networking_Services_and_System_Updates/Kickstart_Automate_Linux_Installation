@@ -1,0 +1,266 @@
+# ⚙️ Kickstart – Automated Linux Installation
+
+## 🚀 What is Kickstart?
+- **Kickstart** = automated method of installing Linux OS.
+- Removes need for manual input during setup.
+- Pre-answers installation questions like:
+  - Language & timezone  
+  - Disk partitioning  
+  - Package selection  
+  - Network & hostname  
+  - Security settings  
+
+---
+
+## 🎯 Why Use Kickstart?
+- Saves time when installing **many servers**.
+- Example:
+  - 1 server → manual install is fine.  
+  - 20, 50, or 1000 servers → Kickstart automates everything.  
+- Configuration is stored in a **Kickstart file (ks.cfg)**.
+
+---
+
+## 🛠 Kickstart Setup – Steps
+1. **Choose a Kickstart Server**
+   - Any Linux machine can be dedicated as Kickstart server.
+
+2. **Create/Edit Kickstart File**
+   - Contains predefined installation parameters.
+   - Must be shared via **network service**:  
+     - NFS, FTP, HTTP/HTTPS.
+
+3. **Make Installation Source Available**
+   - Provide access to the **OS ISO image**.
+   - Can be on Kickstart server or attached directly to client.
+
+4. **Boot Client & Start Installation**
+   - Client accesses `ks.cfg` and ISO image.
+   - Installation runs automatically without user input.
+
+---
+
+## 📂 Kickstart File Sources
+- **system-config-kickstart** (GUI tool in CentOS/Red Hat 7)
+  - Install with:
+    ```bash
+    yum install system-config-kickstart
+    ```
+  - Provides GUI to set parameters.
+- **Anaconda Installer Output**
+  - Every Linux install creates `/root/anaconda-ks.cfg`.
+  - Contains all answers given during first manual install.
+  - Can be reused and edited for Kickstart automation.
+- **Note**: GUI tool removed in RHEL/CentOS 8 → use Anaconda file directly.
+
+---
+
+## 🐍 What is Anaconda?
+- **Anaconda** = the Linux installation wizard.
+- Creates file `/root/anaconda-ks.cfg` after first install.
+- File includes:
+  - Hostname  
+  - Language  
+  - Partitioning  
+  - Root password (encrypted)  
+  - User accounts  
+
+---
+
+## 🌐 Kickstart Server Setup Example (HTTP)
+1. Install Apache (HTTPD):
+   ```bash
+   yum install httpd -y
+   systemctl start httpd
+   systemctl enable httpd
+
+    Copy Kickstart file to Apache directory:
+
+cp /root/anaconda-ks.cfg /var/www/html/ks.cfg
+chmod a+r /var/www/html/ks.cfg
+
+Disable firewall (lab only) or allow port 80:
+
+systemctl stop firewalld
+systemctl disable firewalld
+
+Verify access in browser:
+
+    http://<Kickstart-Server-IP>/ks.cfg
+
+🖥 Kickstart Client Installation
+
+    Create new VM / physical server.
+
+    Boot from Linux ISO.
+
+    Interrupt boot menu → enter boot option:
+
+    linux ks=http://<Kickstart-Server-IP>/ks.cfg
+
+    System installs automatically using ks.cfg.
+
+🔧 Static IP (No DHCP Server)
+
+If no DHCP is available, provide network settings manually:
+
+linux ks=http://<server-ip>/ks.cfg ksdevice=eth0 ip=192.168.1.50 netmask=255.255.255.0 gateway=192.168.1.1
+
+    ksdevice=eth0 → network interface name (VM may use enp0s3).
+
+    ip → static IP for client.
+
+    netmask → usually 255.255.255.0.
+
+    gateway → default gateway of network.
+
+⚡ Benefits of Kickstart
+
+    Install hundreds of servers fast & consistent.
+
+    Parameters easily modified in ks.cfg.
+
+    Works with both physical & virtual machines.
+
+    Still widely used in corporates despite modern alternatives (VM templates, Ansible, etc.).
+
+✅ Key Takeaways
+
+    Kickstart automates Linux installation with ks.cfg.
+
+    File can be created manually (system-config-kickstart) or reused from Anaconda.
+
+    Needs a Kickstart server to host config + installation source.
+
+    Clients boot with special linux ks=... command → OS installs automatically.
+
+    Supports DHCP or static IP network configs.
+
+
+
+
+    Specific for internal network VMs,
+
+    # 📝 Kickstart Installation via Apache in VirtualBox (VM-to-VM)
+
+This note documents how to fix and perform a **Kickstart (ks.cfg) installation** when using **VirtualBox with multiple VMs** (one as HTTP server, one as installer).
+
+---
+
+## ⚙️ Scenario
+- **VM1 (Kickstart Server)** = Running Apache (`httpd`) and hosting `anaconda-ks.cfg`.
+- **VM2 (New Linux Install)** = Needs to fetch Kickstart file during installation.
+- **VirtualBox Network** = Both VMs use **Internal Network (intnet)** to talk to each other.
+
+---
+
+## 🛠 Steps on VM1 (Kickstart Server)
+1. Copy the ks.cfg file into Apache’s default web directory:
+   ```bash
+   sudo cp /root/anaconda-ks.cfg /var/www/html/
+   sudo systemctl restart httpd
+
+    Verify Apache is serving the file:
+
+    curl http://192.168.56.101/anaconda-ks.cfg
+
+    You should see the content of the file.
+    (Replace 192.168.56.101 with VM1’s IP address on intnet.)
+
+🌐 VirtualBox Network Configuration
+
+    VM1 (Server) → Adapter 1 → Internal Network (intnet)
+
+    VM2 (Installer) → Adapter 1 → Internal Network (intnet)
+
+    Both VMs must be on the same internal LAN.
+
+    NAT / Port Forwarding is not required for kickstart between VMs.
+
+💻 Booting VM2 (Installer)
+
+At the boot prompt (boot:) for older ISOs:
+
+linux inst.ks=http://192.168.56.101/anaconda-ks.cfg ip=dhcp
+
+For newer GRUB/EFI boot menus:
+
+    Highlight Install CentOS/RedHat… line.
+
+    Press Tab (BIOS) or e (UEFI).
+
+    Append to the linux or linuxefi line:
+
+    inst.ks=http://192.168.56.101/anaconda-ks.cfg ip=dhcp
+
+🧰 Debugging Tips
+
+    During installer boot, press Ctrl+Alt+F2 for a shell:
+
+    ip addr            # Check network interface + IP
+    ping 192.168.56.101   # Verify server is reachable
+    curl http://192.168.56.101/anaconda-ks.cfg   # Verify file is accessible
+
+    If 404 Not Found → file not in /var/www/html/.
+
+    If No route to host → network misconfigured (check VirtualBox adapters).
+
+✅ Checklist
+
+Apache running on VM1.
+
+anaconda-ks.cfg placed in /var/www/html/.
+
+Both VMs use Internal Network (intnet).
+
+Installer booted with correct inst.ks parameter.
+
+    Verified with curl inside installer shell if it fails.
+
+👉 With this workflow, any time kickstart fails, check:
+(1) File path, (2) Apache running, (3) Network config.
+
+
+🖥️ When you boot the new VM (kslinux)
+
+You’ll see a black screen with a prompt like this:
+boot:
+
+This is the place to type your boot options.
+
+⌨️ What to type
+
+Type the whole line in one shot, for example (if your NIC is enp0s3):
+linux inst.ks=http://192.168.56.101/anaconda-ks.cfg inst.ksdevice=enp0s3 ip=192.168.56.102::192.168.56.1:255.255.255.0:kslinux:enp0s3:none nameserver=8.8.8.8
+
+If your NIC name is eth0, change both places (inst.ksdevice=eth0 and the ip=…:eth0:none).
+
+🔎 Breaking down the line
+
+linux → tells the installer kernel to start
+
+inst.ks=... → where to fetch kickstart file
+
+inst.ksdevice=... → which NIC to use (enp0s3 or eth0)
+
+ip=192.168.56.102::192.168.56.1:255.255.255.0:kslinux:enp0s3:none
+
+IP = 192.168.56.102
+
+Gateway = 192.168.56.1 (ok even if unused)
+
+Netmask = 255.255.255.0
+
+Hostname = kslinux
+
+NIC = enp0s3 (or eth0)
+
+none = no autoconfig (not DHCP)
+
+nameserver=8.8.8.8 → DNS
+
+🧰 Tips
+
+Typing long lines: it’s okay if it wraps on screen, just keep typing until done and press Enter.
+
+If you’re unsure of NIC name, at the boot: prompt you can just try with eth0 first (most VirtualBox installs use enp0s3 or eth0).

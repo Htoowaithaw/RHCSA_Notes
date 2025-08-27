@@ -1,0 +1,190 @@
+# 🚀 Ansible – Install, Configure & Manage in Linux
+
+## 📌 What is Ansible?
+- **Definition (Wikipedia):**  
+  Ansible is a suite of software tools that enable *infrastructure as code*. It supports software provisioning, configuration management, and application deployment.
+- **Simplified:**  
+  An automation tool that helps you:
+  - Install software  
+  - Configure systems  
+  - Provision servers  
+
+⚡ **Key Benefits**:
+- Automates repetitive IT tasks  
+- Ensures consistent configurations  
+- Saves time (especially with large server fleets)
+
+---
+
+## 🧩 Key Concepts
+- **Agentless** → No software needed on remote machines; only the Ansible control node requires installation.  
+- **Playbooks** → YAML files listing tasks for automation.  
+- **YAML basics**:
+  - Key-value pairs → `key: value`  
+  - Indentation → defines hierarchy  
+  - Dash (`-`) → list items  
+  - Comments → start with `#`
+
+### Example Playbook (Install Vim)
+```yaml
+---
+- hosts: localhost
+  become: yes
+  tasks:
+    - name: Install Vim text editor
+      dnf:
+        name: vim
+        state: present
+
+This playbook:
+
+    Runs on localhost
+
+    Uses sudo privileges (become: yes)
+
+    Installs the package vim with DNF
+
+📜 Short History of Ansible
+
+    2012 → Created by Michael DeHaan
+
+    2013 → Released as open-source project
+
+    2015 → Acquired by Red Hat
+
+    2021+ → Red Hat Ansible Automation Platform 2 released
+
+🛠️ Step 1 – Install & Verify Ansible
+
+Check if Ansible is installed:
+
+rpm -qa | grep ansible
+
+If not present, install:
+
+dnf install ansible -y
+
+Verify version:
+
+ansible --version
+
+✅ You now have Ansible Core + Python3 (required runtime).
+🛠️ Step 2 – Configure Inventory File
+
+Edit the inventory file:
+
+vi /etc/ansible/hosts
+
+Add localhost entry:
+
+[webservers]
+localhost ansible_connection=local
+
+This means Ansible will manage localhost without SSH.
+🛠️ Step 3 – Test Connection
+
+Ping the webservers group:
+
+ansible -m ping webservers
+
+Output:
+
+localhost | SUCCESS => {
+    "changed": false,
+    "ping": "pong"
+}
+
+🛠️ Step 4 – Setup SSH Keys for Remote Server
+
+Generate key pair:
+
+ssh-keygen -t rsa -b 2048
+
+(Press Enter at all prompts)
+
+Copy key to remote server:
+
+ssh-copy-id iafzal@192.168.100.169
+
+Test passwordless login:
+
+ssh iafzal@192.168.100.169
+
+🛠️ Step 5 – Add Remote Server to Inventory
+
+Edit /etc/ansible/hosts again:
+
+[webservers]
+localhost ansible_connection=local
+centos_server ansible_host=192.168.100.169 ansible_user=iafzal
+
+Test connection:
+
+ansible -m ping webservers
+
+✅ Both localhost and centos_server should respond with pong.
+🛠️ Step 6 – Create Playbook to Install Apache
+
+Create a new YAML file:
+
+vi install_httpd.yaml
+
+Paste:
+
+---
+- hosts: webservers
+  become: yes
+  tasks:
+    - name: Install Apache HTTP Server
+      dnf:
+        name: httpd
+        state: present
+
+Run the playbook:
+
+ansible-playbook install_httpd.yaml --ask-become-pass
+
+🛠️ Step 7 – Verify Apache Installation
+
+Check if httpd installed:
+
+rpm -qa | grep httpd
+
+Start service:
+
+systemctl enable --now httpd
+
+Test locally:
+
+curl http://localhost
+
+Test remotely:
+
+curl http://192.168.100.169
+
+🎯 Summary
+
+    Ansible = Automation Powerhouse
+
+    Install Ansible on 1 control node, no agent needed on managed nodes
+
+    Use YAML Playbooks to define tasks
+
+    Manage 1 or 100+ servers with a single command
+
+    Example: installed Apache on multiple machines with one playbook
+
+💡 Practice Ideas
+
+    Modify playbook to install nginx instead of Apache
+
+    Add multiple remote servers into inventory and test parallel deployment
+
+    Create a playbook to:
+
+        Install a package
+
+        Copy a file
+
+        Restart a service
+

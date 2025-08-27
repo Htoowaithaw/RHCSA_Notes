@@ -1,0 +1,188 @@
+🔐 Installing, Configuring, and Managing OpenVPN on Linux
+📝 What is a VPN?
+
+    VPN (Virtual Private Network) creates a secure encrypted tunnel between your computer and the internet.
+
+    Hides your IP, encrypts traffic, and bypasses firewalls/blocks.
+
+    Example: On public Wi-Fi (like a coffee shop), a VPN prevents hackers from sniffing your passwords or browsing data.
+
+📝 What is OpenVPN?
+
+    OpenVPN = Open-source VPN protocol (since 2002).
+
+    More secure and flexible than early Microsoft PPTP.
+
+    Uses encryption keys & certificates to protect data.
+
+    Commonly used for:
+
+        Secure internet access
+
+        Remote access to company networks
+
+        Masking client IP addresses
+
+⚙️ Step 1: Install Required Packages
+
+On the server machine (e.g., MyFirstLinuxVM-Server):
+
+dnf install openvpn -y
+dnf install easy-rsa -y
+
+On the client machine (e.g., MyFirstLinuxVM-Client):
+
+dnf install openvpn -y
+
+⚙️ Step 2: Setup Easy-RSA (Server)
+
+    Copy Easy-RSA tools into /etc/openvpn:
+
+cp -r /usr/share/easy-rsa/3.1.6 /etc/openvpn/easy-rsa
+cd /etc/openvpn/easy-rsa
+
+Initialize PKI (Public Key Infrastructure):
+
+./easyrsa init-pki
+
+Build Certificate Authority (CA):
+
+./easyrsa build-ca nopass
+
+Generate server key + certificate request:
+
+./easyrsa gen-req server nopass
+./easyrsa sign-req server server
+
+Generate Diffie-Hellman parameters:
+
+./easyrsa gen-dh
+
+Generate client certificate:
+
+./easyrsa gen-req client nopass
+./easyrsa sign-req client client
+
+Generate TLS auth key:
+
+    openvpn --genkey secret ta.key
+
+⚙️ Step 3: Move Keys & Certs
+
+Move necessary files into /etc/openvpn:
+
+cp pki/ca.crt pki/dh.pem pki/issued/server.crt pki/private/server.key ta.key /etc/openvpn/
+
+For client files (later copied to client machine):
+
+scp pki/ca.crt ta.key pki/issued/client.crt pki/private/client.key root@192.168.100.178:/etc/openvpn/client/
+
+⚙️ Step 4: Configure OpenVPN Server
+
+    Copy sample config:
+
+cp /usr/share/doc/openvpn*/sample/sample-config-files/server.conf /etc/openvpn/server/
+
+Edit /etc/openvpn/server/server.conf:
+
+    Update paths for ca.crt, server.crt, server.key, dh.pem, and ta.key.
+
+    Example:
+
+    ca /etc/openvpn/ca.crt
+    cert /etc/openvpn/server.crt
+    key /etc/openvpn/server.key
+    dh /etc/openvpn/dh.pem
+    tls-auth /etc/openvpn/ta.key 0
+
+Enable IP forwarding:
+
+echo "net.ipv4.ip_forward = 1" >> /etc/sysctl.conf
+sysctl -p
+
+Secure file permissions:
+
+    chmod 600 /etc/openvpn/*.key
+
+⚙️ Step 5: Configure Firewall & Start Service
+
+firewall-cmd --add-service=openvpn --permanent
+firewall-cmd --add-masquerade --permanent
+firewall-cmd --reload
+
+Start and enable OpenVPN:
+
+systemctl start openvpn-server@server
+systemctl enable openvpn-server@server
+systemctl status openvpn-server@server
+
+Verify tunnel interface:
+
+ip a
+# Look for tun0 with IP 10.8.0.1 (server side)
+
+⚙️ Step 6: Configure OpenVPN Client
+
+    Copy sample config:
+
+cp /usr/share/doc/openvpn*/sample/sample-config-files/client.conf /etc/openvpn/client/
+
+Edit /etc/openvpn/client/client.conf:
+
+    Update with server IP:
+
+remote 192.168.100.167 1194
+
+Add correct cert/key paths:
+
+    ca /etc/openvpn/client/ca.crt
+    cert /etc/openvpn/client/client.crt
+    key /etc/openvpn/client/client.key
+    tls-auth /etc/openvpn/client/ta.key 1
+
+Secure client files:
+
+chmod 600 /etc/openvpn/client/*
+
+Start client connection:
+
+    openvpn --config /etc/openvpn/client/client.conf
+
+Verify tunnel interface:
+
+ip a
+# Look for tun0 with IP 10.8.0.2 (client side)
+
+🧪 Verification
+
+    On server:
+
+curl ifconfig.me
+
+On client:
+
+    curl ifconfig.me
+
+    → Should return the same public IP as the server (traffic routed through VPN).
+
+✅ Summary
+
+    VPN = secure encrypted tunnel.
+
+    OpenVPN = open-source, reliable, cross-platform VPN solution.
+
+    Steps:
+
+        Install openvpn + easy-rsa.
+
+        Generate certificates & keys.
+
+        Configure server.conf.
+
+        Enable IP forwarding + firewall rules.
+
+        Start OpenVPN service.
+
+        Configure client with proper certs + config.
+
+    Verification: tun0 interface & same public IP on client and server.
