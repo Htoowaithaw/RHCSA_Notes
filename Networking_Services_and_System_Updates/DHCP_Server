@@ -1,0 +1,118 @@
+📘 DHCP Server in Linux 
+🔹 What is DHCP?
+
+DHCP = Dynamic Host Configuration Protocol
+
+Automatically assigns IP addresses to devices on a network.
+
+Without an IP address → no network communication.
+
+Used heavily in home networks (routers hand out IPs automatically).
+
+In corporate networks, DHCP usually runs on routers or dedicated appliances (not Linux servers).
+
+👉 Static IP = Manually assigned, does not change.
+👉 DHCP IP = Dynamically assigned, may change when device restarts.
+
+🔹 How DHCP Works
+
+A new device connects (phone, tablet, PC).
+
+Device broadcasts → “I need an IP!”
+
+DHCP Server replies with:
+
+IP Address (from its pool)
+
+Subnet Mask
+
+Default Gateway
+
+DNS Server(s)
+
+Device accepts, and now it can communicate on the network.
+
+🔹 Where DHCP Runs
+
+Home Networks → Router/ISP modem provides DHCP service.
+
+Corporate Networks → Dedicated routers/switches handle DHCP.
+
+Linux DHCP Server (lab only) → Possible, but not common in production.
+
+⚠️ To use a Linux DHCP server at home → must disable DHCP on router and point devices to Linux server. This can disconnect your whole home network → only test in labs.
+
+🔹 Steps to Configure DHCP Server on Linux
+1️⃣ Prepare the Server
+
+Take a snapshot of VM (for rollback).
+
+Assign a static IP to the server (cannot itself use DHCP).
+
+Use nmtui (text-based GUI) or edit network config files.
+
+Example: IP 192.168.15.1/24
+
+2️⃣ Install DHCP Server Package
+
+RHEL/CentOS 7: yum install dhcp -y
+
+RHEL/CentOS/Rocky 8/9: dnf install dhcp-server -y
+
+3️⃣ Configure DHCP Server
+
+Main config file: /etc/dhcp/dhcpd.conf
+
+If missing → copy example:
+cp /usr/share/doc/dhcp*/dhcpd.conf.example /etc/dhcp/dhcpd.conf
+
+Example configuration:
+default-lease-time 600;       # 10 minutes
+max-lease-time 7200;          # 2 hours
+
+subnet 192.168.15.0 netmask 255.255.255.0 {
+    range 192.168.15.50 192.168.15.200;   # IP pool
+    option routers 192.168.15.1;          # Default gateway
+    option subnet-mask 255.255.255.0;
+    option domain-name-servers 8.8.8.8;   # DNS server
+}
+
+4️⃣ Start & Enable Service
+
+systemctl start dhcpd
+
+systemctl enable dhcpd
+
+5️⃣ Configure Firewall
+
+Disable firewall (lab only): systemctl stop firewalld
+
+Or allow DHCP through firewall:
+firewall-cmd --add-service=dhcp --permanent
+firewall-cmd --reload
+
+6️⃣ Router/Modem Reconfiguration ⚠️
+
+Disable DHCP on router.
+
+Point router to forward DHCP requests to Linux server.
+
+This step varies by ISP/router brand.
+
+Without this, devices will still use the router as DHCP.
+
+🔹 Key Takeaways
+
+DHCP automates IP assignment → saves manual effort.
+
+Home use → handled by router.
+
+Corporate → usually not Linux admin’s job, but good to know conceptually.
+
+Linux DHCP Server → only practical in lab environments.
+
+Always assign static IP to your DHCP server itself.
+
+Modify dhcpd.conf to define IP ranges, gateway, DNS, lease time.
+
+✅ With this setup → any client on the same network will automatically get an IP from your Linux DHCP server.
