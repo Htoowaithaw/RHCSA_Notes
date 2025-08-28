@@ -1,0 +1,72 @@
+🖥️ Computer Boot Process – Notes
+🔹 Overview
+
+The boot process is how a computer powers on and starts the operating system.
+
+Steps are similar across all computers and operating systems.
+
+🔹 Step-by-Step Boot Process
+
+Power On
+
+Electricity flows from the socket to the motherboard.
+
+First component to power up: CPU.
+
+BIOS (Basic Input/Output System)
+
+CPU looks for instructions in the BIOS.
+
+BIOS is a small program stored on a chip called ROM (Read-Only Memory).
+
+ROM = factory set, cannot be modified.
+
+CMOS (Complementary Metal-Oxide Semiconductor)
+
+Stores BIOS settings (time, date, hardware config).
+
+Powered by a small battery on the motherboard so settings are not lost when power is off.
+
+POST (Power-On Self-Test)
+
+BIOS tells CPU to check all attached devices (keyboard, RAM, disk, etc.).
+
+Ensures devices are working.
+
+If any major fault → boot process stops.
+
+Disk Access (MBR)
+
+BIOS looks for the disk defined in CMOS settings.
+
+Reads the first sector: MBR (Master Boot Record).
+
+MBR contains information about the operating system.
+
+Load Operating System
+
+The OS is loaded into RAM (memory).
+
+OS takes over control.
+
+OS decides which services/programs to start first.
+
+CPU executes instructions from OS.
+
+🔹 Bootstrap Process
+
+The entire sequence CPU → BIOS → CMOS → POST → MBR → OS loaded into RAM is called Bootstrap.
+
+"Bootstrap" = process of starting a computer and handing control to the OS.
+
+🔹 Key Terms Recap
+
+BIOS → Instructions stored in ROM.
+
+CMOS → Stores BIOS settings, powered by battery.
+
+POST → Hardware self-test.
+
+MBR → Master Boot Record, first sector of disk.
+
+Bootstrap → Full boot sequence leading to OS load.

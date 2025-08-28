@@ -1,0 +1,48 @@
+📘 System Run Levels in Linux – Notes
+🔹 What are Run Levels?
+
+Run levels define the mode in which a Linux system operates.
+
+Similar to Windows "Safe Mode," but Linux has multiple modes.
+
+Controlled by the init command (older SysV systems).
+
+🔹 Common Run Levels
+
+0 → Halt (shuts down the system, powers it off)
+
+1 (or s/S) → Single-user mode (used for troubleshooting, maintenance, password reset, no networking)
+
+2 → Multi-user mode without networking
+
+3 → Multi-user mode with networking (no GUI, CLI only)
+
+5 → Multi-user mode with networking and GUI (most desktops run here)
+
+6 → Reboot (same as running reboot command)
+
+🔹 Useful Commands
+
+init 0 → Shutdown
+
+init 1 or init s → Single-user mode
+
+init 3 → Multi-user with network, no GUI
+
+init 5 → Multi-user with GUI
+
+init 6 → Reboot
+
+🔹 Check Current Run Level
+
+Use who -r to see the current run level.
+
+🔹 Key Points
+
+Servers often use run level 3 (no GUI, networking only).
+
+Desktops usually use run level 5 (with GUI).
+
+Always be root to change run levels.
+
+Practice switching between run levels to understand the difference.

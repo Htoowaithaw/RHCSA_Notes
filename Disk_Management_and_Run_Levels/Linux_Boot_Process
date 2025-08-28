@@ -1,0 +1,90 @@
+🐧 Linux Boot Process – Notes
+🔹 Why Learn This?
+
+Important for understanding how Linux starts after pressing the power button.
+
+Common interview question: “Explain the Linux boot process.”
+
+🔹 6 Main Stages of Linux Boot
+
+BIOS (Basic Input/Output System)
+
+Runs when you press power.
+
+Performs system integrity checks.
+
+Looks for a boot device (HDD, CD-ROM, USB, etc.).
+
+Loads the Boot Loader.
+
+MBR (Master Boot Record)
+
+Located in the first sector of the bootable disk (/dev/sda or /dev/hda).
+
+Very small (~512 bytes).
+
+Contains info about GRUB.
+
+GRUB (Grand Unified Boot Loader)
+
+Lets you choose between multiple kernel versions.
+
+Config files: /boot/grub/grub.cfg.
+
+Can modify to change boot order or default kernel.
+
+Kernel
+
+Mounts the root filesystem (defined in grub.cfg).
+
+Executes /sbin/init.
+
+Uses initrd (Initial RAM Disk) as a temporary root filesystem until real one mounts.
+
+initrd contains drivers needed for hardware & disk access.
+
+Init
+
+First process started by kernel (/sbin/init).
+
+Reads /etc/inittab to decide the runlevel.
+
+Runlevels:
+
+0 → Halt (shutdown)
+
+1 → Single-user mode
+
+2 → Multi-user, no networking
+
+3 → Full multi-user, CLI only
+
+4 → Unused
+
+5 → Multi-user with GUI (X11)
+
+6 → Reboot
+
+Runlevel Programs
+
+Located in /etc/rc.d/rc*.d/.
+
+Scripts are started/stopped depending on the runlevel.
+
+Example: Runlevel 5 → starts GUI (display manager) + network.
+
+🔹 Quick Commands to Check
+
+who -r → Show current runlevel.
+
+ls /etc/rc.d/ → View runlevel scripts.
+
+init 3 → Switch to runlevel 3 (no GUI).
+
+init 5 → Switch back to runlevel 5 (GUI).
+
+🔹 Summary
+
+Boot sequence: BIOS → MBR → GRUB → Kernel → Init → Runlevels → Login prompt.
+
+Knowing this sequence helps in troubleshooting startup issues and is a frequent interview topic.
