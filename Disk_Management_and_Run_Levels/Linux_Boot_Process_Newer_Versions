@@ -1,0 +1,91 @@
+🐧 Linux Boot Process (systemd – RHEL 7+/CentOS 7+)
+🔹 Why Important?
+
+Newer versions of Linux (CentOS/RHEL 7 and above) use systemd instead of the old SysV init.
+
+System administrators must know the sequence to troubleshoot boot issues.
+
+🔹 Boot Process Steps
+
+Firmware (BIOS/UEFI)
+
+Runs immediately when system powers on.
+
+Performs POST (Power-On Self-Test): checks hardware (CPU, RAM, storage, etc.).
+
+Hands control to the boot device.
+
+MBR (Master Boot Record)
+
+Stored in first sector of the bootable disk.
+
+Very small but contains info about GRUB2 location.
+
+GRUB2 (Grand Unified Boot Loader v2)
+
+Loads the Linux kernel.
+
+Config file: /boot/grub2/grub.cfg.
+
+Allows selecting between multiple kernels if available.
+
+Kernel
+
+Core of the OS.
+
+Loads drivers from initrd.img (initial RAM disk).
+
+Ensures hardware (disks, network, etc.) can communicate properly.
+
+Starts the first OS process → systemd.
+
+systemd (PID 1)
+
+New init system replacing SysV in RHEL 7+.
+
+Manages all other services/processes.
+
+Reads etc/systemd/system/default.target to decide boot target (runlevel equivalent).
+
+Examples of targets:
+
+graphical.target → Multi-user + GUI
+
+multi-user.target → Multi-user CLI
+
+rescue.target → Single-user (troubleshooting)
+
+System Online
+
+systemd launches enabled services.
+
+System reaches the defined default target (equivalent to old runlevel).
+
+You get the login prompt (CLI or GUI depending on target).
+
+🔹 Runlevels vs Targets (systemd mapping)
+
+0 → poweroff.target
+
+1 → rescue.target
+
+2 → multi-user.target (no networking in older SysV, now same as 3)
+
+3 → multi-user.target
+
+4 → unused (custom)
+
+5 → graphical.target
+
+6 → reboot.target
+
+🔹 Summary
+
+Boot order: BIOS → POST → MBR → GRUB2 → Kernel → systemd → Default Target.
+
+systemd replaced init in RHEL 7+ and manages services & targets.
+
+Knowing this flow is essential for troubleshooting boot failures.
+
+
+![alt text](<Screenshot from 2025-08-29 19-28-24.png>)
