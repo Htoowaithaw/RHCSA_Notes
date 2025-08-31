@@ -1,0 +1,128 @@
+📝 LVM Lecture Notes
+🔹 Concept Overview
+
+LVM (Logical Volume Manager) allows flexible disk management.
+
+Hierarchy:
+
+Hard disk →
+
+Partition →
+
+Physical Volume (PV) →
+
+Volume Group (VG) →
+
+Logical Volume (LV) →
+
+Mount to file system.
+
+Logical Volumes behave like standard partitions but are easier to resize and manage.
+
+🔹 Steps Explained
+
+Add New Disk in VirtualBox
+
+Power off VM → Settings → Storage → Add new disk → Create new disk.
+
+Choose VDI, dynamically allocated, size (e.g., 1 GB).
+
+Name it (e.g., diskoracle) and boot system.
+
+Check New Disk
+
+Run fdisk -l.
+
+Example:
+
+sda = 10 GB (system disk)
+
+sdb = 2 GB (previous disk)
+
+sdc = 1 GB (new disk)
+
+Create Partition on New Disk
+
+Run fdisk /dev/sdc.
+
+Steps inside fdisk:
+
+n → new partition
+
+p → primary
+
+1 → first partition
+
+Accept defaults for first/last sector.
+
+t → change type → enter 8e (Linux LVM).
+
+p → confirm shows "Linux LVM".
+
+w → write changes.
+
+Create Physical Volume (PV)
+
+pvcreate /dev/sdc1
+
+Verify: pvdisplay
+
+Create Volume Group (VG)
+
+vgcreate oracle_vg /dev/sdc1
+
+Verify: vgdisplay oracle_vg
+
+Create Logical Volume (LV)
+
+lvcreate -n oracle_lv -L 1000M oracle_vg
+
+(Note: cannot use full size because LVM metadata takes some space).
+
+Verify: lvdisplay
+
+Format Logical Volume
+
+mkfs.xfs /dev/oracle_vg/oracle_lv
+
+Mount the Logical Volume
+
+mkdir /oracle
+
+mount /dev/oracle_vg/oracle_lv /oracle
+
+Verify: df -h (should show mounted at /oracle).
+
+Unmount (if needed)
+
+umount /oracle
+
+🔹 Key Commands (Order)
+
+fdisk /dev/sdX → create partition with type 8e.
+
+pvcreate /dev/sdX1 → physical volume.
+
+vgcreate vg_name /dev/sdX1 → volume group.
+
+lvcreate -n lv_name -L size vg_name → logical volume.
+
+mkfs.xfs /dev/vg_name/lv_name → format LV.
+
+mount /dev/vg_name/lv_name /mountpoint → mount LV.
+
+df -h → verify mount.
+
+🔹 Summary
+
+LVM setup follows strict order: Disk → Partition → PV → VG → LV → File System → Mount.
+
+Always leave a little space when creating LV (cannot use 100% of disk).
+
+LVM makes it easier to manage storage dynamically compared to fixed partitions.
+
+
+For clear visual diagrams, please check below images;
+
+Diagram_for_Add_Disk_and_LVM_Partition.png
+Editing_config_for_mounting_at_boot_time.png

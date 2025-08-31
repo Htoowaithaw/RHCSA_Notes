@@ -1,0 +1,151 @@
+Disk partitioning and mounting — what, why, how
+Big picture (everyday analogy)
+
+Think of a disk as an empty warehouse building.
+
+A partition is you putting walls inside the building to split it into rooms.
+
+A filesystem (ext4/XFS) is the shelving and labels inside a room so you can actually store and find boxes.
+
+A mount point is the doorway where people enter that room from the main hallway.
+
+Mounting is hanging a sign on a hallway door that says “/data → use this room.” Without mounting, the room exists but nobody can walk into it.
+
+Windows auto-assigns letters (D:, E:). Linux doesn’t use drive letters; it attaches storage to folders (mount points) in one big tree starting at /.
+
+What each step does (and why)
+
+Add a disk
+Why: you’re out of space or want to separate data/logs/backups.
+Result: the OS sees a raw device (e.g., /dev/sdb). You can’t use it yet.
+
+Partition the disk (optional but common)
+Why: to split a disk or just create a single “room” to hold a filesystem.
+Result: you get /dev/sdb1 (partition 1 on disk sdb).
+
+Create a filesystem on that partition
+Why: without a filesystem, the OS can’t organize files.
+Result: the partition can now store files (e.g., XFS/ext4).
+
+Create a mount point (a folder)
+Why: Linux needs a folder to attach this new storage into the tree.
+Result: a directory like /data exists.
+
+Mount it
+Why: to make the new storage usable at that folder.
+Result: you can cd /data and read/write files.
+
+Persist it across reboots (/etc/fstab)
+Why: a manual mount disappears after reboot.
+Result: the OS auto-mounts it every boot.
+
+The quick “tech way” (single new disk, one partition, XFS)
+
+See disks
+lsblk
+
+Suppose the new disk is /dev/sdb. Create one partition
+fdisk /dev/sdb
+Inside fdisk, press: n, p, 1, Enter, Enter, then w
+
+Make a filesystem (XFS is default on Rocky/RHEL)
+mkfs.xfs -L data1 /dev/sdb1
+
+Make a mount point
+mkdir -p /data
+
+Mount now (immediate use)
+mount /dev/sdb1 /data
+
+Verify
+df -h | grep /data
+
+Make it permanent (use the UUID so device names changing won’t break boot)
+blkid /dev/sdb1 ← copy the UUID shown
+Edit /etc/fstab and add a line like:
+UUID=your-uuid-here /data xfs defaults 0 0
+
+Test your fstab entry (very important)
+mount -a ← should be silent if OK
+Reboot and check again with df -h
+
+If mount -a errors, fix /etc/fstab before rebooting (a bad line can block boot).
+
+Why mount at all? Isn’t plugging in a disk enough?
+
+The kernel detects hardware, but Linux won’t pick a random folder to place your data.
+
+On desktops, a GUI automounter may attach USB drives under /run/media/...
+
+On servers, you usually mount explicitly so paths are stable (/data, /var/lib, /backup).
+
+Mounting tells the OS: “attach this filesystem to this folder so apps and users can use it.”
+
+Why separate partitions/mounts?
+
+Reliability and safety: if /var fills with logs, it won’t choke / (root).
+
+Performance and features: choose filesystems per use; enable options per mount.
+
+Maintenance: easy snapshots/backups/quotas; simpler growth planning.
+
+Common patterns:
+
+/ (root) for the OS
+
+/home for user data
+
+/var (and sometimes /var/log) for logs and app data
+
+/data or /srv for application payload
+
+LVM (when you expect growth)
+
+Plain partitions are fixed in size. LVM (Logical Volume Management) lets you pool disks and grow filesystems online.
+
+Concepts:
+
+PV (Physical Volume): a disk or partition you add to LVM.
+
+VG (Volume Group): the pooled “warehouse.”
+
+LV (Logical Volume): the “room” you format and mount.
+
+Simple LVM flow:
+
+pvcreate /dev/sdc
+
+vgcreate datavg /dev/sdc
+
+lvcreate -n data -L 50G datavg (creates /dev/datavg/data)
+
+mkfs.xfs /dev/datavg/data
+
+mkdir -p /data
+
+mount /dev/datavg/data /data
+
+To extend later (add another PV, then): lvextend -r -L +20G /dev/datavg/data
+The -r flag grows the filesystem online (xfs_growfs is run for XFS; for ext4 you’d use resize2fs).
+
+Why LVM: add more disks to the VG and extend LVs without rebuilding servers or moving data.
+
+Troubleshooting quick hits
+
+New disk not seen: run lsblk; if missing, check VirtualBox settings or dmesg.
+
+Can’t mount: check dmesg right after mount; filesystem type mismatch; did you run mkfs?
+
+“Device is busy” on umount: close shells in that directory; lsof +f -- /data to see users.
+
+Boot hangs after fstab edit: use UUIDs; test with mount -a before reboot; use “nofail” for removable/offline disks.
+
+SELinux/permissions: if apps can’t write, check ls -ld /data and set proper owner/mode (e.g., chown appuser:app /data; chmod 755 /data).
+
+TL;DR
+
+Add disk → (optionally) partition → make filesystem → create mount point → mount → add to /etc/fstab.
+
+Mounting is how Linux plugs storage into the directory tree so you can use it.
+
+Use LVM when you want painless growth later.

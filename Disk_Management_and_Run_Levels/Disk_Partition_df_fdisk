@@ -1,0 +1,78 @@
+🖥️ Disk Partition in Linux
+📌 Purpose
+
+Disk partition commands help you check:
+
+Which file systems are partitioned.
+
+Where they are mounted.
+
+The size, usage, and availability of each partition.
+
+🔹 df Command
+
+Stands for disk free.
+
+Shows information about mounted file systems.
+
+Output columns:
+
+Filesystem → device or source.
+
+Size → total capacity.
+
+Used → space already in use.
+
+Avail → remaining free space.
+
+Use% → percentage of disk used.
+
+Mounted on → where it’s mounted in the system.
+
+Useful option:
+
+df -h → human-readable format (GB, MB instead of blocks).
+
+🔹 fdisk Command
+
+Used to view or manage partitions on a disk.
+
+By default, running fdisk without options shows nothing useful.
+
+Common option:
+
+fdisk -l → lists all disks and their partitions.
+
+Typical output includes:
+
+Disk name (e.g., /dev/sda).
+
+Disk size (e.g., 10 GB).
+
+Partitions:
+
+Swap partition (e.g., centos-swap of 1 GB).
+
+Root partition (e.g., /dev/mapper/centos-root around 8.5 GB).
+
+📌 Use Cases
+
+Check available space on each filesystem (df).
+
+See how a disk is divided into partitions (fdisk -l).
+
+Essential when:
+
+Adding a new disk.
+
+Initializing or partitioning a disk.
+
+Mounting partitions to mount points.
+
+✅ Summary:
+
+Use df -h for quick disk usage overview.
+
+Use fdisk -l for detailed partition info.
+
+Together, they help system admins manage storage and troubleshoot disk issues.

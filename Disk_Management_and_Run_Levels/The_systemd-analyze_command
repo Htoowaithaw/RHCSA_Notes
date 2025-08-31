@@ -1,0 +1,71 @@
+🖥️ Linux Systemd-Analyze Command Notes
+📌 What is Systemd-Analyze?
+
+Part of the Systemd package.
+
+Used to analyze boot performance and system startup.
+
+Shows how long the kernel, initrd (initial RAM disk), and user space take to load.
+
+Identifies slowest services (critical chain) and services by startup time (blame list).
+
+Can generate graphical boot charts, check configuration errors, and assess service security.
+
+Helpful for troubleshooting and optimizing Linux system startup.
+
+🕘 History
+
+2010: Developed as part of the Systemd project (by Lennart Poettering).
+
+2014: Included in RHEL 7 / CentOS 7.
+
+Still widely used today for analyzing boot processes.
+
+⚙️ Key Features & Commands
+
+View manual page:
+man systemd-analyze
+(Shows ~20 parameters and options with examples.)
+
+Show total boot time:
+systemd-analyze time
+
+Example result:
+
+Kernel: 2s
+
+Initrd: 5s
+
+User space: 17s
+
+GUI ready: after 17s in user space
+
+Show services and their startup times (blame list):
+systemd-analyze blame
+
+Example: firewalld.service → 860ms
+
+Filter blame output for current user only:
+systemd-analyze blame --user
+
+Example: shows only 4 user-specific processes.
+
+🔍 Why Use Systemd-Analyze?
+
+Detects which services slow down boot.
+
+Helps sysadmins and engineers troubleshoot performance.
+
+Can be mentioned in interviews as part of system troubleshooting experience.
+
+✅ Summary
+
+Systemd-Analyze is a Linux tool to:
+
+Measure boot-up time (kernel, initrd, user space).
+
+Identify slow services.
+
+Optimize and troubleshoot system performance.
+
+👉 Practice: Run systemd-analyze on your own Linux machine to see what affects your boot time.

@@ -1,0 +1,71 @@
+📝 Customize Message of the Day (MOTD)
+🔹 What is it?
+
+MOTD = Message of the Day.
+
+Normally set in /etc/motd → displays plain text at login.
+
+But you can customize MOTD to run commands and show system info dynamically.
+
+🔹 Steps to Customize MOTD
+
+Create a script file
+
+Path: /etc/profile.d/motd.sh
+
+Must end with .sh (shell script).
+
+Example content inside motd.sh:
+
+#!/bin/bash (shebang line)
+
+echo statements with commands inside backticks:
+
+Show hostname → hostname
+
+Show OS version → cat /etc/redhat-release
+
+Show kernel version → uname -r
+
+Show logged-in user → whoami
+
+Example output when user logs in:
+
+############################
+Welcome to: server1.local
+This system is running: CentOS Linux 8
+Kernel is: 4.18.0-348.el8.x86_64
+You are logged in as: root
+############################
+
+Edit SSH configuration
+
+File: /etc/ssh/sshd_config
+
+Find the line: #PrintMotd yes
+
+Uncomment and change it to: PrintMotd no
+
+Why? → This disables /etc/motd and allows your custom script in /etc/profile.d/motd.sh to run instead.
+
+⚠️ Make a backup first:
+
+cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
+
+Restart SSH service
+
+systemctl restart sshd.service
+
+🔹 Verify
+
+Log in again (via PuTTY/SSH).
+
+You should now see the custom MOTD with live command outputs (hostname, OS, kernel, user, etc).
+
+💡 Tips
+
+You can extend MOTD with more system info: memory, disk usage, uptime, etc.
+
+Scripts in /etc/profile.d/ run at login for all users, making it ideal for system-wide messages.
+
+Great for multi-server environments to show which host users are on.

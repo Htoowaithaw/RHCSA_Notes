@@ -1,0 +1,148 @@
+💾 Adding a Disk and Creating New Partition in Linux
+📌 Why Add a New Disk?
+
+Run out of disk space.
+
+Separate applications onto different partitions.
+
+Better organization and performance.
+
+🔹 Steps in VirtualBox (Lab Setup)
+
+Create a Snapshot before making changes (safety net).
+
+Go to Settings → Storage → Add new disk.
+
+Choose Create New Disk → VDI → Dynamically allocated.
+
+Name it (e.g., datadisk) → set size (e.g., 2 GB).
+
+Start VM.
+
+🔹 Verify Current Disks
+
+df -h → shows existing mounted filesystems.
+
+fdisk -l → lists all disks and partitions.
+
+Example:
+
+/dev/sda = main 10 GB disk (with root + swap).
+
+/dev/sdb = new 2 GB disk (unpartitioned).
+
+🔹 Partition the New Disk
+
+Run: fdisk /dev/sdb.
+
+Inside fdisk:
+
+n → create new partition.
+
+p → primary (default).
+
+Partition number: 1.
+
+First sector: leave default (2048).
+
+Last sector: leave default (use whole disk).
+
+Confirm with w → writes changes to disk.
+
+Verify: fdisk -l → now shows /dev/sdb1.
+
+🔹 Create Filesystem
+
+Run: mkfs.xfs /dev/sdb1
+
+This formats the partition with XFS filesystem.
+
+🔹 Mount the Partition
+
+Create mount point: mkdir /data.
+
+Mount: mount /dev/sdb1 /data.
+
+Verify: df -h → shows /dev/sdb1 mounted on /data.
+
+🔹 Persist Mount Across Reboots
+
+Edit /etc/fstab:
+/dev/sdb1    /data    xfs    defaults    0 0
+Save and exit.
+
+Now, partition auto-mounts on boot.
+
+🔹 Useful Commands
+
+Reboot test: init 6 → verify /data is still mounted.
+
+Unmount: umount /data.
+
+Mount all fstab entries: mount -a.
+
+✅ Key Takeaways
+
+Always create snapshot before messing with partitions.
+
+fdisk = create partitions.
+
+mkfs = format filesystem.
+
+mount = attach filesystem to directory.
+
+fstab = makes mounts permanent across reboots.
+
+
+
+
+🖥️ What happens when you plug in a new HDD/SSD
+
+The BIOS/UEFI + OS kernel will detect the new hardware (disk).
+
+But the disk is just raw storage at this point.
+
+It has no filesystem yet (like NTFS on Windows, ext4/XFS on Linux, APFS on macOS).
+
+Without a filesystem, the OS doesn’t know how to organize files and folders on it.
+
+📂 Why you need to “mount” it
+
+In Linux, everything is under a single directory tree (/).
+
+A new disk does not automatically appear there — you must tell Linux “where in the tree should this storage be accessible?”
+
+That’s what mounting does:
+
+Example: you mount /dev/sdb1 → /data.
+
+Now, when you cd /data, you are actually looking at that new disk’s storage.
+
+Think of mounting as giving the OS a doorway into your new storage.
+Without mounting, the disk is invisible to users and apps, even though the hardware exists.
+
+🔑 Real-World Scenarios
+
+Server expands storage:
+A database server’s /var/lib/mysql partition is full. Admin adds a new SSD, mounts it to /var/lib/mysql, and moves the database there.
+
+Separate disks for applications:
+A company may keep logs on /var/log mounted from a separate disk, so logs don’t fill up the main OS disk.
+
+Data isolation:
+Developers mount an extra disk on /home so user files don’t mix with OS/system files.
+
+External drives:
+When you plug in a USB drive, the OS automatically mounts it (e.g., /media/usb) so you can use it. On Linux servers, you often need to mount manually.
+
+⚡ Difference vs Windows
+
+In Windows:
+New disks are formatted with a filesystem (NTFS, exFAT) → then they are assigned a drive letter (D:, E:). That’s Windows’ way of “mounting”.
+
+In Linux:
+No drive letters. Everything plugs into the single tree (/). You decide where by mounting.
+
+✅ So in your example:
+
+If you just plug in a new SSD → the OS sees it (like “here’s a raw 500GB device”), but until you partition, format, and mount it, you can’t store files on it.

@@ -1,0 +1,83 @@
+🗄️ Logical Volume Management (LVM) Notes
+🔹 What is LVM?
+
+LVM = Logical Volume Management
+
+It is software-based disk management in Linux.
+
+Allows multiple disks to be combined into volume groups (VGs) and divided into logical volumes (LVs).
+
+Provides flexibility for resizing storage without reformatting or breaking partitions.
+
+🔹 How it works (basic flow)
+
+Physical Disks (PVs) → Actual hard disks/SSDs.
+
+Volume Group (VG) → A pool created by combining one or more physical disks.
+
+Example: 3 × 100GB disks = 300GB volume group.
+
+Logical Volumes (LVs) → Partitions created from the volume group.
+
+Example: root, swap, home, data1, data2, etc.
+
+🔹 Example: Single Disk LVM
+
+One disk of 100GB.
+
+Create VG = sysvg.
+
+Inside sysvg, create logical volumes:
+
+/root = 50GB
+
+/home = 30GB
+
+swap = 20GB
+
+🔹 Example: Multi-Disk LVM
+
+Three disks, each 100GB.
+
+Combine them into one VG = datavg (300GB total).
+
+Create LVs inside datavg:
+
+data1 = 100GB
+
+data2 = 50GB
+
+data3 = 75GB
+
+data4 = 75GB
+
+🔹 Key Advantage of LVM
+
+Easily extendable:
+
+If the 300GB VG is full, just add another disk (e.g., +100GB).
+
+The VG becomes 400GB.
+
+You can then extend any logical volume (LV), like data1, without destroying the filesystem.
+
+🔹 Real-World Usage
+
+Common in corporate & virtualized environments.
+
+Example:
+
+A developer’s /root partition is 100GB and fills up to 99%.
+
+Instead of rebuilding the server, you:
+
+Add a new virtual disk.
+
+Extend the volume group.
+
+Extend the root LV from 100GB → 200GB.
+
+This flexibility avoids downtime and simplifies storage management.
+
+✅ In summary:
+LVM makes disk space management more flexible, scalable, and dynamic compared to traditional static partitions. It’s especially powerful in servers and virtual machines where resizing storage is a frequent requirement.
