@@ -1,0 +1,141 @@
+Adding and Extending Disk Using LVM
+
+Why We Need to Extend a Disk
+
+When a disk becomes full (100%), such as /oracle mounted with 1 GB, you need to increase its size.
+
+Options:
+
+Delete old files to free up space.
+
+Add a new disk and mount it as /oracle2.
+
+Best option (with LVM): Extend /oracle directly without creating a new mount point.
+
+Without LVM, you cannot extend an existing mount point.
+
+Virtual Environment Benefit
+
+In physical systems, adding a disk requires hardware installation.
+
+In virtual environments:
+
+Add a virtual disk easily via VM settings.
+
+No physical work needed.
+
+Steps to Extend a Disk in LVM
+
+Add a New Virtual Disk
+
+Power off the VM.
+
+Go to Settings → Storage.
+
+Add a new hard disk:
+
+Type: VDI
+
+Allocation: Dynamically allocated
+
+Size: 1 GB
+
+Name it like dataoracle2.vdi (different name from the original).
+
+Power on the VM.
+
+Verify Current Usage
+df -h
+Check /oracle partition.
+Example:
+/dev/mapper/oracle_vg-oracle_lv 997M 33M 965M /oracle
+
+List Available Disks
+fdisk -l | more
+Example disks:
+/dev/sda → Root disk
+/dev/sdb → Data disk
+/dev/sdc → Oracle disk
+New disk → /dev/sdd
+
+Partition the New Disk
+fdisk /dev/sdd
+
+Inside fdisk:
+n → New partition
+p → Primary partition
+Enter → Default partition number
+Enter → Default first sector
+Enter → Default last sector
+t → Change partition type
+l → List available types
+8e → Linux LVM
+w → Write changes and exit
+
+Verify partition:
+fdisk -l | more
+Look for /dev/sdd1
+
+Reboot (Optional)
+Reboot to ensure the system recognizes the new partition.
+reboot
+
+Verify After Reboot
+fdisk -l /dev/sdd1
+Confirm the partition exists.
+
+Identify Current Volume Group
+pvdisplay
+pvs
+
+Example output:
+PV Name /dev/sdc1
+VG Name oracle_vg
+
+Create a Physical Volume (PV)
+pvcreate /dev/sdd1
+Output: Physical volume "/dev/sdd1" successfully created.
+
+Extend the Volume Group (VG)
+vgextend oracle_vg /dev/sdd1
+Adds the new physical volume to the existing group.
+
+Extend the Logical Volume (LV)
+Find the logical volume path:
+lvdisplay
+
+Example:
+LV Path /dev/mapper/oracle_vg-oracle_lv
+
+Extend it by 1 GB:
+lvextend -L +1024M /dev/mapper/oracle_vg-oracle_lv
+
+Grow the Filesystem
+For XFS filesystem:
+xfs_growfs /dev/mapper/oracle_vg-oracle_lv
+
+Verify Final Size
+df -h
+Example output:
+/dev/mapper/oracle_vg-oracle_lv 2.0G 33M 1.9G /oracle
+
+Summary of Commands
+df -h
+fdisk -l
+fdisk /dev/sdd
+pvcreate /dev/sdd1
+vgextend oracle_vg /dev/sdd1
+lvdisplay
+lvextend -L +1024M /dev/mapper/oracle_vg-oracle_lv
+xfs_growfs /dev/mapper/oracle_vg-oracle_lv
+df -h
+
+Key Notes
+
+LVM allows flexible disk management:
+
+Easily add or extend storage.
+
+Avoid downtime or remounting different paths.
+
+Always backup critical data before resizing.

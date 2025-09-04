@@ -1,0 +1,140 @@
+Adding or Extending Swap Space in Linux
+What is Swap Space
+
+Swap space is virtual memory on a hard drive used when physical memory (RAM) is full.
+
+When RAM fills up, inactive pages are moved to swap space.
+
+It acts as backup memory, but it’s slower than RAM.
+
+In Windows, it's called virtual memory. In Linux, it's swap.
+
+Recommended Swap Size
+
+General rule:
+
+If RAM < 2GB → Swap = RAM × 2
+
+If RAM ≥ 2GB → Swap = RAM + 2GB
+
+Example:
+
+If system has 1GB RAM → Swap should be 2GB.
+
+If system has 4GB RAM → Swap should be 6GB.
+
+Commands Used
+
+dd → Create a swap file.
+
+mkswap → Create swap space.
+
+swapon → Enable swap.
+
+swapoff → Disable swap.
+
+Steps to Add Swap Space
+1. Check Existing Swap and Disk Usage
+
+Check mounted partitions:
+df -h
+
+Check memory and swap:
+free -m
+
+Example output of free -m:
+Memory: 1024MB total
+Swap: 1023MB total
+
+2. Create a New Swap File
+
+Become root user first.
+
+Command to create 1GB swap file:
+dd if=/dev/zero of=/newswap bs=1M count=1024
+
+Explanation:
+
+if=/dev/zero → Input file (generates zeros).
+
+of=/newswap → Output file (location of swap file).
+
+bs=1M → Block size of 1MB.
+
+count=1024 → Total blocks = 1024 → 1GB total size.
+
+Verify file creation:
+cd /
+ls -ltr
+You should see newswap file with 1GB size.
+
+3. Set Correct Permissions
+
+Only root should access the swap file:
+chmod 600 /newswap
+
+4. Mark File as Swap
+
+Format the file as swap:
+mkswap /newswap
+
+This will display information like swap version, size, and UUID.
+
+5. Enable Swap File
+
+Turn on the new swap file:
+swapon /newswap
+
+6. Verify Swap Space
+
+Check if swap is now active:
+free -m
+
+Example:
+
+Before: Swap = 1023MB
+
+After: Swap = 2047MB
+
+7. Make Swap Permanent (Optional)
+
+Edit /etc/fstab to enable swap on boot:
+vi /etc/fstab
+
+Add the following line at the end:
+
+/newswap swap swap defaults 0 0
+
+Save and exit.
+
+8. Reboot and Verify
+
+Reboot the system:
+reboot
+
+After reboot, check again:
+free -m
+The swap should remain enabled.
+
+Summary of Commands
+
+df -h
+free -m
+dd if=/dev/zero of=/newswap bs=1M count=1024
+chmod 600 /newswap
+mkswap /newswap
+swapon /newswap
+free -m
+vi /etc/fstab
+reboot
+
+Key Notes
+
+Swap provides extra memory but is much slower than RAM.
+
+Useful when you cannot upgrade physical memory.
+
+Always check /etc/fstab carefully; a mistake can prevent the system from booting.
+
+Disable swap if needed using:
+swapoff /newswap
