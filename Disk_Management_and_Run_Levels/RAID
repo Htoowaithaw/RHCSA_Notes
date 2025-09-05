@@ -1,0 +1,115 @@
+RAID Basics (RAID 0, 1, and 5)
+What is RAID?
+
+RAID stands for Redundant Array of Independent (or Inexpensive) Disks.
+
+Purpose: To provide redundancy and fault tolerance.
+
+If one disk fails, data is not lost.
+
+Also improves performance depending on the RAID level.
+
+Why RAID?
+
+Data protection: Prevents complete data loss if a disk dies.
+
+Used in servers, enterprise storage systems, and critical production environments.
+
+Common RAID Levels
+1. RAID 0 – Striping
+
+Combines two or more disks into one larger disk.
+
+Example:
+
+Two disks: 5 GB + 5 GB = 10 GB total.
+
+How it works:
+
+Data is split (striped) across both disks for faster performance.
+
+Advantage:
+
+Very fast read and write speeds.
+
+Disadvantage:
+
+No redundancy.
+
+If one disk fails, all data is lost.
+
+Best for:
+
+Temporary data storage like backups, data warehousing, or non-critical data.
+
+2. RAID 1 – Mirroring
+
+Two disks of equal size, but data is mirrored.
+
+Example:
+
+Two disks: 5 GB + 5 GB = 5 GB usable.
+
+How it works:
+
+Data is written identically to both disks.
+
+Advantage:
+
+High redundancy — if one disk fails, the other has a complete copy.
+
+Disadvantage:
+
+Slower performance because every write must be duplicated.
+
+Storage is halved (50% usable space).
+
+Best for:
+
+Critical systems where data integrity is more important than speed.
+
+3. RAID 5 – Striping with Parity
+
+Requires minimum of three disks.
+
+Example:
+
+Three disks: 5 GB each = 15 GB total → Usable space ≈ 10–12 GB.
+
+How it works:
+
+Data is striped like RAID 0, but parity information is also distributed across all disks.
+
+If one disk fails, data can be reconstructed from parity.
+
+Parity rotates among disks in a round-robin pattern.
+
+Advantage:
+
+Fault tolerance — survives failure of one disk.
+
+Good balance between speed and redundancy.
+
+Disadvantage:
+
+Slightly slower write performance due to parity calculations.
+
+Best for:
+
+Servers or environments needing both performance and redundancy.
+
+RAID vs LVM
+Feature	RAID	LVM
+Configured on	Physical disks	Virtual/logical disks
+Purpose	Data redundancy & fault tolerance	Flexible volume management
+Typical Use Case	Hardware servers, physical storage arrays	Virtualized environments, dynamic resizing
+
+Summary
+
+RAID 0: Speed only → No redundancy → All data lost if one disk fails.
+
+RAID 1: Mirroring → High redundancy → Slower writes, 50% storage loss.
+
+RAID 5: Speed + Redundancy → Needs minimum 3 disks, tolerates 1 disk failure.
+
+RAID is a hardware-level solution, while LVM is for logical volume management.

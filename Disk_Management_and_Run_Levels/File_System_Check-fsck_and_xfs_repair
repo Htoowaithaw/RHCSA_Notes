@@ -1,0 +1,207 @@
+File System Check – Detailed Notes
+Purpose of File System Checks
+
+Linux uses file system check utilities to ensure file systems are healthy and free of corruption.
+There are two main commands:
+
+fsck → For EXT2, EXT3, EXT4 and related file systems.
+
+xfs_repair → For XFS file systems (used by modern RHEL/CentOS versions).
+
+1. Difference Between fsck and xfs_repair
+
+fsck is a general-purpose file system check tool, running automatically during boot.
+Example: Older systems with ext3 or ext4.
+If corruption is detected during boot, fsck will pause boot to fix it.
+
+xfs_repair is for very large file systems like terabytes or petabytes.
+It never runs automatically at boot because scanning such large partitions would take too long.
+
+Modern Red Hat and CentOS use XFS as the default for / (root) and /boot.
+
+2. Identify Your File System Type
+
+Before deciding which command to use, find the file system type.
+
+Run:
+df -T
+
+Example output:
+
+Filesystem     Type  Size  Used Avail Use% Mounted on
+/dev/mapper/cs-root  xfs   18G  1.7G   16G  10% /
+/dev/sda1      xfs   1G   185M  840M  19% /boot
+/dev/sdb1      xfs   2G    50M  1.9G   3% /data
+
+Type column shows file system type.
+
+Most modern systems will show xfs.
+
+3. Automatic Check at Boot
+
+During every boot, Linux automatically runs fsck for EXT file systems.
+
+If there are errors, fsck will:
+
+Repair them automatically.
+
+Or prompt for manual confirmation if run without -y.
+
+When XFS is used, no auto repair happens during boot — you must run xfs_repair manually.
+
+4. Running fsck for EXT2/EXT3/EXT4
+
+Syntax:
+fsck [options] /dev/<partition>
+
+Common options:
+
+-f → Force check even if the file system is clean.
+
+-y → Automatically fix problems without asking for confirmation.
+
+Example:
+fsck -f -y /dev/sdb1
+
+Important: Never run fsck on a mounted file system, or it can cause corruption.
+
+5. Running xfs_repair for XFS
+
+XFS partitions cannot be checked or repaired while mounted in read/write mode.
+
+Steps:
+
+Identify mount point
+df -T
+Example: /dev/sdb1 mounted on /data.
+
+Unmount the partition
+umount /data
+If you get "operation not permitted", switch to root user:
+su - root
+
+Run repair
+xfs_repair /dev/sdb1
+
+Expected output:
+
+Phase 1 - find and verify superblock...
+Phase 2 - using internal log...
+Phase 3 - checking for duplicate blocks...
+Phase 4 - rebuilding AG headers and trees...
+Phase 5 - checking inode connectivity...
+Phase 6 - verifying link counts...
+done
+
+
+Check exit code
+echo $?
+
+0 → No errors
+
+1 → Errors were fixed
+
+2 → Reboot recommended
+
+Remount the file system
+mount /dev/sdb1 /data
+
+Verify mount
+df -h
+The device /dev/sdb1 should now be mounted back to /data.
+
+6. Repairing the Root (/) Partition
+
+You cannot unmount the root partition while the system is running normally.
+
+Solutions:
+
+Boot into single-user mode or rescue mode.
+
+Run xfs_repair on the root partition device, for example:
+xfs_repair /dev/mapper/cs-root
+
+Reboot once the repair is complete.
+
+7. fsck Exit Codes
+
+To check the exit status of fsck:
+echo $?
+
+Common exit codes:
+
+0 → No errors found.
+
+1 → Errors found and corrected.
+
+2 → Errors found, not corrected. System needs reboot.
+
+4, 8, 16, 32 → Serious problems.
+
+8. Example Walkthrough
+
+Goal: Repair corruption on /dev/sdb1 mounted at /data.
+
+Step 1 – Check file systems
+
+df -T
+Output shows /dev/sdb1 is xfs and mounted at /data.
+
+Step 2 – Unmount
+
+umount /data
+If permission denied → su - root → retry.
+
+Step 3 – Run repair
+
+xfs_repair /dev/sdb1
+Output goes through phases 1–7, ending with "done".
+
+Step 4 – Check exit code
+
+echo $?
+Returns 0 → successful repair.
+
+Step 5 – Remount
+
+mount /dev/sdb1 /data
+
+Step 6 – Verify
+
+df -h
+Ensure /dev/sdb1 is listed and mounted correctly.
+
+9. Why XFS Doesn't Run at Boot
+
+XFS is designed for very large file systems.
+
+Automatic checking during boot would dramatically delay startup.
+
+Manual intervention ensures the system only runs the repair when needed.
+
+10. Safety Precautions
+
+Always take snapshots or backups before repairing.
+
+Double-check device names (/dev/sdb1, /dev/sda2) before running commands.
+
+Never run on a mounted partition unless in single-user or rescue mode.
+
+11. Summary
+
+Use df -T to check file system type.
+
+EXT → Use fsck.
+Example: fsck -f -y /dev/sdb1
+
+XFS → Use xfs_repair.
+Example:
+umount /data
+xfs_repair /dev/sdb1
+mount /dev/sdb1 /data
+
+For root partition, use single-user or rescue mode.
+
+Use echo $? to confirm success.
+
+Exit codes guide next steps (0 = no issues, 1 = fixed, 2 = reboot).
