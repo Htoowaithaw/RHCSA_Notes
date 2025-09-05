@@ -1,0 +1,214 @@
+Implementing Advanced Storage Features Using Stratis
+Introduction
+
+Stratis is a next-generation volume management solution introduced in RHEL 8 and CentOS 8.
+
+Available starting from CentOS 7.5 and later.
+
+Thin provisioning is enabled by default.
+
+Combines LVM (Logical Volume Management) and file system creation into a single, simplified management process.
+
+Stratis vs LVM
+Traditional LVM Workflow
+
+Combine physical disks into a Volume Group (VG).
+
+Create Logical Volumes (LV) within the VG.
+
+Manually create and extend file systems on LVs.
+
+Example Problem:
+
+VG size = 20 GB
+
+File system size = 10 GB
+
+If FS gets full → Admin must manually extend it using lvextend.
+
+Stratis Workflow
+
+Combine disks into a Pool (e.g., 3 disks × 10 GB = 30 GB pool).
+
+Create file systems directly on top of the pool.
+
+File system grows automatically when needed, up to the total pool size.
+
+Advantage:
+No need to manually extend file systems — Stratis auto-extends them as data grows.
+
+Lab Steps
+1. Install Stratis Packages
+
+Install required tools:
+
+stratis-cli → command-line utility.
+
+stratisd → Stratis daemon.
+
+Command:
+dnf install stratis-cli stratisd -y
+
+Verify installation:
+rpm -qa | grep stratis
+
+2. Enable and Start Stratis Service
+
+Enable Stratis to start at boot:
+systemctl enable stratisd
+
+Check status:
+systemctl status stratisd
+
+Start the service:
+systemctl start stratisd
+
+Confirm it is active and running:
+systemctl status stratisd
+
+3. Prepare Virtual Disks
+
+Take a snapshot of the VM before making changes.
+
+Power off the VM before adding disks.
+
+In VirtualBox:
+
+Go to Settings → Storage.
+
+Add two new 5 GB disks (sdb and sdc).
+
+Power on the VM.
+
+Verify new disks:
+lsblk
+
+sdb → 5 GB
+
+sdc → 5 GB
+
+4. Create Stratis Pool
+
+Create a pool using the first disk:
+stratis pool create pool1 /dev/sdb
+
+Verify:
+stratis pool list
+
+Pool name: pool1
+
+Total size: 5 GB
+
+5. Extend the Pool
+
+Add the second disk (sdc) to the pool:
+stratis pool add-data pool1 /dev/sdc
+
+Verify:
+stratis pool list
+
+New total pool size: 10 GB
+
+6. Create a File System
+
+Create a file system inside the pool:
+stratis filesystem create pool1 FS1
+
+Verify:
+stratis filesystem list
+
+FS starts at 546 MB (thin provisioning).
+
+It will grow automatically as data is added.
+
+7. Mount the File System
+
+Create a directory to mount:
+mkdir /BigData
+
+Mount the file system:
+mount /dev/stratis/pool1/FS1 /BigData
+
+Verify mount:
+lsblk
+df -h
+
+Note:
+
+Stratis will display 1 TB as the default logical size.
+
+This is hard-coded and not the actual size.
+
+For real usage, run:
+stratis filesystem list
+
+8. Create a Snapshot
+
+Create a snapshot of the file system:
+stratis filesystem snapshot pool1 FS1 FS1-snap
+
+Verify:
+stratis filesystem list
+
+Original FS: FS1
+
+Snapshot: FS1-snap
+
+Snapshots make it easy to backup or clone data instantly.
+
+9. Configure Persistent Mount (fstab)
+
+To auto-mount at boot, edit /etc/fstab.
+
+Get UUID of the file system:
+blkid | grep FS1
+
+Add an entry to /etc/fstab:
+UUID=<filesystem-UUID> /BigData xfs defaults,x-systemd.requires=stratisd.service 0 0
+
+Save and exit.
+
+Important:
+
+x-systemd.requires=stratisd.service ensures the Stratis daemon starts before mounting the file system.
+
+Summary of Commands
+
+Install Stratis:
+dnf install stratis-cli stratisd -y
+
+Enable/start service:
+systemctl enable --now stratisd
+
+Create pool:
+stratis pool create pool1 /dev/sdb
+
+Extend pool:
+stratis pool add-data pool1 /dev/sdc
+
+Create file system:
+stratis filesystem create pool1 FS1
+
+Mount FS:
+mkdir /BigData
+mount /dev/stratis/pool1/FS1 /BigData
+
+Create snapshot:
+stratis filesystem snapshot pool1 FS1 FS1-snap
+
+Verify:
+stratis pool list
+stratis filesystem list
+df -h
+
+Key Takeaways
+
+Stratis simplifies storage management by combining LVM and file system into one solution.
+
+Thin provisioning allows efficient disk usage and automatic file system growth.
+
+Easy to create snapshots for backups or testing.
+
+Pools can be dynamically extended by adding more disks.
+
+Ideal for modern Linux environments requiring flexible and scalable storage.
