@@ -1,0 +1,240 @@
+Network File System (NFS)
+What NFS is and why it matters
+
+NFS = Network File System, created by Sun Microsystems (Solaris/UNIX), now ubiquitous on Linux.
+
+Lets one machine (server) export a directory so other machines (clients) can mount it and use it like a local folder.
+
+Typical use cases: shared app data, user home directories, software repos, backups, VM images, analytics datasets.
+
+NFS is part of NAS (network-attached storage) patterns: storage over the network via an OS service and a protocol.
+
+Key terms (keep these straight)
+
+Export: making a server directory available to clients. Defined in /etc/exports and applied with exportfs.
+
+Mount: attaching the remote share on a client to a local mount point, e.g., /mnt/share.
+
+rpcbind: legacy RPC mapper required by older NFS workflows (NFSv3). NFSv4 reduces dependency but many setups still use it.
+
+NFS versions: NFSv3 (stateless, UDP/TCP, separate mountd, lockd). NFSv4 (stateful, TCP only, one port 2049, integrated mount protocol, better security and ACLs).
+
+High-level flow
+
+Server exports a directory with rules (which clients, permissions, behavior).
+
+Client mounts that export to a local path.
+
+Read/write operations go over the network; on the client it feels like a local folder.
+
+Server-side setup (RHEL/CentOS/Alma/Rocky family)
+
+Install NFS packages if missing: nfs-utils and libnfsidmap.
+
+Verify with: rpm -qa | grep nfs
+
+Install with: dnf install nfs-utils libnfsidmap -y (or yum on older systems)
+
+Enable and start services:
+
+systemctl enable nfs-server
+
+systemctl start nfs-server
+
+If using v3 or mixed envs, also ensure: systemctl enable rpcbind; systemctl start rpcbind; systemctl start nfs-idmapd; systemctl start rpc-statd
+
+Create the directory to share and set permissions:
+
+Example dir: /mypretzels
+
+Create directory: mkdir /mypretzels
+
+Set permissive test perms (lab only): chmod a+rwx /mypretzels
+
+Put test files if you want: touch /mypretzels/a /mypretzels/b; echo hello > /mypretzels/readme
+
+Define exports in /etc/exports (this file controls who can mount and how):
+
+Minimal example for a single client: /mypretzels 192.168.1.11(rw,sync,no_root_squash)
+
+Example for any client on a subnet: /mypretzels 192.168.1.0/24(rw,sync,no_root_squash)
+
+Testing-only “open to all” (not recommended in prod): /mypretzels *(rw,sync,no_root_squash)
+
+Notes on options:
+
+rw vs ro: read/write or read-only.
+
+sync: commit changes to disk before replying (safer). async is faster but risks data on power loss.
+
+no_root_squash: client root acts as server root on the share (dangerous in prod). Default root_squash maps client root to nobody for safety.
+
+subtree_check/no_subtree_check: performance vs path checking; most modern uses set no_subtree_check.
+
+Apply/refresh exports:
+
+exportfs -rv (r = reexport, v = verbose)
+
+Verify what’s exported: exportfs -v
+
+Firewalld and SELinux considerations (RHEL family):
+
+Allow service through firewalld: firewall-cmd --permanent --add-service=nfs; firewall-cmd --permanent --add-service=rpc-bind; firewall-cmd --permanent --add-service=mountd; firewall-cmd --reload
+
+For NFSv4-only minimal firewall: firewall-cmd --permanent --add-service=nfs; firewall-cmd --reload (still safe to add rpc/mountd if mixing v3)
+
+SELinux: by default, exporting system dirs may be blocked. For custom export trees under /srv/nfs or /export it’s nicer. If exporting a nonstandard path, set context:
+
+semanage fcontext -a -t public_content_rw_t "/mypretzels(/.*)?"
+
+restorecon -Rv /mypretzels
+
+To permit NFS exports generally: setsebool -P nfs_export_all_rw on (only if needed; prefer precise contexts)
+
+Persist service on boot:
+
+systemctl enable nfs-server (rpcbind too if you need v3)
+
+Client-side setup (RHEL/CentOS/Alma/Rocky family)
+
+Install client utilities:
+
+dnf install nfs-utils -y
+
+Ensure network reachability:
+
+ping the server IP; ensure same L2/L3 (e.g., bridged networking in VirtualBox/VMware if needed)
+
+Optional rpcbind for v3 environments:
+
+systemctl start rpcbind
+
+Discover available exports from server:
+
+showmount -e SERVER_IP
+
+If this fails, check server firewall, SELinux, service status, and that exportfs -rv ran successfully.
+
+Create a mount point on the client:
+
+mkdir -p /mnt/kramer
+
+Mount the share:
+
+For NFSv4: mount -t nfs4 SERVER_IP:/mypretzels /mnt/kramer
+
+For NFSv3: mount -t nfs -o vers=3 SERVER_IP:/mypretzels /mnt/kramer
+
+Verify with df -h or mount | grep kramer
+
+Read/write test:
+
+On client: touch /mnt/kramer/test_from_client
+
+On server: ls -l /mypretzels to verify you see the new file
+
+Unmount when done:
+
+umount /mnt/kramer
+
+If “device is busy”, leave the directory (cd /) and retry, or use fuser -vm /mnt/kramer then close processes.
+
+Persistent mounts (client) that survive reboots
+
+Add an entry in /etc/fstab
+
+NFSv4 example: SERVER_IP:/mypretzels /mnt/kramer nfs4 defaults,_netdev 0 0
+
+NFSv3 example: SERVER_IP:/mypretzels /mnt/kramer nfs defaults,_netdev,vers=3 0 0
+
+Use _netdev to ensure network is up before mounting under systemd.
+
+After editing fstab, test with: mount -a (should be silent if OK)
+
+Choosing NFS version
+
+Prefer NFSv4 (TCP, single well-known port 2049, integrated locking, better ACLs).
+
+Use NFSv3 only when you must interoperate with older clients or specific appliances.
+
+Force version with mount option vers=4.2, vers=4.1, or vers=3 as needed.
+
+Common troubleshooting steps
+
+showmount -e SERVER_IP should list exports; if not, server firewall or exports config is wrong.
+
+On server, check: systemctl status nfs-server; exportfs -v; journalctl -u nfs-server
+
+Firewalld must allow nfs, rpc-bind, mountd for v3; for v4, nfs is typically sufficient.
+
+SELinux denials show in audit logs; use ausearch -m AVC -ts recent or journalctl to spot denials; fix with semanage fcontext and restorecon.
+
+“permission denied” on mount:
+
+Client not allowed in /etc/exports (IP/CIDR mismatch)
+
+Using v4 path style: with v4, some distros prefer export root like /export and bind mount subdirs; try SERVER_IP:/mypretzels or SERVER_IP:/ (if root export configured). If in doubt, mount with nfsvers=3 or explicitly nfs4 and confirm export root.
+
+“stale file handle”: the server’s inode for a file changed (moved or reexported). Unmount/remount on clients; avoid changing underlying paths during use.
+
+“device is busy” on unmount: leave the directory, close shells or processes using it (lsof +f -- /mnt/kramer; fuser -vm /mnt/kramer).
+
+Safety and security tips
+
+Avoid no_root_squash in production. Use root_squash to map client root to nobody.
+
+Restrict clients in /etc/exports with exact IPs or subnets, not *.
+
+Prefer ro for read-only datasets (software repos, media).
+
+Use sync for safer writes (accept performance tradeoff) or async for speed if you tolerate risk.
+
+Keep server and clients time-synced (chronyd or ntpd) to avoid Kerberos/ACL issues in advanced setups.
+
+For stronger security, use NFSv4 with Kerberos (sec=krb5, krb5i, krb5p). This requires a KDC and host keytabs; out of scope for this quick start but worth learning for enterprise.
+
+Quick lab recipe you can reproduce fast
+
+Server:
+
+dnf install nfs-utils -y
+
+mkdir -p /mypretzels; chmod 0777 /mypretzels; echo hello > /mypretzels/hello.txt
+
+echo "/mypretzels 192.168.1.0/24(rw,sync,no_subtree_check,root_squash)" >> /etc/exports
+
+systemctl enable --now nfs-server
+
+exportfs -rv
+
+firewall-cmd --permanent --add-service=nfs; firewall-cmd --permanent --add-service=rpc-bind; firewall-cmd --permanent --add-service=mountd; firewall-cmd --reload
+
+(If SELinux blocks, set contexts and restorecon for the export path)
+
+Client:
+
+dnf install nfs-utils -y
+
+mkdir -p /mnt/kramer
+
+mount -t nfs4 SERVER_IP:/mypretzels /mnt/kramer
+
+Verify with ls /mnt/kramer and create a test file
+
+Persist on client:
+
+Add to /etc/fstab: SERVER_IP:/mypretzels /mnt/kramer nfs4 defaults,_netdev 0 0
+
+Test with mount -a
+
+Mental model summary
+
+NFS lets many machines share the same files from one server.
+
+Server advertises directories via /etc/exports; clients mount them.
+
+Firewalld and SELinux often decide whether it works on first try.
+
+Start with NFSv4, sync, root_squash, subnet-scoped access; open perms only for learning labs.
+
+Use fstab and _netdev for reliable mounts at boot.
