@@ -1,0 +1,76 @@
+# SATA vs SAS
+
+## Introduction
+SATA and SAS are two common **storage drive technologies** used for communication between a **motherboard** and **storage devices** inside a computer or server.  
+Understanding their differences is crucial when selecting drives for desktop systems or enterprise servers.
+
+---
+
+## Definitions
+- **SATA** → Serial Advanced Technology Attachment  
+- **SAS** → Serial Attached SCSI (Small Computer System Interface, pronounced *scuzzy*)  
+
+Both **SATA** and **SAS** use **serial communication** for data transfer.
+
+---
+
+## Serial vs Parallel Communication
+### **Old Parallel Communication (Before Serial)**
+- Used **two separate cables**:  
+  - **Inbound communication cable** (data coming to storage).  
+  - **Outbound communication cable** (data going from storage).  
+- Resulted in:
+  - More cables → bulky design.
+  - Hard to fit inside compact computers like modern laptops.
+
+### **Modern Serial Communication**
+- Uses **one cable** with **two internal lanes**:  
+  - One lane for inbound data.
+  - One lane for outbound data.
+- Benefits:
+  - Compact cabling.
+  - Simpler and cleaner hardware design.
+
+---
+
+## Main Differences Between SATA and SAS
+| Feature              | **SATA**                        | **SAS**                           |
+|----------------------|----------------------------------|------------------------------------|
+| **Speed**            | Slower                          | Faster                             |
+| **Reliability**      | Less reliable                   | Highly reliable                     |
+| **Cost**             | Cheaper                         | More expensive                      |
+| **Use Case**         | Desktop storage, general files  | Servers, heavy data processing      |
+| **Connection Type**  | Single connection (one device)  | Multiple devices can be connected   |
+
+---
+
+## Cable Design Difference
+- **SATA Cable:**
+  - All four wires are **inside the same cable**.
+  - Only allows a direct connection between **motherboard and one storage device**.
+
+- **SAS Cable:**
+  - Four wires are **split into two separate channels**.
+  - Allows connecting the motherboard to:
+    - A **storage drive**, **and**
+    - Another hardware device with SAS connectors.
+
+This multi-device support is why SAS is more common in servers and enterprise storage systems.
+
+---
+
+## Highway Analogy
+Think of the connections like highways:
+- **SATA** → Single highway between **Los Angeles and San Francisco** (only one route, one device).  
+- **SAS** → Highway system that allows travel to **multiple cities** (e.g., Los Angeles to San Francisco **and** Los Angeles to Las Vegas).  
+  - SAS gives **flexibility** and **multiple access paths**.
+
+---
+
+## Summary
+- SATA and SAS both use **serial communication**, making them compact and efficient.  
+- **SATA** is ideal for desktops and basic storage needs due to lower cost.  
+- **SAS** is designed for **high-performance servers** and **mission-critical systems**, offering speed, reliability, and the ability to connect multiple devices.  
+- When choosing, consider your use case:  
+  - Desktop or personal storage → SATA.  
+  - Enterprise server or heavy workloads → SAS.

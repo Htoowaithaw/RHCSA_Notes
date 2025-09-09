@@ -1,0 +1,255 @@
+# MySQL and MariaDB
+
+## Introduction
+As a system administrator, you will often work with databases in Linux environments.  
+Two of the most popular databases are **MySQL** and **MariaDB**, both widely used for data storage and management.
+
+---
+
+## Relationship Between MySQL and MariaDB
+- **MySQL** is owned by **Oracle Corporation**.
+- **MariaDB** was created by the **original MySQL developers** to keep the project open source and free.
+- MariaDB is essentially a **fork of MySQL**, sharing the same foundation and commands.
+- Applications built for MySQL can **work seamlessly with MariaDB** without modification.
+
+---
+
+## Key Differences
+| Feature        | **MySQL**                | **MariaDB**               |
+|----------------|--------------------------|---------------------------|
+| Ownership      | Oracle Corporation       | MariaDB Foundation (nonprofit) |
+| Licensing      | Open source but controlled by Oracle | Fully open source |
+| Goal           | Commercial and enterprise | Community-driven |
+| Default in Linux Distros | Less common | Default in many distributions like Fedora and RHEL |
+
+---
+
+## MariaDB Overview
+- **Type:** Open-source, multithreaded relational database management system (RDBMS).
+- **License:** GNU Public License (GPL).
+- **Lead Developer:** Michael "Monty" Widenius, co-founder of MySQL.
+- **Data Storage:** Uses **tables with rows and columns**, similar to spreadsheets.
+- **Query Language:** Supports **SQL (Structured Query Language)** for Create, Read, Update, Delete (CRUD) operations.
+- **Advanced Features:** Stored procedures, triggers, views, JSON, NoSQL-style queries, big data integration.
+
+---
+
+## Brief History
+- **1995:** MySQL created by MySQL AB (Sweden).
+- **2008:** Sun Microsystems acquires MySQL AB (~$1 billion).
+- **2009:** Michael Widenius forks MySQL to create MariaDB.
+- **2010:** Oracle acquires Sun Microsystems → MySQL becomes Oracle-owned.
+- **2013:** MariaDB replaces MySQL as default database in many Linux distros.
+
+---
+
+## Step-by-Step Guide
+
+### **Step 1: Install and Start MariaDB**
+1. Install MariaDB packages:
+   ```
+   dnf install mariadb-server mariadb -y
+   ```
+2. Start MariaDB service:
+   ```
+   systemctl start mariadb
+   ```
+3. Enable MariaDB to run at boot:
+   ```
+   systemctl enable mariadb
+   ```
+4. Verify status:
+   ```
+   systemctl status mariadb
+   ```
+
+---
+
+### **Step 2: Secure MariaDB Installation**
+Run the secure installation command:
+```
+mysql_secure_installation
+```
+- Set a **root password**.
+- Choose **no** for Unix socket authentication.
+- Skip other optional steps (anonymous users, remote login, test databases).
+
+---
+
+### **Step 3: Create Database and User**
+1. Login as root:
+   ```
+   mysql -u root -p
+   ```
+2. Create a new database:
+   ```sql
+   CREATE DATABASE first_MariaDB;
+   ```
+3. Create a new user:
+   ```sql
+   CREATE USER 'iafzal'@'localhost' IDENTIFIED BY '123';
+   ```
+4. Grant privileges:
+   ```sql
+   GRANT ALL PRIVILEGES ON first_MariaDB.* TO 'iafzal'@'localhost';
+   ```
+5. Reload privileges:
+   ```sql
+   FLUSH PRIVILEGES;
+   ```
+6. Verify databases:
+   ```sql
+   SHOW DATABASES;
+   ```
+7. Exit MariaDB shell:
+   ```
+   EXIT;
+   ```
+
+---
+
+### **Step 4: Create Table and Perform CRUD**
+1. Login again:
+   ```
+   mysql -u root -p
+   ```
+2. Select database:
+   ```sql
+   USE first_MariaDB;
+   ```
+3. Create table:
+   ```sql
+   CREATE TABLE people (
+       id INT AUTO_INCREMENT PRIMARY KEY,
+       name VARCHAR(100),
+       profession VARCHAR(100)
+   );
+   ```
+4. Insert data:
+   ```sql
+   INSERT INTO people (name, profession) VALUES
+   ('Alice', 'Engineer'),
+   ('Bob', 'Doctor'),
+   ('Charlie', 'Teacher');
+   ```
+5. Retrieve data:
+   ```sql
+   SELECT * FROM people;
+   ```
+6. Update record:
+   ```sql
+   UPDATE people SET profession='Principal' WHERE name='Charlie';
+   ```
+7. Delete record:
+   ```sql
+   DELETE FROM people WHERE name='Bob';
+   ```
+8. Exit MariaDB shell:
+   ```
+   EXIT;
+   ```
+
+---
+
+### **Step 5: Uninstall MariaDB**
+1. Stop service:
+   ```
+   systemctl stop mariadb
+   ```
+2. Remove packages:
+   ```
+   dnf remove mariadb mariadb-server -y
+   ```
+3. Delete data directory:
+   ```
+   rm -rf /var/lib/mysql
+   ```
+4. Remove configuration file:
+   ```
+   rm -f /etc/my.cnf
+   ```
+
+---
+
+### **Step 6: Install and Configure MySQL**
+1. Install MySQL server:
+   ```
+   dnf install mysql-server -y
+   ```
+2. Start MySQL service:
+   ```
+   systemctl start mysqld
+   ```
+3. Enable at boot:
+   ```
+   systemctl enable mysqld
+   ```
+4. Verify status:
+   ```
+   systemctl status mysqld
+   ```
+
+**Note:** All commands, CRUD operations, and configurations are **identical to MariaDB**.
+
+---
+
+## CRUD Recap
+- **C** → Create: `INSERT`
+- **R** → Read: `SELECT`
+- **U** → Update: `UPDATE`
+- **D** → Delete: `DELETE`
+
+CRUD operations are the foundation of database management.
+
+---
+
+## Summary
+- MariaDB and MySQL are nearly identical; mastering one means you know both.
+- MariaDB focuses on **open-source community-driven development**.
+- MySQL is **corporate-backed** by Oracle.
+- Installation, commands, and management steps are **exactly the same**.
+- Use MariaDB for open environments and MySQL for enterprise Oracle-supported setups.
+
+----------------------------------------------------------------------------------------
+Install and Configure MariaDB & MySQL
+Step 1: Install and Start MariaDB
+dnf install mariadb-server mariadb -y
+systemctl start mariadb
+systemctl enable mariadb
+systemctl status mariadb
+Step 2: Secure MariaDB Installation
+mysql_secure_installation
+Step 3: Create Database and User in MariaDB
+CREATE DATABASE first_MariaDB;
+CREATE USER 'iafzal'@'localhost' IDENTIFIED BY '123';
+GRANT ALL PRIVILEGES ON first_MariaDB.* TO 'iafzal'@'localhost';
+FLUSH PRIVILEGES;
+SHOW DATABASES;
+EXIT;
+Step 4: Create Table and CURD operation
+vi /etc/nginx/nginx.conf
+USE first_MariaDB;
+CREATE TABLE people (
+ id INT PRIMARY KEY AUTO_INCREMENT,
+ name VARCHAR(100),
+ profession VARCHAR(100)
+);
+INSERT INTO people (name, profession) VALUES
+('Alice', 'Engineer'), 
+('Bob', 'Doctor'),
+('Charlie', 'Teacher');
+SELECT * FROM people;
+UPDATE people SET profession = 'Principal' WHERE name = 'Charlie';
+DELETE FROM people WHERE name = 'Bob';
+EXIT;
+Step 5: Uninstall MariaDB
+systemctl stop mariadb
+dnf remove mariadb mariadb-server
+rm -rf /var/lib/mysql
+rm -rf /etc/my.cnf
+Step 6: Install and Setup MySQL
+dnf install mysql-server -y
+systemctl start mysqld
+systemctl enable mysqld
+systemctl status mysqld
+mysql_secure_installation
