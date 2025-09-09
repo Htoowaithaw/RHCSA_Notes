@@ -1,0 +1,333 @@
+# Samba Lecture Notes
+
+## Introduction to Samba
+Samba is a Linux tool used to share Linux resources such as files and printers with other operating systems.  
+It is similar to NFS, but while **NFS** is used for Linux/Unix systems only, **Samba** allows sharing between Linux and systems like **Windows** and **Mac**.
+
+Example:  
+- Computer A (server) shares a directory using Samba.  
+- Computer B (client) sends a mount request to access it.  
+- Samba server verifies and approves the request.  
+- Computer B mounts it and sees it like a local filesystem.
+
+---
+
+## SMB vs CIFS
+- **SMB (Server Message Block):** Protocol developed by IBM, used by Samba for sharing resources.  
+- **CIFS (Common Internet File System):** Extension of SMB developed by Microsoft.  
+- Microsoft now uses **SMB v2 and v3**.  
+- **NMB (NetBIOS Name Server):** Used for naming services.  
+- In practice, SMB and CIFS are often used to mean the same thing.
+
+---
+
+## Samba Installation and Configuration Steps
+
+### 1. Preparation
+- Take a **snapshot** of the VM before starting to allow reverting if something breaks.  
+- Log in as **root** and verify:
+  ```
+  id
+  ```
+
+### 2. Install Samba Packages
+Install required packages:
+```
+yum install samba samba-client samba-common
+```
+
+Verify installation:
+```
+rpm -qa | grep samba
+```
+
+### 3. Configure Firewall
+Check if firewall is active:
+```
+systemctl status firewalld
+```
+
+If active, allow Samba through the firewall.  
+For lab purposes, you can disable it:
+```
+systemctl stop firewalld
+systemctl disable firewalld
+```
+
+### 4. Create Samba Shared Directory
+Create directory to be shared:
+```
+mkdir -p /samba/more_pretzels
+```
+
+Set permissions:
+```
+chmod 777 /samba/more_pretzels
+```
+
+Change ownership to **nobody**:
+```
+chown -R nobody:nobody /samba
+```
+
+### 5. Configure SELinux
+Check if SELinux is enabled:
+```
+sestatus
+```
+
+If enabled, disable it for lab use:
+```
+vi /etc/selinux/config
+```
+Change:
+```
+SELINUX=enforcing
+```
+To:
+```
+SELINUX=disabled
+```
+
+Reboot and verify:
+```
+sestatus
+```
+
+### 6. Edit Samba Configuration File
+Backup original config:
+```
+cd /etc/samba
+cp smb.conf smb.conf.org
+```
+
+Edit file:
+```
+vi smb.conf
+```
+
+Replace contents with:
+```
+[global]
+workgroup = WORKGROUP
+netbios name = CentOS
+security = user
+map to guest = Bad User
+dns proxy = no
+
+[Anonymous]
+path = /samba/more_pretzels
+browsable = yes
+writable = yes
+guest ok = yes
+guest only = yes
+read only = no
+```
+
+Test configuration:
+```
+testparm
+```
+If no errors, proceed.
+
+### 7. Start and Enable Samba Services
+Enable services:
+```
+systemctl enable smb
+systemctl enable nmb
+```
+
+Start services:
+```
+systemctl start smb
+systemctl start nmb
+```
+
+Check status:
+```
+systemctl status smb
+systemctl status nmb
+```
+
+### 8. Test Samba Share on Windows
+Create a test file on Linux:
+```
+touch /samba/more_pretzels/apples
+```
+
+On Windows:
+- Open Run or File Explorer.
+- Enter `\\192.168.1.95` (replace with server IP).
+- Open **Anonymous** share.
+- Create a file there.
+
+Verify on Linux:
+```
+ls -ltr /samba/more_pretzels
+```
+The file should appear with owner as **nobody**.
+
+### 9. Mount Samba Share on Another Linux Machine
+On client machine, install required packages:
+```
+yum install cifs-utils samba-client
+```
+
+Create a mount point:
+```
+mkdir /mnt/sambashare
+```
+
+Mount the share:
+```
+mount -t cifs //192.168.1.95/Anonymous /mnt/sambashare
+```
+
+When asked for a password, just press Enter (no password for anonymous).
+
+Verify:
+```
+df -h
+ls -ltr /mnt/sambashare
+```
+
+Files should match between server, Windows, and client.
+
+### 10. Verify Sync
+Create files from any connected system:
+- Linux server
+- Windows client
+- Linux client
+
+All files should appear on every system instantly.
+
+---
+
+## Secure Samba Share
+To secure with username and password:
+- Create Samba user accounts.
+- Update `smb.conf` to require login.
+- Follow detailed instructions provided in the attached guide.
+
+---
+
+## Summary
+- Samba allows sharing Linux resources with other operating systems using SMB/CIFS.  
+- Key steps:
+  1. Snapshot VM  
+  2. Install Samba packages  
+  3. Configure firewall or disable it  
+  4. Create and set permissions for shared directory  
+  5. Adjust SELinux settings  
+  6. Edit smb.conf  
+  7. Start and enable Samba services  
+  8. Test with Windows and Linux clients  
+- Supports both anonymous and secure file sharing.
+
+------------------------------------------------------------------------
+
+Step by steps installation instructions
+First please make sure to take a snapshot of your VM
+•
+Install samba packages
+# Become root user
+# yum install samba samba-client samba-common
+•
+Enable samba to be allowed through firewall (Only if you have firewall running)
+# firewall-cmd --permanent --zone=public --add-service=samba
+# firewall-cmd –reload
+•
+To stop and disable firewall or iptables
+# systemctl stop firewalld
+# systemctl stop iptables
+# systemctl disable firewalld
+# systemctl disable iptables•
+Create Samba share directory and assign permissions
+# mkdir -p /samba/morepretzels
+# chmod a+rwx /samba/morepretzels
+# chown -R nobody:nobody /samba
+•
+Also, you need to change the SELinux security context for the samba shared
+directory as follows: (Only if you have SELinux enabled)
+# chcon -t samba_share_t /samba/morepretzels
+•
+If you want to disable SELinux, follow these instructions
+# sestatus To check the SELinux status)
+# vi /etc/selinux/config
+Change
+SELINUX=enforcing
+To
+SELINUX=disabled
+# reboot
+•
+Modify /etc/samba/smb.conf file to add new shared filesystem (Make sure to
+create a copy of smb.conf file)
+Delete everything from smb.conf file and add the following parameters
+[global]
+workgroup = WORKGROUP
+netbios name = centos
+security = user
+map to guest = bad user
+dns proxy = no
+[Anonymous]
+path = /samba/morepretzels
+browsable = yes
+writable = yes
+guest ok = yes
+guest only = yes
+read only = no
+•
+Verify the setting
+# testparm
+•
+Once the packages are installed, enable and start Samba services
+# systemctl enable smb
+# systemctl enable nmb
+# systemctl start smb
+# systemctl start nmb•
+•
+Mount on Windows client
+o Go to start
+o Go to search bar
+o Type \\192.168.1.95
+(This is my server IP, you can check your Linux
+CentOS IP by running the command ifconfig)
+Mount on Linux client
+Become root
+# yum -y install cifs-utils samba-client
+Create a mount point directory
+# mkdir /mnt/sambashare
+Mount the samba share
+# mount -t cifs //192.168.1.95/Anonymous /mnt/sambashare/
+# Entry without password
+Secure Samba Server
+•
+Create a group smbgrp & user larry to access the samba server with proper
+authentication
+# useradd larry
+# groupadd smbgrp
+# usermod -a -G smbgrp larry
+# smbpasswd -a larry
+New SMB password: YOUR SAMBA PASS
+Retype new SMB password:
+REPEAT YOUR SAMBA PASS
+Added user larry
+•
+Create a new share, set the permission on the share:
+# mkdir /samba/securepretzels
+# chown -R larry:smbgrp /samba/securepretzels
+# chmod -R 0770 /samba/securepretzels
+# chcon -t samba_share_t /samba/securepretzels
+•
+Edit the configuration file /etc/samba/smb.conf (Create a backup copy first)
+# vi /etc/samba/smb.conf
+Add the following lines
+[Secure]
+path = /samba/securepretzels
+valid users = @smbgrp
+guest ok = nowritable = yes
+browsable = yes
+•
+Restart the services
+# systemctl restart smb
+# systemctl restart nmb

@@ -1,0 +1,148 @@
+# NAS Device for NFS and Samba Configuration
+
+## Introduction
+A **NAS (Network Attached Storage)** device is a dedicated hardware system that provides centralized storage which can be shared across multiple clients.  
+NAS can share files with:
+- **Linux machines** using **NFS** (Network File System).
+- **Windows machines** using **Samba (SMB/CIFS)**.
+
+In previous lessons, we learned to share storage using Linux servers directly for NFS and Samba.  
+With a NAS device, the same can be done but in a simpler, dedicated way.
+
+---
+
+## NAS Device Overview
+- A NAS device looks like a **box or rack-mounted server**.  
+- It contains **multiple disks** inside for storage.  
+- It has its **own operating system** for managing storage, shares, and network settings.
+- NAS devices have **network ports** to connect to a network via **CAT5 or CAT6 cables**.
+
+---
+
+## Setup Process Overview
+1. **Connect NAS to network** and power it on.
+2. Access its **web portal** using the DHCP-assigned IP address.
+3. Configure storage pools and volumes.
+4. Create shared folders.
+5. Configure NFS and Samba services.
+6. Mount shares from Linux and Windows clients.
+
+---
+
+## Step 1: Configure Storage Pool and Volume
+- Go to **Storage Manager** → **Create Pool and Volume**.
+- Steps:
+  1. Choose **Create Now** → **Start**.
+  2. Select **RAID type** (example: **RAID 5**).
+  3. Select all available drives (e.g., 4 drives).
+  4. Allocate storage size (use entire available size, e.g., `5575GB`).
+  5. Select a **file system**:
+     - Recommended: **BTRFS**.
+     - Alternative: **EXT4** for compatibility with Linux/Windows.
+  6. Confirm settings → Click **Apply**.
+  7. Acknowledge data wipe warning → Click **OK**.
+- Creation of RAID pool and volume will run in the background.
+
+---
+
+## Step 2: Create Shared Folder
+- Go to **Main Menu** → **File Station** → Create shared folder.
+- Example folder name: `peanuts`.
+- Default settings: **no encryption**, **no checksum**.
+- Configure user permissions → allow **read/write for everyone** → Apply.
+
+---
+
+## Step 3: Configure NFS Permissions
+- Edit the shared folder → **NFS Permissions** → Create new rule:
+  - Host/IP: `*` (all clients).
+  - Privilege: **Read/Write**.
+  - No mapping, Security: `sys`.
+  - Enable asynchronous option.
+- Save settings.
+
+Enable NFS service if not already enabled.  
+This allows Linux clients to mount the share.
+
+---
+
+## Step 4: Export Shared Folder
+- Go back to the shared folder → **Action** → **Export Permission Report**.
+- Note the shared folder path, for example:
+  ```
+  /volume1/peanuts
+  ```
+- This path is needed for mounting.
+
+---
+
+## Step 5: Mount NFS Share on Linux
+On the Linux client:
+1. Create a mount point:
+   ```
+   mkdir /a
+   ```
+2. Mount the shared folder:
+   ```
+   mount 192.168.1.56:/volume1/peanuts /a
+   ```
+   *(Replace `192.168.1.56` with the NAS device IP address.)*
+
+3. Verify the mount:
+   ```
+   df -h
+   ```
+   The mounted folder will appear at the bottom of the output.
+
+4. List contents:
+   ```
+   ls -ltr /a
+   ```
+
+---
+
+## Step 6: Configure Samba (SMB) for Windows
+- Go to **File Services** in the NAS portal.
+- **Samba (SMB)** service is usually **enabled by default**.
+- Workgroup defaults to `WORKGROUP`.
+- To access the share on Windows:
+  - Open File Explorer or Run dialog.
+  - Enter:
+    ```
+    \\nas420
+    ```
+    *(Replace `nas420` with your NAS device name or IP address.)*
+
+- Enter NAS credentials created during NAS setup.
+- The shared folder (`peanuts`) will now be visible.
+
+---
+
+## Step 7: Verify Cross-Platform Sync
+1. **On Linux:**
+   - Go to the mounted directory:
+     ```
+     cd /a
+     touch xyz
+     ls -ltr
+     ```
+   - The file `xyz` will appear in the shared folder.
+
+2. **On Windows:**
+   - Refresh the share in File Explorer.
+   - The file `xyz` should now be visible.
+
+Changes made from either system will be synced across all connected clients.
+
+---
+
+## Summary
+- A NAS device simplifies creating and managing shared storage.
+- Supports **NFS** for Linux and **SMB/Samba** for Windows.
+- Key steps:
+  1. Configure storage pool and RAID.
+  2. Create shared folder.
+  3. Set up NFS and Samba permissions.
+  4. Mount from Linux using `mount` command.
+  5. Access from Windows using `\\nas_name`.
+- Provides a centralized, easy-to-manage solution for multi-platform environments.
