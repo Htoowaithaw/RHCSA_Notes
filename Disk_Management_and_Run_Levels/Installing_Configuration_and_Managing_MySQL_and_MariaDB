@@ -219,6 +219,10 @@ systemctl enable mariadb
 systemctl status mariadb
 Step 2: Secure MariaDB Installation
 mysql_secure_installation
+
+Enter to mysql database;
+# mysql -u root -p
+
 Step 3: Create Database and User in MariaDB
 CREATE DATABASE first_MariaDB;
 CREATE USER 'iafzal'@'localhost' IDENTIFIED BY '123';
@@ -226,6 +230,9 @@ GRANT ALL PRIVILEGES ON first_MariaDB.* TO 'iafzal'@'localhost';
 FLUSH PRIVILEGES;
 SHOW DATABASES;
 EXIT;
+Re-enter to mysql database again;
+# mysql -u root -p
+
 Step 4: Create Table and CURD operation
 vi /etc/nginx/nginx.conf
 USE first_MariaDB;
