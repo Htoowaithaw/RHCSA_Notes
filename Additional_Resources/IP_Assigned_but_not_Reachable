@@ -1,0 +1,88 @@
+
+# 🌐 IP Address Assigned but Not Reachable
+
+When your system has an IP address assigned but you **cannot reach it**, follow these troubleshooting steps to identify and fix the issue.
+
+---
+
+## **Troubleshooting Steps**
+
+1. **Check the Network Interface**
+   - Run `ifconfig` or `ip addr` to confirm the interface is active and has the correct IP.
+   - Example:
+
+     ip addr show
+
+     Look for the interface status — it should be **UP**.
+
+2. **Verify Subnet Mask and Gateway**
+   - Ensure the correct subnet mask and gateway are configured in `/etc/sysconfig/network-scripts/` or via `nmcli`.
+
+3. **Ping the Gateway**
+   ping -c 4 <gateway-ip>
+
+   If it fails, there may be a gateway or network issue.
+
+4. **Check Gateway Assignment**
+   netstat -rnv
+
+   - Confirms the default gateway is correctly set.
+
+5. **Verify VLAN Settings**
+   - Ask the network team if the **correct VLAN** is assigned on the switch port.
+
+6. **Check NIC (Network Interface Card) Status**
+   ethtool <interface-name>
+
+   or
+   mii-tool <interface-name>
+
+
+7. **Bring Interface Up**
+   ifup <interface-name>
+
+
+8. **Restart Network Service**
+   sudo systemctl restart network
+
+
+9. **Check for IP Conflicts**
+   - Run `arp-scan` or disconnect other devices to ensure no two devices share the same IP.
+
+10. **Turn Off Firewall Temporarily**
+    
+    sudo systemctl stop firewalld
+    
+
+---
+
+## **Simple Example**
+
+- Server IP: `192.168.1.10`
+- Gateway: `192.168.1.1`
+
+### Steps:
+1. Verify interface status:
+   ip addr show
+
+2. Ping the gateway:
+   ping -c 4 192.168.1.1
+
+3. If ping fails, check routes:
+   netstat -rnv
+
+4. Bring the NIC up:
+   ifup eth0
+
+5. Restart network service if needed:
+   systemctl restart network
+
+
+---
+
+## **Summary**
+- Most connectivity issues happen due to incorrect gateway, VLAN mismatch, or NIC being down.
+- Always test **basic connectivity** (ping, routes) before diving deeper.
+
+
+[Alt text](IP_ASSIGNED_BUT_Network_NOT_REACHABLE_Tshoot.png)

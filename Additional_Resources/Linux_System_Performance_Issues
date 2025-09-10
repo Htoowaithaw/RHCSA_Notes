@@ -1,0 +1,131 @@
+
+# 🚦 System Is Running Slow — Practical Troubleshooting (Linux)
+
+A fast, repeatable checklist to diagnose slowness by **Disk → CPU/Memory → I/O → Network → Logs/Hardware**.
+
+---
+
+## 0) Verify Target
+- Confirm you're on the right host:
+  - `hostname -f` • `whoami` • `ip a`
+
+---
+
+## 1) Disk Space & Big Consumers
+- Capacity snapshot (exclude tmpfs):  
+  `df -h | grep -v tmpfs`
+- Find largest directories/files (example for `/`):  
+  `du -xh / 2>/dev/null | sort -h | tail -50`
+- If a FS is ~100%, expect stalls (journals, DBs, temp files). Free space or expand.
+
+---
+
+## 2) CPU & Memory Pressure
+- Live view: `top` (or `htop`)  
+  - Check load average, `%CPU`, `%MEM`, and top offenders.
+- Memory: `free -m` • `vmstat 1 5` • `/proc/meminfo`
+- Per‑process memory map (replace PID): `pmap -x <PID> | tail -n 1`
+- Hardware inventory (quick): `lscpu` • `lsmem` • `dmidecode -t memory`
+
+**Rules of thumb**
+- High load with low CPU usage → often I/O wait (see §3).  
+- Swap thrashing → add RAM, tune workloads, or reduce caches.
+
+---
+
+## 3) Disk I/O Bottlenecks
+- I/O stats in intervals: `iostat -x 5`  
+  - Watch **r/s, w/s, rkB/s, wkB/s, await, svctm, %util**.  
+  - **High %util (~100%) + large await** = saturated/slow disk.
+- Who’s holding files/FS busy: `lsof +D /mount/point` (can be heavy) or `lsof | grep <mount>`
+
+**If a mount hits 100% util**
+- Check journal/DB/backup jobs, rotate logs, throttle batch jobs, move hot data.
+
+---
+
+## 4) Network Factors
+- What’s listening & established:
+  - `ss -plnt` (TCP) • `ss -plu` (UDP)
+- Live bandwidth by host: `iftop` (install: `dnf install epel-release -y && dnf install iftop -y`)
+- Packet capture for a specific IF (replace IF): `tcpdump -i <IF>`  
+  - Filter examples: `tcpdump -i <IF> host <ip>` • `tcp port <port>`
+
+**Signs**
+- High retransmissions/latency → network path, NIC errors, or CPU offload settings.
+
+---
+
+## 5) Uptime & Load Story
+- `uptime` • `top` (load averages over **1/5/15 min**)  
+  - Rising load correlates with I/O wait, run queue, or memory pressure.
+
+---
+
+## 6) Logs & Errors
+- System/kernel messages:  
+  `journalctl -p err -b` (systemd) or `grep -Ei 'error|warn|fail' /var/log/messages`
+- Service‑specific logs (Apache/MySQL/etc.) in `/var/log/<service>/`
+
+**Look for**
+- Disk I/O errors, OOM‑killer, NIC flaps, service restarts, SELinux denials.
+
+---
+
+## 7) Hardware/Platform
+- Firmware console/iLO/iDRAC for hardware faults (disks, DIMMs, PSU).  
+- On host: `smartctl -a /dev/sdX` (if SMART available), `dmidecode` for inventory.
+
+---
+
+## Handy Tools (Install as needed)
+- `htop` (CPU/mem), `iotop` (per‑process I/O), `iftop` (bandwidth), `ncdu` (disk usage TUI)
+
+Install examples (RHEL/Rocky/CentOS Stream):  
+```
+dnf install -y epel-release
+dnf install -y htop iotop iftop ncdu sysstat smartmontools
+```
+
+---
+
+## Quick Triage Workflows
+
+### A) Disk Full / Hotspots
+```
+df -h | grep -v tmpfs
+du -xh /var 2>/dev/null | sort -h | tail -50
+journalctl --vacuum-time=7d   # shrink old journals (systemd)
+logrotate -f /etc/logrotate.conf
+```
+
+### B) High Load, Suspect I/O
+```
+iostat -x 5
+lsof | grep /data
+iotop -oPa
+```
+
+### C) Memory Pressure / OOM
+```
+free -m
+dmesg | grep -i oom
+pmap -x <PID> | tail -n 1
+```
+
+### D) Network Throughput/Latency
+```
+ss -plnt
+iftop
+tcpdump -i <IF> tcp port 443
+```
+
+---
+
+## Summary
+1) Confirm host → 2) Disk space → 3) CPU/mem → 4) Disk I/O → 5) Network → 6) Logs/Hardware.  
+Capture the offender (process, FS, or interface), apply the smallest corrective action (free space, restart a noisy service, throttle batch jobs, add resources), then **verify** with the same metrics.
+
+
+
+[Alt text](System_Running_Slow_Tshoot_Steps.png)
