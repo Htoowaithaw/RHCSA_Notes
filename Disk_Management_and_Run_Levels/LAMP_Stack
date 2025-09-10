@@ -1,0 +1,149 @@
+
+# LAMP Stack
+
+## Introduction
+The **LAMP stack** is a popular open-source software package for building and deploying **web applications** on Linux-based systems.  
+**LAMP** stands for:
+- **L** → Linux (Operating System)
+- **A** → Apache (Web Server)
+- **M** → MySQL / MariaDB (Database)
+- **P** → PHP (Scripting Language)
+
+It provides a **secure, stable, and free platform** for hosting web applications like WordPress and other dynamic websites.
+
+---
+
+## Components Overview
+1. **Linux** – Base operating system.
+2. **Apache** – Handles HTTP requests and serves web pages.
+3. **MySQL / MariaDB** – Manages databases and stores dynamic data.
+4. **PHP** – Generates dynamic web content and interacts with the database.
+
+PHP works with MySQL/MariaDB to manage and display **dynamic content** such as:
+- Login systems
+- Forms
+- User dashboards
+
+---
+
+## LAMP Stack Setup
+
+### **Step 1: Verify Current Services**
+Check who you are:
+```
+whoami
+```
+Verify hostname and IP:
+```
+hostname
+ip a
+```
+Check Apache status:
+```
+systemctl status httpd
+```
+Check MariaDB status:
+```
+systemctl status mariadb
+```
+
+If either service is not installed, use `dnf install` to add them.
+
+---
+
+### **Step 2: Install PHP**
+Install PHP and required modules:
+```
+dnf install php php-mysqlnd php-cli -y
+```
+- **php-cli** → Run PHP commands from terminal.
+- **php-mysqlnd** → Allows PHP to communicate with MySQL/MariaDB.
+
+Restart Apache to recognize PHP:
+```
+systemctl restart httpd
+```
+
+---
+
+### **Step 3: Test PHP Installation**
+Navigate to the default web directory:
+```
+cd /var/www/html
+```
+Create a test file:
+```
+vi info.php
+```
+Add the following PHP code:
+```php
+<?php
+phpinfo();
+?>
+```
+Open browser and visit:
+```
+http://<your-ip-address>/info.php
+```
+Example: `http://192.168.100.192/info.php`
+
+If you see PHP details, installation is successful.
+
+---
+
+### **Step 4: Create Database in MariaDB**
+Log into MariaDB as root:
+```
+mysql -u root -p
+```
+Create a test database:
+```
+CREATE DATABASE testdb;
+```
+Exit MariaDB:
+```
+exit;
+```
+
+---
+
+### **Step 5: Create PHP Script to Connect to Database**
+Create a new PHP file:
+```
+vi database_connect.php
+```
+Add the following code:
+```php
+<?php
+$servername = "localhost";
+$username = "root";
+$password = ""; // Add root password if set
+$dbname = "testdb";
+
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+echo "Successfully connected to the database";
+?>
+```
+
+---
+
+### **Step 6: Test Database Connection**
+Open browser and visit:
+```
+http://<your-ip-address>/database_connect.php
+```
+- If successful: Displays `Successfully connected to the database`.
+- If error occurs: Update `$password` with the correct root password.
+
+---
+
+## Summary
+- **LAMP Stack** combines Linux, Apache, MySQL/MariaDB, and PHP for a powerful web hosting platform.
+- You tested:
+  1. PHP installation with `phpinfo()`.
+  2. Database connection using a custom PHP script.
+- LAMP is used to host dynamic web applications like **WordPress**, **Drupal**, and custom sites.
