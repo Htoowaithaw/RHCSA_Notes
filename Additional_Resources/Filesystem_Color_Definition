@@ -1,0 +1,131 @@
+
+# 🌈 Filesystem Color Definitions in Linux
+
+When you run commands like `ls -ltr` or `ls -l`, files and directories in Linux are displayed in **different colors**.  
+These colors help identify the type and state of files at a glance.
+
+---
+
+## **Color Guide**
+| **Color**           | **Meaning** |
+|----------------------|-------------|
+| **Blue**            | Directory |
+| **Green**           | Executable file or recognized script (`chmod +x`) |
+| **Sky Blue (Cyan)** | Symbolic link |
+| **Yellow with Black Background** | Device files (e.g., `/dev/`) like keyboard, mouse, network card |
+| **Pink**            | Image/graphic files (e.g., `.jpg`, `.png`, `.gif`) |
+| **Red**             | Archive/compressed files (e.g., `.tar`, `.gz`) |
+| **Red with Black Background** | Broken symbolic link |
+
+---
+
+## **Examples**
+
+### **1. Blue – Directory**
+- Directories always appear in blue.
+- Verified by the first column showing **`d`** in permissions.
+
+```bash
+ls -ltr
+# Output example:
+drwxr-xr-x  2 user user 4096 Sep 10 12:00 my_folder
+```
+
+---
+
+### **2. Green – Executable Files**
+- Files with **`x` (executable)** permission are green.
+- Example:
+```bash
+chmod +x script.sh
+ls -ltr
+# script.sh will now appear green
+```
+
+Removing execute permission will turn it back to white:
+```bash
+chmod a-x script.sh
+```
+
+---
+
+### **3. Sky Blue – Symbolic Links**
+Create a symbolic link:
+```bash
+ln -s /home/user/file.txt /tmp/file_link
+```
+- The link will show in **sky blue**.
+
+---
+
+### **4. Yellow – Device Files**
+- Found under `/dev/`, e.g., `tty`, `sda`, etc.
+- These start with **`c`** (character device) or **`b`** (block device) in permissions.
+
+```bash
+cd /dev
+ls -ltr
+```
+
+---
+
+### **5. Pink – Image Files**
+- Graphic files like `.jpg` or `.gif` appear in **pink**.
+
+Download an image to test:
+```bash
+wget <image-url>
+ls -ltr
+# The downloaded image will show in pink
+```
+
+> Images cannot be viewed in SSH terminal, only on a GUI.
+
+---
+
+### **6. Red – Archive Files**
+- Archive files like `.tar` or `.gz` appear in **red**.
+
+Example:
+```bash
+tar cvf all.tar A B C D
+ls -ltr
+# all.tar will appear red
+```
+
+---
+
+### **7. Red with Black Background – Broken Link**
+- A broken symbolic link shows **red text with black background**.
+
+Example of broken link creation:
+```bash
+ln -s ihulk /tmp/ihulk   # Missing absolute source path
+```
+
+Fix by specifying absolute path:
+```bash
+rm /tmp/ihulk
+ln -s /home/user/ihulk /tmp/ihulk
+```
+
+---
+
+## **Tips**
+- Not all Linux systems have identical colors.
+- Avoid modifying color settings to maintain consistency across environments.
+- Use `ls -ltr` to display files with timestamps and reverse order (newest at the bottom).
+
+---
+
+## **Summary**
+Linux uses colors to visually indicate file types and statuses:
+- **Blue** → Directory  
+- **Green** → Executable  
+- **Sky Blue** → Symbolic Link  
+- **Yellow** → Device File  
+- **Pink** → Image File  
+- **Red** → Archive File  
+- **Red with Black Background** → Broken Link  
+
+These visual cues help you quickly identify and troubleshoot files in your system.

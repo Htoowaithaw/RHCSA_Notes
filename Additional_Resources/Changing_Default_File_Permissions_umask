@@ -1,0 +1,95 @@
+
+# 🗂️ Changing Default File Creation Permissions (umask)
+
+When you create a new file or directory in Linux using commands like `touch` or `cp`, the system assigns **default permissions** automatically.  
+To control these default permissions, you use the `umask` command.
+
+---
+
+## **What is umask?**
+- `umask` stands for **User Mask**.
+- It **sets the default permission** for newly created files and directories.
+- Instead of manually running `chmod` after creating files, you can predefine permissions using `umask`.
+
+---
+
+## **Check Default umask Value**
+Global settings are stored in `/etc/bashrc`.  
+You can check the current default umask with:
+```bash
+umask
+```
+
+When you log in:
+1. The system first checks **your personal `.bashrc` file** (hidden in your home directory).
+2. If no umask is set there, it falls back to `/etc/bashrc`.
+
+---
+
+## **Example: Temporary umask Change**
+Set default permissions **only for the current session**:
+
+```bash
+umask u+rw,g+r,o-
+```
+
+- **u+rw** → Owner gets read & write
+- **g+r** → Group gets read only
+- **o-** → Others get no permissions
+
+### **Steps:**
+1. Run:
+   ```bash
+   umask u+rw,g+r,o-
+   ```
+2. Create a new file:
+   ```bash
+   touch ck
+   ```
+3. Verify permissions:
+   ```bash
+   ls -ltr
+   ```
+
+> 📝 *This setting lasts only for your current terminal session.*
+
+---
+
+## **Example Output**
+Before applying umask:
+```
+-rw-rw-r-- 1 user user 0 Sep 10 10:00 js
+```
+After applying `umask u+rw,g+r,o-`:
+```
+-rw-r----- 1 user user 0 Sep 10 10:05 ck
+```
+
+---
+
+## **Making umask Permanent**
+To **persist** the umask settings for every login:
+
+1. Open your personal `.bashrc` file:
+   ```bash
+   vi ~/.bashrc
+   ```
+2. Add the line at the end:
+   ```bash
+   umask u+rw,g+r,o-
+   ```
+3. Save and exit `vi`.
+4. Reload `.bashrc` or log out and back in:
+   ```bash
+   source ~/.bashrc
+   ```
+
+Now every new file you create will have the custom default permissions automatically.
+
+---
+
+## **Summary**
+- `umask` defines **default permissions** for new files and directories.
+- Temporary changes apply only to the **current session**.
+- Permanent changes must be added to **`.bashrc`** or `/etc/bashrc`.
+- Saves time by avoiding repetitive `chmod` commands.
