@@ -1,0 +1,121 @@
+Security Threats — Quick Study Notes (Linux/Admin Focus)
+TL;DR
+
+Know the names, spot the symptoms, act fast. Reduce attack surface, patch often, least-privilege, and keep good backups.
+
+DDoS (Distributed Denial of Service)
+
+What: A swarm of compromised machines (“botnet”) floods a site/service with traffic until it’s unusable.
+Symptoms: Site slow/unreachable; spikes in inbound traffic from many IPs.
+Example: Your web server gets tens of thousands of requests/sec from random IPs and stops responding.
+Mitigations: CDN/WAF with DDoS protection, rate-limiting, autoscaling, anycast, upstream filtering, separate control plane from data plane.
+
+Hacking (Unauthorized Access)
+
+What: Attackers gain access via stolen creds, brute force, unpatched vulns, misconfig.
+Symptoms: New users/SSH keys, odd processes, unusual logins.
+Example: Reused admin password leaked; attacker SSHs in.
+Mitigations: Strong unique passwords + MFA, disable password SSH (keys only), patching, minimize exposed services, audit logs.
+
+Malware (Umbrella Term)
+
+What: Malicious software: viruses, worms, trojans, spyware, adware.
+
+Viruses: Attach to files; spread via downloads/email.
+Mitigate: AV/EDR, user training, block macros.
+
+Worms: Self-propagate over networks.
+Mitigate: Patch quickly, segment networks, egress control.
+
+Trojan horses: Malicious code disguised as legit software.
+Mitigate: Verify sources/signatures, least privilege, application allow-listing.
+
+Spyware/Adware: Collect data, inject ads.
+Mitigate: Browser hardening, extensions policy, EDR.
+
+Common Impacts: Data theft, system instability, spam sent from your host.
+Linux Tip: Use EDR or malware scanners, immutable infrastructure, and read-only containers where possible.
+
+Phishing
+
+What: Fake emails/SMS/pages that look legit to steal creds.
+Example: “Your bank account locked—click to verify.”
+Mitigations: User training, phishing-resistant MFA (FIDO2), email authentication (SPF/DKIM/DMARC), password managers (domain matching), report buttons.
+
+Pharming
+
+What: Redirects a correct URL to a fake site (e.g., DNS cache poisoning, hosts file tampering).
+Example: Typing yourbank.com opens a perfect clone.
+Mitigations: DNSSEC, secure resolvers, endpoint protection, HSTS, verify padlock/domain carefully.
+
+Ransomware
+
+What: Encrypts files or locks screen and demands payment.
+Symptoms: Files with new extensions; ransom notes.
+Mitigations: 3-2-1 backups (offline/immutable), least privilege, application allow-listing, patching, macro/script controls, network segmentation, EDR with rollback.
+
+Spam
+
+What: Unsolicited messages delivering scams or links/malware.
+Impact: Wastes time/bandwidth; can be phishing.
+Mitigations: Mail filtering, user training, blocklists, DMARC.
+
+Spoofing
+
+What: Forged sender identity (email/IP/website) to gain trust.
+Example: “CEO” asks you to buy gift cards; sender is look-alike domain.
+Mitigations: Verify via second channel, domain allow-listing, look-alike domain detection, DMARC enforcement.
+
+Wi-Fi Eavesdropping
+
+What: Attackers sniff traffic on open or weak Wi-Fi.
+Example: Café hotspot capturing logins to non-HTTPS sites.
+Mitigations: Prefer WPA2-Enterprise/WPA3, use VPN on untrusted networks, enforce HTTPS/HSTS, disable auto-connect.
+
+Admin Lens: Practical Signals & First Moves
+
+Performance falls off a cliff (web/app): Check upstream/WAF metrics → likely DDoS.
+
+Unexpected logins/keys/processes: Review /var/log/secure, journalctl -xe, last, who, ss -plnt, crontab -l → isolate host.
+
+Mass file renames/notes: Ransomware → disconnect network, restore from offline backups, rotate creds.
+
+Users report “bank” emails: Phishing/spoofing → alert, block domain, reset creds, check mail auth.
+
+Correct URL but wrong site: Pharming → verify DNS, flush caches, check /etc/hosts, use alternative resolver.
+
+Core Defenses (Keep It Lean & Mean)
+
+Least privilege everywhere: Users, services, sudoers, SELinux/AppArmor on.
+
+Patch fast: Kernel, OpenSSL, glibc, exposed daemons (SSH, Apache/Nginx, PHP, MySQL/MariaDB).
+
+Reduce attack surface: Uninstall unneeded/orphan packages, close ports, disable services.
+
+Strong auth: MFA, SSH keys only, no shared accounts, rotate credentials.
+
+Network hygiene: Segment VLANs, restrict east-west, egress filtering, WAF/CDN, IDS/IPS.
+
+Secure DNS/HTTPS: DNSSEC where possible; HSTS, TLS 1.2+, cert monitoring.
+
+Backups: 3-2-1 with regular restore tests; protect backups from ransomware (immutable/object lock).
+
+Monitoring & logs: Centralize logs, alert on anomalies, file integrity monitoring, EDR.
+
+User training: Recognize phishing/spoofing, safe software sources, VPN on public Wi-Fi.
+
+Two Mini Scenarios (Simple)
+
+SSH brute-force spikes
+
+Symptoms: Many failed logins in /var/log/secure.
+
+Fix fast: Disable password auth, change SSH port (defense-in-depth), fail2ban, allow-list via firewall, MFA for bastion.
+
+Website sluggish/unreachable
+
+Symptoms: High requests/second from many IPs; app OK locally.
+
+Fix fast: Enable CDN/WAF “under attack” mode, rate-limit, block offending IP ranges upstream, scale out, contact provider’s DDoS desk.
+
+Quick Checklist (Print Me)

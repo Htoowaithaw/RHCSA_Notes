@@ -1,0 +1,268 @@
+# Linux File System & I/O Essentials
+
+> **Goal:** A clean, visual recap you can paste into your notes or repo.  
+> **Covers:** File systems, directory layout, `ls -l` attributes, creating & maintaining files/dirs, links & inodes, I/O redirection, and pipes—plus quick labs and troubleshooting.
+
+---
+
+## 1) What is a File System? (closet analogy)
+A **file system** is how the OS **organizes**, **stores**, and **retrieves** data on disk—like neatly grouping shirts, pants, and shoes in a closet instead of tossing everything in a heap.
+
+### Common types
+- **Linux:** `ext3`, `ext4`, `xfs`
+- **Windows:** `NTFS`, `FAT/FAT32`
+
+### Linux root layout (high level)
+| Path | What lives here |
+|---|---|
+| `/` | Root of everything |
+| `/bin`, `/sbin` | Essential user/admin commands |
+| `/etc` | System configs |
+| `/home` | User home directories |
+| `/var` | Logs, spools, variable data |
+| `/opt` | Optional apps |
+| `/tmp` | Temporary files |
+| `/boot` | Boot loader & kernel bits |
+| `/usr` | Userland apps/libs (read-mostly) |
+
+---
+
+## 2) Directory listing attributes (`ls -l`)
+`ls -l` shows **type**, **permissions**, **links**, **owner**, **group**, **size**, **mtime**, **name**.
+
+```bash
+$ ls -l
+drwxr-xr-x  2 root root 4096 Sep 10 12:34 etc
+lrwxrwxrwx  1 root root    7 Sep 10 12:34 vmlinuz -> vmlinuz-...  # symlink
+-rw-r--r--  1 user user  123 Sep 10 12:34 notes.txt              # regular file
+```
+
+### First character (file type)
+| Char | Meaning |
+|---|---|
+| `d` | directory |
+| `-` | regular file |
+| `l` | symbolic (soft) link |
+| `c` / `b` | character/block device |
+| `s` / `p` | socket / named pipe |
+
+> **Tip:** `ls -li` adds **inode** numbers. `ls -lZ` (with SELinux) shows labels.
+
+---
+
+## 3) Creating files & directories
+### Files
+```bash
+# empty files
+touch jerry kramer george
+
+# copy as create
+cp jerry lex         # new file 'lex' from 'jerry'
+cp jerry /tmp/lex    # create at a different path
+
+# quick create with content
+echo "Hello" > hello.txt      # overwrite
+echo "More"  >> hello.txt     # append
+
+# with an editor (vi)
+vi homer  # :wq to save & quit
+```
+
+### Directories
+```bash
+mkdir seinfeld simpson superman
+```
+
+> **Gotcha:** Creating in system dirs (e.g., `/etc`) usually needs `sudo`/root—else **Permission denied**.
+
+---
+
+## 4) File maintenance
+```bash
+# copy
+cp src.txt dst.txt
+cp file /some/dir/
+
+# move or rename
+mv oldname newname
+mv file /other/place/
+
+# remove
+rm file
+rm -r  dir/          # recursive
+rmdir emptydir/      # only if empty
+
+# change owners
+chgrp root file
+chown root file
+chown user:group file   # both at once
+```
+
+> **Rule of thumb:** `cp|mv <source> <destination>` — last argument is the **destination**.
+
+---
+
+## 5) Links & inodes (soft vs hard)
+Every file has an **inode** (numeric identity on disk). Names point to inodes.
+
+### Soft (symbolic) link
+- Points **to a path/name** (indirectly to the inode).
+- **Breaks** if the original is **deleted/renamed**.
+```bash
+ln -s /home/user/hulk /tmp/hulk   # symlink
+```
+
+### Hard link
+- Points **directly to the same inode**.
+- Survives if the original name is removed.
+- Cannot cross filesystems; normally not used for dirs.
+```bash
+ln /home/user/hulk /tmp/hulk      # hard link
+```
+
+### Inspecting
+```bash
+ls -li            # show inode numbers
+# Compare inodes: hard links share the same inode; symlinks have their own.
+```
+
+> **Mental model:**  
+> Soft link = desktop **shortcut** to a file path.  
+> Hard link = **another name** for the same on‑disk object.
+
+---
+
+## 6) I/O redirection (stdin/stdout/stderr)
+Everything is a file descriptor:
+- **0**: stdin (keyboard/input)
+- **1**: stdout (screen/output)
+- **2**: stderr (errors)
+
+### Redirect output
+```bash
+ls -l   > list.txt   # overwrite
+ls -la >> list.txt   # append
+pwd     > path.txt
+```
+
+### Redirect input
+```bash
+cat < path.txt
+```
+
+### Redirect errors
+```bash
+ls -l /root 2> errors.txt         # only stderr
+somecmd > out.txt 2>&1            # both stdout+stderr to one file
+somecmd &> all.txt                # bash shorthand (stdout+stderr)
+```
+
+> **Safety:** Use `>>` to append and avoid accidental overwrite.
+
+### Bonus: Capture & see (`tee`)
+```bash
+ls -l | tee list.txt        # show and save
+ls -l | tee -a list.txt     # append
+```
+
+---
+
+## 7) Pipes (`|`)
+Pipes send **stdout of left** into **stdin of right**.
+
+```bash
+# paginate
+ls -ltr | more      # space: next page, q: quit
+ls -ltr | less      # j/k to scroll, q to quit
+
+# refine
+ls -l | tail -1
+dmesg | grep -i error
+ps -ef | grep httpd | grep -v grep
+journalctl -xe | less
+```
+
+> **Pattern:** **producer** `|` **filter** `|` **viewer**
+
+---
+
+## 8) Quick labs (copy/paste friendly)
+
+### A. Create a playground
+```bash
+cd ~
+mkdir -p lab/{a,b}
+touch lab/a/jerry lab/a/kramer lab/a/george
+echo "puddy!" > lab/a/david
+cp lab/a/david lab/a/lex
+```
+
+### B. Rename, move, copy
+```bash
+mv lab/a/lex lab/a/luther
+cp lab/a/luther lab/b/luthor.copy
+mv lab/a/david /tmp/puddy && mv /tmp/puddy lab/a/puddy
+```
+
+### C. Links & inodes
+```bash
+echo "HULK SMASH" > lab/a/hulk
+ln -s "$HOME/lab/a/hulk" lab/b/hulk.symlink
+ln    "$HOME/lab/a/hulk" lab/b/hulk.hard
+ls -li lab/a/hulk lab/b/hulk.*
+rm lab/a/hulk
+# Now: hard link content remains, symlink is broken
+```
+
+### D. Redirection & pipes
+```bash
+ls -la  > lab/list.txt
+echo "---" >> lab/list.txt
+pwd     >> lab/list.txt
+
+ls -l /root 2> lab/errors.txt
+cat lab/list.txt | wc -l
+ls -ltr /etc | more
+```
+
+---
+
+## 9) Troubleshooting checklist
+
+- **Permission denied?**
+  - Need `sudo`? Does parent dir allow write/execute?
+- **“Not a directory” vs “No such file or directory”?**
+  - Wrong **type** or wrong **path** (case-sensitive!).
+- **Symlink “No such file or directory”?**
+  - Target path moved or deleted → recreate the link.
+- **Overwrite oops?**
+  - Use `>>` or `tee -a`. Consider `set -o noclobber` in bash.
+- **Hard link fails?**
+  - Likely crossing filesystems or targeting a directory.
+
+---
+
+## 10) Command cheat‑sheet
+- **Listing:** `ls -l`, `ls -li`, `ls -lZ`, `tree`
+- **Create:** `touch`, `vi`, `cp`, `mkdir -p`
+- **Maintain:** `cp`, `mv`, `rm`, `rm -r`, `rmdir`, `chown`, `chgrp`
+- **Links:** `ln -s`, `ln`, `readlink -f`
+- **Inspect:** `stat file`, `file file`, `du -sh dir`, `df -h`
+- **I/O:** `>`, `>>`, `<`, `2>`, `&>`, `2>&1`, `tee`
+- **Pipes:** `|` with `grep`, `sort`, `uniq`, `head`, `tail`, `less`
+
+---
+
+### Mini‑FAQ
+**Q: When do I use `rmdir` vs `rm -r`?**  
+`rmdir` only removes **empty** dirs. Use `rm -r` for dirs with content.
+
+**Q: Why does `ls -l /root` fail for me?**  
+`/root` is owned by **root**; regular users can’t read it. Try `sudo ls -l /root`.
+
+**Q: Why can’t I hard‑link across mounts?**  
+Hard links must point to the **same filesystem** (same inode space).
+
+---
+
+**You’re set.** These are the day‑to‑day building blocks for navigating and automating Linux work like a pro. Keep this note close. 👍

@@ -1,189 +1,134 @@
-Commands We Have Learned
-Course Completion and Overview
-You have spent considerable time on this course, and now you have finished it. It is time to do a recap and go over the commands that have been learned throughout the course.
 
-Number of Commands Learned
-Do you know how many commands have been learned in this course? Take a guess. Approximately, about 146 to 150 commands have been covered. To be specific, a few commands may be added later or have been added that are not part of the original list, but approximately 150 commands have been learned.
+# 🌟 Linux Course Recap & Command Summary
 
-Reviewing Commands Alphabetically
-All commands are presented in alphabetical order, from A to Z. Each command will be reviewed one by one.
+---
 
-Alias and System Information Commands
-alias: Creates a shortcut or short name for a long command. Typing alias shows all aliases already created. To remove an alias, use unalias.
-arch: Tells you the system architecture, whether it is 64-bit or 32-bit.
-at: Schedules ad-hoc jobs. For repetitive jobs, use crontab. For one-time jobs, use at. The syntax can be found by running man at.
-File Processing and Shell Commands
-awk: Shows the output of a file by field. For example, to list only the first column from ls -ltr, use awk to print the first field.
-bash: The shell being used. To check, run echo $SHELL.
-bc: Calculator utility. Type bc to enter calculator mode and perform calculations. Use Ctrl + C to exit.
-cal: Displays a calendar.
-case: Used in scripts to provide options, such as A, B, or C.
-cat: Reads a file.
-cd: Changes the directory.
-Password and File Permission Commands
-chage: Changes password properties, such as expiration. Covered in module three.
-chgrp: Changes group ownership of a file or directory.
-chmod: Changes file permissions.
-chown: Changes file ownership.
-System and File Management Utilities
-chronyc: Newer program for NTP system or service.
-clear: Clears the terminal screen.
-cmp: Compares files byte by byte.
-command --help: Provides quick help on any command.
-cp: Copies files and directories.
-createrepo: Used to create a local repository for downloading packages. Covered in module seven.
-crontab: Schedules jobs, either one-time or regular.
-cut: Cuts characters or fields from output. For example, cut -c1 gives the first character of each line.
-Disk and File Comparison Tools
-date: Displays the current date and time.
-dd: Converts or copies files, often used for backups.
-df: Shows file system disk space usage. df -h gives human-readable output.
-diff: Compares files line by line.
-dig: DNS lookup utility. Used to find the IP address of a hostname. Covered in module seven.
-dmesg: Prints kernel ring buffer or system messages, especially hardware-related. Can be run as a regular user.
-dmidecode: Displays system and hardware information. Requires root privileges.
-Scripting and Disk Usage Commands
-do: Used in scripting with for or while loops.
-du: Shows file space usage for a specific file or directory. For example, du -sh Pictures/ gives the size of the Pictures directory.
-Display and Scripting Utilities
-echo: Displays input on the screen. Commonly used in scripting (covered in module six).
-else: Used in scripting, works with for loops.
-ethtool: Provides information about the network interface card (NIC), such as speed and properties.
-exit: Exits the terminal.
-Disk and Process Management
-fdisk: Displays disk information. Requires root privileges.
-foreground: Brings a process to the foreground.
-fi: Used in scripting, works with if statements.
-find: Finds files and directories.
-firewall-cmd: Enables or configures the firewall via command line. For GUI, use firewall-config.
-Memory, File Transfer, and Search Commands
-for: Used in scripting.
-free: Displays memory usage.
-ftp: Transfers files between systems.
-grep: Searches for a specific keyword in files or directories. egrep is an enhanced version.
-groupadd: Creates a new group.
-groupdel: Deletes a group.
-gunzip/gzip: Compresses files.
-System Shutdown and File Viewing
-halt: Shuts down the system immediately.
-head: Displays the first few lines of a file (default is 10 lines).
-history: Shows the list of commands run in the terminal.
-hostname: Displays the system's hostname.
-hostnamectl: Manages the hostname (introduced in Red Hat 7/CentOS 7).
-User and Network Information
-id: Prints user information.
-if: Used in scripting, works with fi.
-ifconfig: Displays network information. On newer systems, use ip a.
-ifdown/ifup: Brings network interfaces down or up.
-init: Changes system run levels (0 through 6).
-Input/Output and Networking
-iostat: Displays input/output status.
-ip: Newer command replacing ifconfig.
-iptables: Older firewall command, replaced by firewall-cmd or firewall-config.
-kill: Kills a process by process ID.
-last: Shows the last logged-in users.
-File Viewing and Linking
-less: Opposite of more; reads a file one page at a time.
-ln: Creates a link.
-locate: Finds files using a database. If a file was just created, run updatedb before using locate.
-ls: Lists directory contents.
-Logical Volume Management and Mail
-lvcreate: Creates a logical volume (covered in module eight).
-lvs: Displays logical volumes.
-mail/sendmail: Sends mail from one system to another.
-man: Displays manual pages for commands.
-mkdir: Creates a directory.
-File System Creation and Swap
-mkfs: Creates a file system (e.g., XFS) on a new disk (covered in module eight).
-mkswap: Creates swap space from hard disk space (covered in module eight).
-modprobe: Adds or removes modules, used in NIC bonding (covered in module seven).
-File Viewing, Mounting, and Moving
-more: Views files one page at a time.
-mount: Mounts a file system (covered in module eight).
-mv: Moves or renames files.
-Network Statistics and Process Prioritization
-netstat: Displays network statistics. Commonly used for troubleshooting.
-nice: Prioritizes processes (covered in module five).
-nohup: Prevents interruption of a process upon terminal exit.
-DNS, NTP, and Password Management
-nslookup: DNS utility, similar to dig.
-ntpq: NTP utility, shows NTP clock synchronization. If not available, use chronyc.
-passwd: Changes user password.
-Output Manipulation and Process Management
-pipe (|): Changes the output of a command by passing it to another command, such as awk.
-pkill: Kills a process by name.
-ps: Displays running processes. ps -ef shows all processes.
-LVM and Directory Management
-pvcreate: Creates a physical volume for LVM.
-pvs: Displays physical volumes.
-pwd: Prints the working directory.
-Scripting and System Reboot
-read: Used in scripting to read user input (covered in module six).
-reboot: Reboots the system.
-rm: Removes files and directories.
-rmdir: Removes directories. Exists as a dedicated command for directory removal.
-Package Management and Synchronization
-rpm: Manages packages (install, remove, query).
-rsync: Synchronizes files or directories between systems.
-scp: Copies files between systems.
-Scripting and SELinux
-script: Records all commands run in a session.
-sestatus: Displays SELinux status.
-sh: Shell, similar to bash or ksh.
-shutdown: Shuts down the system.
-Sorting, Reporting, and File Splitting
-sort: Sorts output alphabetically or in reverse.
-sosreport: Generates a system report (covered in module five).
-split: Splits files by size or lines.
-SSH, File Attributes, and User Switching
-ssh: Secure protocol to connect to another machine.
-stat: Shows file or directory attributes, often used for SELinux.
-su: Switches user, defaults to root if no user is specified.
-sudo: Runs commands as root.
-Swap and Service Management
-swapon/swapoff: Enables or disables swap space after creation with mkswap.
-systemctl: Starts, stops, or enables services (newer command). For older systems, use service.
-File Viewing and Archiving
-tail: Displays the last few lines of output (default is 10).
-tar: Archives files into a single container.
-tcpdump: Shows all network traffic in and out of the system.
-Telnet, Scripting, and System Monitoring
-telnet: Connects to another machine, not secure compared to ssh.
-then: Used in scripting with for or while loops.
-top: Monitors system resources.
-touch: Creates a new empty file.
-File System and System Information
-umount: Unmounts a file system.
-uname: Displays system information. uname -a gives all details.
-uniq: Removes duplicate lines from output.
-uptime: Shows system uptime and load.
-User Management and LVM
-useradd: Creates a new user.
-userdel: Deletes a user.
-usermod: Modifies user properties.
-users: Prints all currently logged-in usernames.
-vgcreate/vgdisplay: Creates or displays LVM volume groups.
-Text Editing and System Monitoring
-vi: Text editor. Running vi followed by a filename creates or edits a file.
-w: Shows who is logged in and their activity.
-wall: Sends a message to all users' terminals.
-wc: Counts words, characters, and lines.
-Downloading, Command Info, and Scripting
-wget: Downloads files from the network using a URL.
-whatis: Provides a short description of a command.
-which: Shows the full path of a shell command.
-while: Used in scripting with do loops.
-who: Shows who is logged in, but with less detail than w.
-whoami: Displays your username.
-write: Sends a message to a specific user.
-File System Growth and Package Management
-xfs_growfs: Used to extend a file system (covered in module seven).
-yum: Downloads and installs packages on your system.
-Summary and Encouragement
-This summary covers all the commands learned throughout the course. If you remember every single command covered, you have done an excellent job and know everything inside out. Good luck.
+## 📊 Total Commands Learned
+- **Approx. 150 Commands** were covered throughout this course.
+- Commands range from **basic file operations** to **advanced system administration**.
 
-Key Takeaways
-Approximately 150 Linux commands were covered, ranging from basic file operations to advanced system administration tools.
-Commands are presented in alphabetical order, with explanations and examples for each.
-Scripting-related commands and their usage in automation are discussed throughout the course.
-System administration, networking, and package management commands are highlighted with practical context.
+---
+
+## 🗂️ Commands A–Z Overview
+
+### 🔹 Alias & System Info
+| Command | Purpose |
+|----------|---------|
+| **alias** | Create shortcuts for long commands. `unalias` to remove. |
+| **arch** | Show system architecture (32-bit / 64-bit). |
+| **at** | Schedule **one-time jobs**. Use `man at` for syntax. |
+
+---
+
+### 📂 File Processing & Shell Utilities
+| Command | Purpose |
+|----------|---------|
+| **awk** | Extract specific fields from output. Example: `ls -ltr | awk '{print $1}'` |
+| **bash** | Check current shell → `echo $SHELL` |
+| **bc** | Calculator utility. Type `bc` to enter, `Ctrl+C` to exit. |
+| **cal** | Display calendar. |
+| **case** | Scripting conditional option block. |
+| **cat** | View file contents. |
+| **cd** | Change directory. |
+
+---
+
+### 🔐 Password & Permissions
+| Command | Purpose |
+|----------|---------|
+| **chage** | Manage password expiry settings. |
+| **chgrp** | Change group ownership. |
+| **chmod** | Modify file permissions. |
+| **chown** | Change file owner. |
+
+---
+
+### 🖥️ System & Disk Utilities
+| Command | Purpose |
+|----------|---------|
+| **clear** | Clear terminal screen. |
+| **cmp** | Compare files byte-by-byte. |
+| **cp** | Copy files/directories. |
+| **crontab** | Schedule **repetitive jobs**. |
+| **df** | Display disk space usage. Use `df -h` for human-readable format. |
+| **du** | Show size of a directory. Example: `du -sh Pictures/` |
+
+---
+
+### 🌐 Networking & Firewall
+| Command | Purpose |
+|----------|---------|
+| **dig** | DNS lookup utility. |
+| **ifconfig** | Display network interfaces. Use `ip a` on newer systems. |
+| **iptables** | Legacy firewall management. |
+| **firewall-cmd** | Modern firewall management tool. |
+| **netstat** | Show active network connections. |
+| **tcpdump** | Capture network traffic. |
+
+---
+
+### 👥 User Management
+| Command | Purpose |
+|----------|---------|
+| **useradd** | Create new user. |
+| **usermod** | Modify user properties. |
+| **userdel** | Delete a user. |
+| **groupadd** | Create new group. |
+| **passwd** | Change password. |
+
+---
+
+### 💾 File Systems & LVM
+| Command | Purpose |
+|----------|---------|
+| **mkfs** | Create a new filesystem. |
+| **mount** | Mount a filesystem. |
+| **umount** | Unmount a filesystem. |
+| **pvcreate** | Create physical volume for LVM. |
+| **vgcreate** | Create volume group for LVM. |
+| **lvcreate** | Create logical volume. |
+| **xfs_growfs** | Extend XFS filesystem. |
+
+---
+
+### 📝 Text & File Editors
+| Command | Purpose |
+|----------|---------|
+| **vi** | Text editor. |
+| **nano** | Simple editor (if installed). |
+| **grep** | Search text in files. |
+| **less/more** | Read files page-by-page. |
+| **tail** | View last 10 lines of a file. |
+| **head** | View first 10 lines of a file. |
+
+---
+
+### ⚙️ Process Management
+| Command | Purpose |
+|----------|---------|
+| **ps** | List running processes. |
+| **top** | Monitor processes in real-time. |
+| **kill** | Kill process by PID. |
+| **pkill** | Kill process by name. |
+| **nohup** | Keep processes running after logout. |
+
+---
+
+## 🎯 Key Takeaways
+- **~150 commands mastered**, covering:
+  - File management
+  - Networking
+  - Security
+  - Process control
+  - Scripting
+- Alphabetical organization makes review easy.
+- **Scripting integration** for automation was a major focus.
+
+---
+
+## 🚀 Next Steps
+- Practice these commands daily.  
+- Build scripts for real-world tasks.  
+- Explore **Linux server administration projects**.
+
+> *"Mastery comes with consistent practice!"* 💪
