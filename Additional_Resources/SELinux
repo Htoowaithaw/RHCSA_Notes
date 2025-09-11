@@ -1,0 +1,154 @@
+
+# SELinux: Security Enhanced Linux
+
+## Overview
+**SELinux (Security Enhanced Linux)** is a Linux kernel security module providing a mechanism for supporting access control security policies, including **Mandatory Access Control (MAC)**.
+
+Initially developed by the **NSA (National Security Agency)** and the open-source SELinux community, SELinux strengthens security beyond traditional **Discretionary Access Control (DAC)**.
+
+---
+
+## DAC vs MAC
+- **DAC (Discretionary Access Control)**:
+  - Traditional Linux permission system.
+  - Users control permissions on the files they own using `chmod`.
+  - Example:
+    ```bash
+    chmod 644 file.txt
+    ```
+
+- **MAC (Mandatory Access Control)** with SELinux:
+  - SELinux enforces additional rules **even if DAC allows access**.
+  - Example:
+    - The `httpd` user may have access to `/var/www/html`, but SELinux can restrict it from accessing `/var/www/cgi-bin` even though both are owned by `httpd`.
+
+---
+
+## SELinux Modes
+SELinux has **three modes of operation**:
+
+| Mode        | Description |
+|-------------|-------------|
+| **Enforcing** (default) | SELinux policies are applied and enforced. |
+| **Permissive** | Policies are **logged but not enforced**. Useful for testing. |
+| **Disabled** | SELinux is completely turned off. |
+
+Commands:
+```bash
+getenforce      # Check current mode
+setenforce 0    # Switch to permissive mode (temporary)
+setenforce 1    # Switch back to enforcing mode
+```
+
+To make permanent changes, edit:
+```bash
+vi /etc/selinux/config
+SELINUX=enforcing   # or permissive/disabled
+```
+
+> **Important:** Always snapshot or back up your VM before making SELinux changes.
+
+---
+
+## Checking SELinux Status
+```bash
+sestatus    # Detailed SELinux status report
+getenforce  # Quick check of current mode
+```
+
+---
+
+## Labels and Types
+SELinux uses **labels** to track security attributes of files, directories, processes, and sockets.
+
+A label has four parts:
+```
+user:role:type:level
+```
+Example:
+```bash
+ls -lZ /usr/sbin/httpd
+-rwxr-xr-x. root root system_u:object_r:httpd_exec_t:s0 /usr/sbin/httpd
+```
+
+- **httpd_exec_t** → Type for HTTP executables.
+- SELinux assigns different **types** to different objects:
+  - Config files: `httpd_config_t`
+  - Executables: `httpd_exec_t`
+  - Web content: `httpd_sys_content_t`
+
+> When files are moved or copied, you may need to restore their labels:
+```bash
+restorecon -Rv /var/www/html
+```
+
+---
+
+## Booleans
+Booleans are **on/off switches** for SELinux policies.
+
+Examples:
+- Allow HTTPD to connect to an FTP server:
+  ```bash
+  getsebool -a | grep httpd
+  setsebool -P httpd_can_connect_ftp on
+  ```
+- List all Booleans:
+  ```bash
+  getsebool -a
+  ```
+
+---
+
+## Troubleshooting SELinux Issues
+If a service fails due to SELinux restrictions:
+1. Check logs:
+   ```bash
+   journalctl -xe | grep AVC
+   ```
+2. Adjust file labels:
+   ```bash
+   chcon -t httpd_sys_content_t /home/user/file.html
+   ```
+3. Confirm fixes by re-running the service.
+
+---
+
+## Disabling SELinux (Permanent)
+1. Edit configuration file:
+   ```bash
+   vi /etc/selinux/config
+   SELINUX=disabled
+   ```
+2. Reboot the system:
+   ```bash
+   reboot
+   ```
+3. Verify:
+   ```bash
+   sestatus
+   ```
+
+> **Note:** Disabling SELinux is not recommended for production, especially for DMZ/public-facing servers.
+
+---
+
+## Key Commands
+| Purpose                      | Command |
+|------------------------------|---------|
+| Check SELinux mode            | `getenforce` |
+| Detailed SELinux status       | `sestatus` |
+| Temporarily set mode          | `setenforce 0/1` |
+| List all Booleans              | `getsebool -a` |
+| Set Boolean permanently        | `setsebool -P <boolean_name> on/off` |
+| View file/directory labels     | `ls -lZ` |
+| Restore default labels         | `restorecon -Rv <path>` |
+| Change file label manually     | `chcon -t <type> <file>` |
+
+---
+
+## Summary
+- SELinux adds **mandatory access control** for stronger security.
+- Use **Permissive mode** to test before enabling Enforcing mode.
+- Understand **labels** and **Booleans** for troubleshooting.
+- Always snapshot or backup before making major SELinux changes.
