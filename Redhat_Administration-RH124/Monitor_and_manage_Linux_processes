@@ -1,0 +1,184 @@
+
+# 🖥️ Linux Processes and Jobs
+
+## 📘 Key Terminology
+- **Application / Service**: A program running on your computer.  
+  - **Examples (Linux):** NTP, NFS, Apache  
+  - **Examples (Windows):** Word, PowerPoint  
+- **Script**: A file containing commands that execute a specific task (e.g., startup scripts for services).  
+- **Process**: When an application starts, it creates a *process* with a unique **Process ID (PID)**.
+- **Daemon**: A background process that runs continuously, listening for incoming/outgoing traffic.  
+- **Thread**: A lightweight sub-process. One process may have multiple threads.  
+- **Job**: A scheduled task created by schedulers like `cron` to run applications or services automatically.
+
+---
+
+## ⚙️ Why Monitor Processes?
+Processes consume **CPU**, **memory**, and **disk space**.  
+Poor management → **System crashes or performance degradation**.  
+We use monitoring commands to prevent system stress.
+
+---
+
+## 🛠 Common Monitoring Commands
+| Command      | Purpose |
+|--------------|---------|
+| `df`         | Shows filesystem disk space usage |
+| `du`         | Displays disk usage per file/directory |
+| `uptime`     | Shows how long the system has been up |
+| `top`        | Displays running processes dynamically |
+| `free`       | Shows memory usage |
+| `lsof`       | Lists open files by processes |
+| `tcpdump`    | Captures network traffic |
+| `netstat`    | Displays network statistics and connections |
+| `ps`         | Shows a snapshot of current processes |
+| `kill`       | Terminates a process by PID |
+| `vmstat` / `iostat` / `iftop` | Advanced system performance stats |
+
+---
+
+## 📂 `df` – Disk Free
+- **Purpose:** Shows disk space usage of filesystems.
+- **Command:**
+  ```bash
+  df -h        # Human-readable format
+  df -T        # Show filesystem type
+  ```
+- **Example Output:**
+  ```
+  Filesystem      Size  Used Avail Use% Mounted on
+  /dev/sda1       101M   24M   77M  24% /boot
+  /dev/mapper/... 17G    4.8G  13G  29% /
+  ```
+
+---
+
+## 🗂️ `du` – Disk Usage
+- **Purpose:** Shows how much disk space **files and directories** are using.
+- **Command:**
+  ```bash
+  du -h /        # Human-readable
+  du -k / | sort -rn | more    # Sort by size, biggest files first
+  ```
+- Helps identify files consuming excessive space before deletion.
+
+---
+
+## ⏱️ `uptime` – System Uptime
+- **Purpose:** Displays how long the system has been running.
+- **Command:**
+  ```bash
+  uptime
+  ```
+- **Output Example:**
+  ```
+  18:56:43 up 41 min,  1 user,  load average: 0.00, 0.01, 0.05
+  ```
+  - **Load Average:** CPU utilization over last 1, 5, and 15 minutes.
+
+---
+
+## 📊 `top` – Process Monitor
+- **Purpose:** Real-time view of CPU, memory, and process usage.
+- **Command:**
+  ```bash
+  top
+  ```
+- **Key Columns:**
+  | Column | Description |
+  |---------|-------------|
+  | PID     | Process ID |
+  | USER    | Owner of process |
+  | PR      | Priority |
+  | %CPU    | CPU usage by process |
+  | %MEM    | Memory usage by process |
+  | TIME+   | Total CPU time |
+  | COMMAND | Name of the process |
+- **Exit:** Press `q`.
+
+---
+
+## 💾 `free` – Memory Usage
+- **Purpose:** Show memory and swap space usage.
+- **Command:**
+  ```bash
+  free -m      # Show in megabytes
+  ```
+
+---
+
+## 📂 `lsof` – List Open Files
+- **Purpose:** Displays all files currently opened by processes.
+- **Command:**
+  ```bash
+  lsof
+  ```
+
+---
+
+## 🌐 `tcpdump` – Network Traffic Sniffer
+- **Purpose:** Monitor incoming/outgoing packets.
+- **Steps:**
+  1. Identify network interface:
+     ```bash
+     ifconfig
+     ```
+     Example: `enp0s3`
+  2. Run tcpdump on interface:
+     ```bash
+     tcpdump -i enp0s3
+     ```
+
+---
+
+## 🌍 `netstat` – Network Stats
+- **Purpose:** View routing tables and active connections.
+- **Examples:**
+  ```bash
+  netstat -rnv      # Show routing table
+  netstat -a        # Show all connections
+  netstat -tu       # TCP & UDP connections
+  ```
+
+---
+
+## 📝 `ps` – Process Status
+- **Purpose:** Snapshot of current processes.
+- **Commands:**
+  ```bash
+  ps -ef            # Full list of processes
+  ps -ef | grep top # Filter by process name
+  ```
+
+---
+
+## 🔪 `kill` – Kill a Process
+- **Purpose:** Terminate a process by PID.
+- **Steps:**
+  1. Find PID:
+     ```bash
+     ps -ef | grep process_name
+     ```
+  2. Kill process:
+     ```bash
+     kill <PID>      # Graceful stop
+     kill -9 <PID>   # Forceful termination
+     ```
+
+---
+
+## 🔧 Other Useful Commands
+| Command  | Purpose |
+|-----------|---------|
+| `vmstat`  | Memory, CPU, I/O statistics |
+| `iostat`  | CPU and disk I/O statistics |
+| `iftop`   | Network bandwidth usage |
+
+---
+
+## 🧾 Summary
+- Processes are at the heart of Linux administration.  
+- Use monitoring tools like **top**, **ps**, and **df** to manage resources.  
+- **Kill rogue processes** to free system resources.
+- **Network tools** (`tcpdump`, `netstat`) help diagnose connectivity issues.
+- Regular monitoring = **healthy system**.
