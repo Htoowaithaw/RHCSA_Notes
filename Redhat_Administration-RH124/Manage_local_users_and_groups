@@ -1,0 +1,172 @@
+
+# 🧑‍💻 Linux User Account Management
+
+## 📌 Overview
+This lesson covers **user account management** in Linux.  
+Key commands introduced:
+- `useradd` → Create a new user  
+- `groupadd` → Create a new group  
+- `userdel` → Delete a user  
+- `groupdel` → Delete a group  
+- `usermod` → Modify an existing user  
+
+All user and group information is stored in **three important files**:
+1. `/etc/passwd` → User account information  
+2. `/etc/group` → Group information  
+3. `/etc/shadow` → Encrypted passwords and password policies  
+
+---
+
+## 🆕 Create Users and Groups
+
+### **Create a User**
+
+sudo useradd spiderman
+```
+- Creates user `spiderman` and also a group with the same name.
+
+**Verify:**
+
+id spiderman
+```
+Output shows UID, primary group, and any additional groups.
+
+---
+
+### **Create a Group**
+
+sudo groupadd superheroes
+```
+
+**Verify by checking `/etc/group`:**
+
+cat /etc/group
+```
+
+---
+
+## ❌ Delete Users and Groups
+
+### **Delete a User (without home directory)**
+
+sudo userdel spiderman
+```
+
+### **Delete a User (with home directory)**
+
+sudo userdel -r spiderman
+```
+
+### **Delete a Group**
+
+sudo groupdel superheroes
+```
+
+---
+
+## ✏️ Modify Users
+
+### **Add User to a Group**
+
+sudo usermod -G superheroes spiderman
+```
+- Adds `spiderman` to `superheroes` group.
+
+**Verify:**
+
+grep spiderman /etc/group
+```
+
+---
+
+### **Change Primary Group of a User**
+
+sudo chgrp -R superheroes /home/spiderman
+```
+
+---
+
+## 📂 Important Files
+
+| File          | Purpose |
+|---------------|---------|
+| `/etc/passwd` | Stores basic user account info (username, UID, GID, home dir, shell) |
+| `/etc/group`  | Contains all group information |
+| `/etc/shadow` | Holds encrypted passwords and password expiration policies |
+
+---
+
+## 🔐 Password Management with `chage`
+`chage` sets password aging policies for users.
+
+### Example:
+
+sudo chage -m 5 -M 90 -W 10 -I 3 babu
+```
+- `-m 5` → Minimum 5 days between password changes  
+- `-M 90` → Maximum password age of 90 days  
+- `-W 10` → Warn user 10 days before password expires  
+- `-I 3` → Disable account 3 days after password expires  
+
+**Verify:**
+
+grep babu /etc/shadow
+```
+
+---
+
+## 🔑 Switching Users and `sudo`
+
+### **Switch Users**
+
+su - spiderman
+```
+Prompts for `spiderman`'s password.
+
+**Switch to root:**
+
+su -
+```
+
+---
+
+### **Run Commands with `sudo`**
+If a regular user needs to run root-level commands:
+
+sudo <command>
+```
+Example:
+
+sudo dmidecode
+sudo fdisk -l
+```
+
+---
+
+## ⚙️ Configure `sudo` Access
+Edit sudoers file with:
+
+sudo visudo
+```
+- Ensure group `wheel` has full privileges:  
+  ```
+  %wheel  ALL=(ALL)  ALL
+  ```
+
+Add user to the `wheel` group:
+
+sudo usermod -G wheel iafzal
+```
+
+**Verify:**
+
+grep wheel /etc/group
+```
+
+---
+
+## 📝 Summary
+- **Core commands**: `useradd`, `groupadd`, `userdel`, `groupdel`, `usermod`, `chage`
+- **Key files**: `/etc/passwd`, `/etc/group`, `/etc/shadow`
+- Use `sudo` for privilege escalation instead of logging in as root.
+- Apply password policies with `chage` or globally via `/etc/login.defs`.

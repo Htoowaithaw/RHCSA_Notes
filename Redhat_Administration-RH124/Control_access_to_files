@@ -1,0 +1,170 @@
+
+# 🗂️ Linux File Permissions and Ownership
+
+## 📌 Overview
+In Linux, **file permissions** and **ownership** help secure the system by controlling **who can read, write, or execute** files and directories.  
+Linux is a **multi-user system**, so every file and directory has:
+- **Owner (User)** → The creator of the file.
+- **Group** → Users in the same group/project/department.
+- **Others** → Everyone else.
+
+---
+
+## 🔑 Types of Permissions
+| Permission | Symbol | Meaning |
+|------------|--------|---------|
+| **Read**   | `r` | View contents of a file or list a directory. |
+| **Write**  | `w` | Modify or delete the file or its contents. |
+| **Execute**| `x` | Run a program or script; enter a directory. |
+
+---
+
+## 👥 Permission Levels
+Permissions are divided into three **sets of three characters**:
+
+Example:
+```
+-rw-rw-r--
+```
+- **First character** → Type of file (`-` for file, `d` for directory, `l` for link).
+- **Next 3 characters** → Permissions for **User (Owner)**.
+- **Next 3 characters** → Permissions for **Group**.
+- **Last 3 characters** → Permissions for **Others**.
+
+| Character | Represents |
+|------------|------------|
+| `u` | User (Owner) |
+| `g` | Group |
+| `o` | Others |
+| `a` | All (u + g + o) |
+
+---
+
+## 📂 Viewing Permissions
+```bash
+ls -l
+```
+
+Example output:
+```
+-rw-rw-r-- 1 iafzal iafzal  4096 Sep 11 09:00 Jerry
+```
+- `-rw-rw-r--` → Permission string.
+- First `rw-` → Owner can read & write.
+- Second `rw-` → Group can read & write.
+- Last `r--` → Others can **only read**.
+
+---
+
+## 🛠️ Changing Permissions: `chmod`
+
+### Syntax
+```bash
+chmod [ugoa][+-=][rwx] filename
+```
+| Symbol | Action |
+|---------|--------|
+| `+` | Add permission |
+| `-` | Remove permission |
+| `=` | Set exact permission |
+
+### Examples
+```bash
+# Remove write permission from group
+chmod g-w Jerry
+
+# Remove read permission from everyone
+chmod a-r Jerry
+
+# Add read and write permission for user
+chmod u+rw Jerry
+```
+
+Verify changes:
+```bash
+ls -l Jerry
+```
+
+---
+
+## 🗂️ Directories and Execute Permission
+- **Directories require `x` (execute) permission** to allow `cd` into them.
+- If `x` is missing → `Permission denied` error.
+
+Example:
+```bash
+chmod a-x myfolder  # Remove execute for all
+chmod a+x myfolder  # Add execute back
+```
+
+---
+
+## 👑 File Ownership
+
+### Two Types of Ownership
+1. **User (Owner)** → The creator of the file.
+2. **Group** → Group to which the file belongs.
+
+View ownership:
+```bash
+ls -l
+```
+Example:
+```
+-rw-r--r-- 1 root root 4096 Sep 11 09:00 Lisa
+```
+
+### Change File Owner
+```bash
+sudo chown newowner filename
+```
+Example:
+```bash
+sudo chown root Lisa
+```
+
+### Change File Group
+```bash
+sudo chgrp newgroup filename
+```
+
+### Change Both Owner and Group
+```bash
+sudo chown newowner:newgroup filename
+```
+
+---
+
+## 🔁 Recursive Changes
+To apply changes to a directory **and all files/subdirectories** inside:
+```bash
+sudo chown -R root:root /myfolder
+sudo chmod -R 755 /myfolder
+```
+
+---
+
+## 🧪 Practice Ideas
+1. Create a test file:
+   ```bash
+   touch permission_test.txt
+   ```
+2. Experiment with:
+   - `chmod`
+   - `chown`
+   - `chgrp`
+3. Always test inside **your home directory** to avoid breaking system files.
+
+---
+
+## 🔐 Summary
+- `r` = Read, `w` = Write, `x` = Execute
+- Levels: **User (u), Group (g), Others (o)**
+- Commands:
+  - `chmod` → Change permissions
+  - `chown` → Change file owner
+  - `chgrp` → Change file group
+- Always verify using:
+  ```bash
+  ls -l
+  ```
