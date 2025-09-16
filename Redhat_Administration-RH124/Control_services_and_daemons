@@ -34,6 +34,7 @@ When a **service** or **application** starts in Linux:
 | `systemctl disable <service>.service` | Disable service from starting at boot |
 | `systemctl mask <service>.service` | Completely prevent service from starting |
 | `systemctl unmask <service>.service` | Allow the service to start again |
+| `systemctl list-units --type=service --state=active` | Directly shows only active services. |
 
 ---
 

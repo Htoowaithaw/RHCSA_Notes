@@ -1,0 +1,237 @@
+
+# 🔐 Configure and Secure SSH
+
+## 🌐 What is SSH?
+- **SSH (Secure Shell)** provides a secure way to access and manage a Linux system remotely.
+- It encrypts all communication between client and server.
+- Default port: **22**.
+
+### 🖥️ Role of Shell
+- Shell provides an interface between **user commands** and the **Linux kernel**.
+- Common shells: ` `, `csh`, `ksh`.
+
+---
+
+## ⚙️ Securing SSH Configuration
+SSH is secure by default but can be hardened further by editing the SSH configuration file:  
+`/etc/ssh/sshd_config`
+
+Always **backup** before making changes:
+  
+cp /etc/ssh/sshd_config /etc/ssh/sshd_config-org
+ 
+
+### 1️⃣ Set Idle Timeout
+Automatically log out idle SSH sessions to prevent unauthorized access.
+
+- Add these lines to `/etc/ssh/sshd_config`:
+  
+ClientAliveInterval 600
+ClientAliveCountMax 0
+ 
+- `600` = 10 minutes (in seconds).  
+- Restart SSH daemon:
+  
+systemctl restart sshd
+ 
+
+---
+
+### 2️⃣ Disable Root Login
+Prevents direct root login over SSH.
+- Find and edit:
+  
+PermitRootLogin no
+ 
+- Restart service:
+  
+systemctl restart sshd
+ 
+
+---
+
+### 3️⃣ Disable Empty Passwords
+Disallow accounts with no password from logging in remotely.
+- Locate and **uncomment**:
+  
+PermitEmptyPasswords no
+ 
+- Restart service:
+  
+systemctl restart sshd
+ 
+
+---
+
+### 4️⃣ Limit SSH Access to Specific Users
+Only allow specific users to log in via SSH.
+- Add at the end of `/etc/ssh/sshd_config`:
+  
+# Allow the following users only
+AllowUsers user1 user2
+ 
+- Restart service:
+  
+systemctl restart sshd
+ 
+
+---
+
+### 5️⃣ Change Default SSH Port
+Changing from default port 22 reduces brute-force attacks.
+- Locate and edit:
+  
+Port 22224
+ 
+- Restart service:
+  
+systemctl restart sshd
+ 
+- When connecting:
+  
+ssh -p 22224 username@server_ip
+ 
+
+---
+
+## 🔑 SSH Key-Based Authentication (Passwordless Login)
+
+### Scenario:
+You have **Client Machine A** and **Server Machine B**.  
+Goal: Log in from **A → B** **without entering a password**.
+
+---
+
+### Steps:
+
+#### **Step 1: Generate SSH Key on Client**
+  
+ssh-keygen
+ 
+- Default path: `/root/.ssh/id_rsa`
+- Two files created:
+  - **Private Key**: `id_rsa`
+  - **Public Key**: `id_rsa.pub`
+
+#### **Step 2: Copy Public Key to Server**
+  
+ssh-copy-id root@192.168.1.58
+ 
+- Enter password **only this time**.
+- Key is saved to `/root/.ssh/authorized_keys` on the server.
+
+#### **Step 3: Verify Passwordless Login**
+  
+ssh root@192.168.1.58
+ 
+- You should **log in without password prompt**.
+
+---
+
+## 🧾 Summary of Commands
+
+| Action                  | Command Example |
+|-------------------------|-----------------|
+| Restart SSH Service     | `systemctl restart sshd` |
+| Backup Config           | `cp /etc/ssh/sshd_config /etc/ssh/sshd_config-org` |
+| Generate SSH Key         | `ssh-keygen` |
+| Copy Key to Server       | `ssh-copy-id user@server_ip` |
+| Login to Remote Server   | `ssh user@server_ip` |
+| Change Port (example)    | `Port 22224` in `sshd_config` |
+
+---
+
+## 🛡️ Best Practices
+1. Always **backup configuration files** before changes.
+2. Use **strong, unique passwords** if not using key authentication.
+3. Limit SSH access to **specific IPs** using firewall rules.
+4. Regularly **rotate SSH keys** and audit login logs (`/var/log/secure`).
+
+---
+
+With these configurations, your SSH server will be more secure and efficient.
+
+
+
+
+----------------------------------------------------------------------------------------------------------
+
+
+# 🗝️ Managing SSH Keys & Checking Ports in Linux
+
+---
+
+## **1. Finding Which Service is Using a Port**
+Before changing the SSH port (default: `22`), **check if another service is already using your desired port** (e.g., `22224`).
+
+### **Commands**
+- **Check all listening services:**
+    
+  netstat -tulpn
+   
+  or
+    
+  ss -tulpn
+   
+
+### **Output Example:**
+ 
+tcp   LISTEN  0  128  0.0.0.0:22       0.0.0.0:*    users:(("sshd",pid=1334,fd=3))
+tcp   LISTEN  0  128  0.0.0.0:3306     0.0.0.0:*    users:(("mysqld",pid=1456,fd=22))
+tcp   LISTEN  0  128  0.0.0.0:8080     0.0.0.0:*    users:(("nginx",pid=1789,fd=6))
+ 
+
+- **Filter for a specific port (e.g., 22224):**
+    
+  netstat -tulpn | grep 22224
+   
+  or
+    
+  ss -tulpn | grep 22224
+   
+
+If there is **no output**, the port is **free to use**.
+
+---
+
+## **2. Removing Old SSH Keys**
+When a device or user no longer needs access to your server, **remove its SSH key** to maintain security.
+
+### **Steps**
+1. **Go to the `.ssh` directory:**
+     
+   cd /root/.ssh/
+   ls -l
+    
+
+2. **Check for the file containing keys:**
+   - The main file is usually:
+     - `authorized_keys`
+   - Or custom named files like:
+     - `workpc-authorized-key.ssh`
+     - `laptop-authorized-key.ssh`
+
+3. **View contents before deleting (optional):**
+     
+   cat authorized_keys
+    
+
+4. **Remove a specific key:**
+   - **Edit the file** to remove just one key:
+       
+     vi authorized_keys
+      
+     Delete the line for the old device, then save and exit.
+
+   - **Or delete the entire file** if no keys are needed:
+       
+     mv authorized_keys authorized_keys.bak
+      
+     This renames the file as a backup, effectively disabling all SSH key access.
+
+---
+
+## **Summary**
+- Use `netstat` or `ss` to verify port availability before changing the SSH port.
+- Manage access by removing old SSH keys from `/root/.ssh/`.
+- Always **backup** the `authorized_keys` file before deleting or modifying it.

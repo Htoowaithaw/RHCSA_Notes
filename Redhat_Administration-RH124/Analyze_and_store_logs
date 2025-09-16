@@ -1,0 +1,206 @@
+
+# 📝 Log Monitoring and Chronyd Setup in Linux
+
+## 🌟 Overview
+Log monitoring is a critical part of **system administration**. Logs are like a **doctor's chart** for your system, keeping track of all its activities, problems, and health over time.
+
+Linux stores most of its logs in the `/var/log/` directory. These logs record important events like booting, user authentication, scheduled tasks, and application activities.
+
+---
+
+## 📂 Important Log Files
+| **Log File**        | **Purpose**                                                                 |
+|----------------------|-----------------------------------------------------------------------------|
+| `boot.log`           | Logs events during system **boot** or **reboot**.                          |
+| `cron`               | Records scheduled job execution history.                                   |
+| `messages`           | General log for **system hardware, processes, and applications**.          |
+| `secure`             | Tracks **login and logout activity**, failed login attempts, etc.           |
+| `maillog`            | Records **email send/receive activity** of the sendmail daemon.            |
+| `httpd`              | Stores logs for **Apache web server** activities.                          |
+
+> By default, only the **root user** can view many log files.
+
+---
+
+## 🔹 Viewing Logs
+### View Log Contents
+  
+cd /var/log
+ls -l
+ 
+
+- Use `more` or `less` to view logs one page at a time:
+  
+more boot.log
+less messages
+ 
+
+### Monitor Logs in Real-Time
+  
+tail -f secure
+ 
+- **Example:** Detect failed SSH login attempts in real time.
+
+---
+
+## 🔹 Using `dmesg`
+The `dmesg` command displays **hardware-related messages**.
+  
+dmesg
+ 
+Or directly read the log file:
+  
+cat /var/log/dmesg
+ 
+
+---
+
+## 🔹 Searching Logs for Errors
+To search for the keyword **"error"** in a log file:
+  
+grep -i "error" messages
+ 
+
+Count total lines in a log file:
+  
+wc -l messages
+ 
+
+---
+
+## ⏱ Importance of Accurate System Time
+Accurate time is **critical for analyzing logs**, especially across **multiple systems**.  
+If system times are out of sync, troubleshooting becomes difficult.
+
+Example use cases:
+- Web servers with multiple backend servers.
+- Production databases.
+- Security auditing.
+
+Linux uses **NTP (Network Time Protocol)** to synchronize system clocks.
+
+---
+
+## 🔹 `date` Command
+- Show current date and time:
+  
+date
+ 
+
+- Set system date and time:
+  
+date MMDDhhmmYYYY
+ 
+Example:
+  
+date 091112302025   # Sep 11, 12:30, 2025
+ 
+
+---
+
+## 🔹 `timedatectl` Command
+A modern tool to **view and configure system time settings**.
+
+### Check current status:
+  
+timedatectl
+ 
+
+### List available time zones:
+  
+timedatectl list-timezones
+ 
+
+### Set time zone:
+  
+timedatectl set-timezone Asia/Singapore
+ 
+
+### Enable NTP synchronization:
+  
+timedatectl set-ntp true
+ 
+
+---
+
+## 🌐 Chronyd - Modern NTP Service
+
+### What is Chronyd?
+Chronyd is the **modern replacement for NTPD**, used for time synchronization.
+
+| **Item**              | **Description** |
+|-----------------------|-----------------|
+| **Package Name**      | `chrony` |
+| **Configuration File**| `/etc/chrony.conf` |
+| **Log File**          | `/var/log/chrony/` |
+| **Service Name**      | `chronyd` |
+| **Utility Command**   | `chronyc` |
+
+---
+
+## 🛠 Steps to Configure Chronyd
+
+### 1. Verify Chrony is Installed
+  
+rpm -qa | grep chrony
+ 
+
+### 2. Configure Chrony
+Edit the configuration file:
+  
+vi /etc/chrony.conf
+ 
+- Add or modify NTP server entries:
+ 
+server 0.centos.pool.ntp.org iburst
+server 1.centos.pool.ntp.org iburst
+server 8.8.8.8 iburst   # Example (Google DNS, for practice only)
+ 
+
+### 3. Start and Enable Chronyd
+  
+# Stop old NTP service (if running)
+systemctl stop ntpd
+systemctl disable ntpd
+
+# Start Chronyd
+systemctl start chronyd
+systemctl enable chronyd
+
+# Verify status
+systemctl status chronyd
+ 
+
+### 4. Check Sources
+Run the `chronyc` command:
+  
+chronyc
+ 
+Inside chronyc:
+ 
+sources
+ 
+- Displays which NTP server the system is synced with.
+
+Exit:
+ 
+quit
+ 
+
+---
+
+## 📝 Key Notes
+- Only **one time-sync service** should run at a time (either `ntpd` or `chronyd`).
+- Logs in `/var/log/messages` are the **first place to check** for issues.
+- Use `tail -f` for real-time monitoring.
+- Accurate system time is essential for security, troubleshooting, and distributed systems.
+
+---
+
+## 🧪 Quick Troubleshooting Commands
+| **Command**                            | **Purpose** |
+|---------------------------------------|-------------|
+| `tail -f secure`                      | Monitor SSH login activity |
+| `grep -i error /var/log/messages`     | Find error messages |
+| `timedatectl`                         | Check time sync status |
+| `chronyc sources`                     | Verify NTP source servers |
