@@ -23,9 +23,9 @@ Linux is a **multi-user system**, so every file and directory has:
 Permissions are divided into three **sets of three characters**:
 
 Example:
-```
+ 
 -rw-rw-r--
-```
+ 
 - **First character** → Type of file (`-` for file, `d` for directory, `l` for link).
 - **Next 3 characters** → Permissions for **User (Owner)**.
 - **Next 3 characters** → Permissions for **Group**.
@@ -41,14 +41,14 @@ Example:
 ---
 
 ## 📂 Viewing Permissions
-```bash
+ 
 ls -l
-```
+ 
 
 Example output:
-```
+ 
 -rw-rw-r-- 1 iafzal iafzal  4096 Sep 11 09:00 Jerry
-```
+ 
 - `-rw-rw-r--` → Permission string.
 - First `rw-` → Owner can read & write.
 - Second `rw-` → Group can read & write.
@@ -59,9 +59,9 @@ Example output:
 ## 🛠️ Changing Permissions: `chmod`
 
 ### Syntax
-```bash
+ 
 chmod [ugoa][+-=][rwx] filename
-```
+ 
 | Symbol | Action |
 |---------|--------|
 | `+` | Add permission |
@@ -69,7 +69,7 @@ chmod [ugoa][+-=][rwx] filename
 | `=` | Set exact permission |
 
 ### Examples
-```bash
+ 
 # Remove write permission from group
 chmod g-w Jerry
 
@@ -78,12 +78,12 @@ chmod a-r Jerry
 
 # Add read and write permission for user
 chmod u+rw Jerry
-```
+ 
 
 Verify changes:
-```bash
+ 
 ls -l Jerry
-```
+ 
 
 ---
 
@@ -92,10 +92,10 @@ ls -l Jerry
 - If `x` is missing → `Permission denied` error.
 
 Example:
-```bash
+ 
 chmod a-x myfolder  # Remove execute for all
 chmod a+x myfolder  # Add execute back
-```
+ 
 
 ---
 
@@ -106,49 +106,49 @@ chmod a+x myfolder  # Add execute back
 2. **Group** → Group to which the file belongs.
 
 View ownership:
-```bash
+ 
 ls -l
-```
+ 
 Example:
-```
+ 
 -rw-r--r-- 1 root root 4096 Sep 11 09:00 Lisa
-```
+ 
 
 ### Change File Owner
-```bash
+ 
 sudo chown newowner filename
-```
+ 
 Example:
-```bash
+ 
 sudo chown root Lisa
-```
+ 
 
 ### Change File Group
-```bash
+ 
 sudo chgrp newgroup filename
-```
+ 
 
 ### Change Both Owner and Group
-```bash
+ 
 sudo chown newowner:newgroup filename
-```
+ 
 
 ---
 
 ## 🔁 Recursive Changes
 To apply changes to a directory **and all files/subdirectories** inside:
-```bash
+ 
 sudo chown -R root:root /myfolder
 sudo chmod -R 755 /myfolder
-```
+ 
 
 ---
 
 ## 🧪 Practice Ideas
 1. Create a test file:
-   ```bash
+    
    touch permission_test.txt
-   ```
+    
 2. Experiment with:
    - `chmod`
    - `chown`
@@ -165,6 +165,6 @@ sudo chmod -R 755 /myfolder
   - `chown` → Change file owner
   - `chgrp` → Change file group
 - Always verify using:
-  ```bash
+   
   ls -l
-  ```
+   

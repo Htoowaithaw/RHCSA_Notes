@@ -1,0 +1,157 @@
+
+# 🖥️ Controlling Services, Applications, and Daemons in Linux
+
+## 🌐 Overview
+When a **service** or **application** starts in Linux:
+- It **creates processes**.
+- When these processes **run continuously in the background**, they become **daemons**.
+
+> **Daemon** = Background process that keeps running to handle ongoing tasks (like web servers, schedulers, etc.)
+
+---
+
+## ⚙️ systemd and systemctl
+- **systemd** is the core system and service manager for modern Linux systems (RHEL 7 & 8).
+- **systemctl** is the **command-line tool** to control services managed by systemd.
+
+> In older Linux systems, services were managed using `init.d` scripts, but now replaced by **systemctl**.
+
+---
+
+## 📝 Common systemctl Commands
+
+| Command | Description |
+|----------|-------------|
+| `systemctl --version` | Check if `systemd` is installed and view its version |
+| `ps -ef | grep systemd` | Verify if systemd is running |
+| `systemctl --all` | List all services and their statuses |
+| `systemctl status <service>.service` | Check detailed status of a service |
+| `systemctl start <service>.service` | Start a service |
+| `systemctl stop <service>.service` | Stop a service |
+| `systemctl restart <service>.service` | Restart a service |
+| `systemctl reload <service>.service` | Reload configuration without stopping service |
+| `systemctl enable <service>.service` | Enable service to start at boot |
+| `systemctl disable <service>.service` | Disable service from starting at boot |
+| `systemctl mask <service>.service` | Completely prevent service from starting |
+| `systemctl unmask <service>.service` | Allow the service to start again |
+
+---
+
+## 🔍 Example Walkthrough: firewallD Service
+
+### 1. Check Status
+ 
+systemctl status firewalld.service
+ 
+- Shows configuration, running status, main process ID (PID), and logs.
+
+### 2. Stop Service
+ 
+systemctl stop firewalld.service
+ 
+- Gracefully stops the service.
+
+> ⚠️ **Do NOT use `kill` unless necessary**, as it’s not a graceful stop.
+
+### 3. Start Service
+ 
+systemctl start firewalld.service
+ 
+
+### 4. Restart Service (for configuration changes)
+ 
+systemctl restart firewalld.service
+ 
+
+### 5. Reload Configurations
+ 
+systemctl reload firewalld.service
+ 
+- Updates configuration **without downtime**.
+
+### 6. Enable at Boot
+ 
+systemctl enable firewalld.service
+ 
+- Ensures service starts automatically at boot.
+
+### 7. Disable at Boot
+ 
+systemctl disable firewalld.service
+ 
+
+### 8. Mask / Unmask Service
+- **Mask:** Completely prevents service from being started.
+ 
+systemctl mask firewalld.service
+ 
+- **Unmask:** Allows the service to be started again.
+ 
+systemctl unmask firewalld.service
+ 
+
+-----------------------------
+
+## 🧾 Understanding Reload vs Restart
+
+| Action | Behavior |
+|---------|----------|
+| **Restart** | Stops the service and starts it again → Causes downtime |
+| **Reload** | Refreshes configuration **without stopping** the service → No downtime |
+
+Example:
+- When editing a web server like **Apache (httpd)**, use `reload` to apply changes without taking the site offline.
+
+
+systemctl reload and systemctl restart are NOT the same, even though they seem similar. The key difference comes down to how deeply the service is refreshed and whether there is downtime.
+
+Here’s a clear comparison:
+
+⚔️ systemctl reload vs restart
+
+| Feature             | **reload** ⚡ (No Downtime)                                                                        | **restart** 🔄 (With Downtime)                                                     |
+| ------------------- | ------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| **What it does**    | Reloads the **configuration file only** without stopping the running service.                     | **Stops the service completely** and starts it again from scratch.                 |
+| **Downtime**        | ✅ **No downtime** — existing connections keep running smoothly.                                   | ❌ **Downtime occurs** — active sessions/connections are dropped.                   |
+| **Use Case**        | When you make **minor configuration changes** and want them applied **without disrupting users**. | When the service is **unstable**, **frozen**, or you need a **clean fresh start**. |
+| **Example**         | Editing firewall rules or Nginx config — the process just reloads rules into memory.              | Restarting a web server after a crash or kernel upgrade.                           |
+| **Command Example** | `systemctl reload httpd`                                                                          | `systemctl restart httpd`                                                          |
+
+
+
+
+📝 Why Restart is Still Needed
+
+Even though reload is safer:
+
+Some services don’t support reload at all.
+
+Example: systemctl reload on sshd works, but not every service has this ability.
+
+If a service is misbehaving or stuck, reload won’t fix it. You need a full restart to clear memory and processes.
+
+After major upgrades or patches, restart ensures the service uses the new binaries.
+
+Use reload first to apply changes without downtime.
+
+Use restart only when a reload isn’t supported or the service is broken and needs a full reset.
+
+---
+
+## 🔹 Key Notes
+- `systemd` **process ID (PID)** is always **1** because it’s the first process that starts at boot.
+- Killing the systemd process will **crash the entire operating system**.
+- Always check the status of services using:
+   
+  systemctl status <service>.service
+   
+- Use `systemctl --all` to see **all available services**, both active and inactive.
+
+---
+
+## 🧠 Summary
+- **systemd** manages services and processes in modern Linux systems.
+- **systemctl** is the tool used to control services:
+  - Start, stop, restart, reload, enable, disable, mask/unmask.
+- Always prefer `reload` for configuration updates to avoid downtime.
+- `systemd` replaces old init.d scripts, providing better control and dependency management.
