@@ -1,0 +1,205 @@
+# Linux File Transfer & Compression — Notes
+
+## 1) `tar` (pack/unpack many files into one archive)
+`tar` bundles files/dirs into a single **archive**. It doesn’t compress by itself.
+
+### Create an archive
+ 
+# From inside your home, pack everything into home.tar
+tar cvf home.tar .
+
+# Verbose (-v) shows each file as it’s added
+# File goes wherever you run the command from
+ 
+
+### Extract an archive
+ 
+# Extract *into the current directory*
+tar xvf home.tar
+ 
+
+### List archive contents (safe preview)
+ 
+tar tvf home.tar
+ 
+
+### Useful options
+- `-C <dir>`: change to dir before action (good for clean extraction)
+- `--exclude='pattern'`: skip paths
+- `--absolute-names` (rare): keep leading `/`
+- `-p`: preserve permissions on extract
+- `--same-owner`: preserve owner (root usually required)
+
+### Common patterns
+ 
+# Create archive of /path/to/dir and write under /tmp
+tar cvf /tmp/dir_backup.tar -C /path/to dir
+
+# Exclude caches/logs
+tar cvf site.tar --exclude='*.log' --exclude='cache/*' .
+ 
+
+---
+
+## 2) Compression with `gzip` / `gunzip`
+`gzip` compresses a *single* file. Paired with `tar` you’ll see `.tar.gz` (or `.tgz`).
+
+### Compress an existing tarball
+ 
+gzip home.tar        # → home.tar.gz (original removed)
+# OR keep original:
+gzip -c home.tar > home.tar.gz
+ 
+
+### Uncompress (`gunzip` or `gzip -d`)
+ 
+gunzip home.tar.gz   # → home.tar
+gzip -d home.tar.gz  # same
+ 
+
+### Do tar + gzip in one step
+ 
+# Create
+tar czvf home.tgz .          # -z = gzip
+# Extract
+tar xzvf home.tgz
+# List
+tar tzvf home.tgz
+ 
+
+> Rule of thumb: **`.tar` = bundle only**, **`.tar.gz/.tgz` = bundle + compress**.
+
+---
+
+## 3) FTP (File Transfer Protocol)
+**FTP uses TCP/21** and is **unencrypted** by default. Use only in trusted networks or behind VPN; otherwise prefer SFTP/SCP.
+
+### Server side (vsftpd) — quick setup
+ 
+# Install
+sudo yum install -y vsftpd  # RHEL/CentOS
+# or: sudo dnf install -y vsftpd
+
+# Back up config and edit
+sudo cp /etc/vsftpd/vsftpd.conf /etc/vsftpd/vsftpd.conf.orig
+sudo vi /etc/vsftpd/vsftpd.conf
+# Make/ensure these changes:
+# anonymous_enable=NO
+# ascii_upload_enable=YES
+# ascii_download_enable=YES
+# ftpd_banner=Welcome to <your> FTP service
+# (optional) use_localtime=YES   # add near end
+
+# Start + enable
+sudo systemctl start vsftpd
+sudo systemctl enable vsftpd
+sudo systemctl status vsftpd
+
+# Firewall (prod): allow 21/TCP (and passive port range if configured)
+# sudo firewall-cmd --add-service=ftp --permanent && sudo firewall-cmd --reload
+# LAB ONLY (not recommended in prod): disable firewall
+# sudo systemctl stop firewalld && sudo systemctl disable firewalld
+
+# Ensure a local user exists to log in via FTP
+sudo useradd <username>    # if needed
+sudo passwd <username>
+ 
+
+### Client side (classic `ftp` client)
+ 
+# Install client
+sudo yum install -y ftp
+
+# From client host:
+ftp <server_ip_or_host>
+# Username: <your_user>
+# Password: <your_password>
+
+bin     # binary mode (always do this for non-text content)
+hash    # show progress with # marks
+lcd <dir>   # set local dir (optional)
+cd  <dir>   # set remote dir
+put <file>  # upload file
+mput *      # upload many (interactive)
+get <file>  # download file
+mget *      # download many (interactive)
+ls          # remote list
+pwd         # remote cwd
+bye         # quit
+ 
+
+> Tip: If transfer looks corrupted, confirm you used **`bin`** (binary) mode, not ASCII.
+
+---
+
+## 4) SCP (Secure Copy)
+**SCP uses SSH (TCP/22)** for encrypted file transfer. Minimal setup if SSH already works.
+
+### Send local → remote
+ 
+scp /path/to/local/file  user@server:/remote/path/
+scp -r /path/to/dir      user@server:/remote/path/   # recursive
+ 
+
+### Pull remote → local
+ 
+scp user@server:/remote/path/file  /local/dir/
+ 
+
+### First-time host check
+When you see “The authenticity of host … can’t be established…”, type `yes` to trust the host key (it’s saved to `~/.ssh/known_hosts`).
+
+### Using SSH keys (no password prompt)
+ 
+# On the client
+ssh-keygen -t rsa -b 4096 -C "<label>"   # accept defaults
+ssh-copy-id user@server                  # installs your pubkey
+# Now scp/ssh without typing a password each time
+ 
+
+---
+
+## 5) Quick comparisons & tips
+- **`tar`**: packaging; add `-z` (gzip) or `-J` (xz) to compress.
+- **`gzip`/`gunzip`**: compress a **single** file; pair with tar.
+- **FTP** (`vsftpd`): legacy, plaintext; use **only** on trusted networks. Consider **FTPS** (FTP over TLS) if you must keep FTP.
+- **SCP**: simple, secure, piggybacks on SSH; great default for ad‑hoc transfers.
+- **SFTP**: (not covered in detail) also over SSH, more feature‑rich than scp; many clients (WinSCP, FileZilla) speak it.
+
+### Verify transfers
+- Check sizes and hashes before/after:
+ 
+sha256sum file
+# or
+md5sum file
+ 
+
+### Common pitfalls
+- Forgetting `-f` with `tar` when providing the archive filename (always `tar <opts> -f archive.tar …`).
+- Extracting into the wrong directory; use `-C <dir>`.
+- Firewalls blocking FTP (21 and passive range) or SSH (22).
+- Wrong transfer mode in FTP (use `bin`).
+
+---
+
+## 6) Handy one‑liners
+
+ 
+# Pack and gzip a directory (fast)
+tar czf project-$(date +%F).tgz -C /path/to project
+
+# Extract into a clean dir
+mkdir -p restore && tar xzf project.tgz -C restore
+
+# Mirror a directory securely (rsync over SSH; bonus)
+rsync -avz -e ssh /src/ user@server:/dst/
+ 
+
+---
+
+### Practice checklist
+- [ ] Create a `.tar` of your home dir and list contents.
+- [ ] Compress it to `.tar.gz`, then uncompress.
+- [ ] Set up `vsftpd` on a test VM and upload a file via `ftp`.
+- [ ] Copy a file with `scp` in both directions.
+- [ ] Generate SSH keys and use `ssh-copy-id`, then repeat `scp` without a password.

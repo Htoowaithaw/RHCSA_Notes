@@ -1,0 +1,187 @@
+
+# 📦 Linux Package Management Notes
+
+## 📝 Overview
+This note covers how to **install**, **update**, **remove**, and **manage packages** on Linux systems using the following commands:
+- **yum / dnf** – For package installation and management (online repositories).
+- **rpm** – For installing packages locally without internet.
+- **System update and patch management**.
+- **Creating a local repository** from a DVD or ISO.
+
+---
+
+## 🔹 Key Concepts
+- **Software**: Applications like Firefox, MS Office, Calculator.
+- **Package**: A container of software files, executables, and configs.
+- **Repository (Repo)**: A storage location containing many packages.
+
+> **yum vs rpm**
+> - **yum** → Downloads & installs automatically from internet or defined repos.
+> - **rpm** → Used when the package `.rpm` file is already downloaded locally.
+
+---
+
+## 🌐 Commands for System Updates and Repositories
+### 1. **yum (CentOS/Red Hat)**
+- Installs packages directly from repositories.
+- Requires internet access.
+  
+yum install <package_name>
+yum remove <package_name>
+yum update           # Updates packages but keeps old ones
+yum upgrade          # Updates and deletes old versions
+ 
+
+### 2. **rpm (Red Hat Package Manager)**
+- Install `.rpm` files locally (offline).
+  
+rpm -ihv package_name.rpm    # Install
+rpm -e package_name          # Remove
+rpm -qa                       # List all installed packages
+rpm -qi package_name          # Show detailed info of package
+rpm -qc package_name          # Show config files of package
+rpm -qf /path/to/command      # Find which package a file belongs to
+ 
+
+---
+
+## 🔍 Finding Installed Packages
+  
+rpm -qa | grep <package_name>
+wc -l                          # Counts how many packages are installed
+ 
+
+Example:
+  
+rpm -qa | grep bind   # Check if DNS package is installed
+ 
+
+---
+
+## 📥 Installing a Package (Example: bind for DNS)
+  
+yum install bind
+ 
+
+If dependencies are required, `yum` installs them automatically.
+
+---
+
+## 🗑 Removing a Package
+  
+yum remove bind
+ 
+Or using rpm:
+  
+rpm -e bind
+ 
+
+---
+
+## 🆙 System Upgrade / Patch Management
+- **Minor upgrade:** Example from 7.3 → 7.4  
+  - Command: `yum update`
+- **Major upgrade:** Example from 6 → 7  
+  - Must **backup** system, rebuild from scratch, and restore files.
+
+> **Check Linux version:**
+  
+cat /etc/redhat-release
+uname -srm
+ 
+
+---
+
+## 🔧 Advanced Package Management
+- **View installed package info:**
+  
+rpm -qi ksh
+ 
+- **List configuration files:**
+  
+rpm -qc ksh
+ 
+- **Find which package owns a file:**
+  
+which ksh                # Find file path
+rpm -qf /usr/bin/ksh     # Find package that owns the file
+ 
+
+---
+
+## 💾 Creating a Local Repository from DVD
+When **no internet access** is available, you can create a local repo.
+
+### Steps:
+1. **Mount the DVD:**
+     
+   mount /dev/cdrom /mnt
+   df -h  # Verify mount point
+    
+
+2. **Create a directory for local repo:**
+     
+   mkdir /localrepo
+    
+
+3. **Copy packages from DVD:**
+     
+   cp -r /mnt/Packages/* /localrepo/
+    
+
+4. **Install `createrepo` tool:**
+     
+   yum install createrepo
+    
+
+5. **Create metadata:**
+     
+   createrepo /localrepo
+    
+
+6. **Configure local repo file:**  
+   Create file `/etc/yum.repos.d/local.repo` with the following:
+    
+   [centos7]
+   name=CentOS 7 Local Repository
+   baseurl=file:///localrepo
+   enabled=1
+   gpgcheck=0
+    
+
+7. **Clean cache and verify:**
+     
+   yum clean all
+   yum repolist all
+    
+
+---
+
+## 🧪 Testing Local Repo
+Install a package to confirm:
+  
+yum install tomcat
+ 
+
+If successful, your local repository is working!
+
+---
+
+## 📝 Summary
+| Command             | Purpose                          |
+|---------------------|----------------------------------|
+| yum install pkg     | Install package (online)         |
+| yum remove pkg      | Remove package (online)          |
+| rpm -ihv pkg.rpm    | Install local RPM file           |
+| rpm -e pkg          | Remove local package             |
+| rpm -qa             | List all installed packages      |
+| rpm -qi pkg         | Show package details             |
+| rpm -qc pkg         | Show config files of package     |
+| rpm -qf /path/file  | Identify which package owns file |
+
+---
+
+## 📌 Notes
+- Use `yum` for most tasks, `rpm` only for offline installation.
+- Always check internet connectivity before running `yum`.
+- For production systems, schedule patching and updates carefully.

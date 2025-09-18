@@ -1,0 +1,218 @@
+# Linux Networking — Admin Notes
+
+> Quick, practical reference for managing networking on RHEL/CentOS-like systems (RHEL 7/8/9 & derivatives).
+
+---
+
+## 1) Static vs. Dynamic IP (DHCP)
+
+- **Static IP**: Manually set; persists across reboots/changes. Use for servers and anything others must reliably reach.
+- **Dynamic IP (DHCP)**: Assigned by DHCP server; may change after reboot/lease renewal—ok for labs or ephemeral hosts.
+- **Private vs Public IP**:
+
+  - *Public*: Routable on the Internet.
+
+**See current addresses**  
+  
+ip addr            # Preferred on modern distros
+ifconfig           # Legacy; may be absent by default
+ 
+
+---
+
+## 2) OS Network Components (what they are & how to view)
+
+- **Interfaces (NICs)**: `enp0s3`, `eth0`, `lo` (loopback)  
+    
+  ip link show
+  ip addr show enp0s3
+   
+- **MAC address**: Hardware address on the NIC.  
+    
+  ip link show enp0s3      # look for 'link/ether'
+   
+- **Subnet mask / prefix**: Defines local subnet size (e.g., `/24` = 255.255.255.0).
+- **Default Gateway**: Next hop for non-local traffic.  
+    
+  ip route
+  # or legacy:
+  netstat -rn
+   
+- **DNS**: Resolves names to IPs.  
+  Files: `/etc/resolv.conf`, `/etc/nsswitch.conf`, `/etc/hosts`  
+  Tools: `nslookup`, `dig`
+
+---
+
+## 3) NetworkManager overview
+
+- **NetworkManager** manages connections & devices on RHEL/CentOS 7+ (systemd era).
+- Service: `NetworkManager`  
+    
+  systemctl status NetworkManager
+   
+- Tooling layers:
+  - **nmcli** — command line (script-friendly)
+  - **nmtui** — text UI (TUI) in terminal
+  - **nm-connection-editor** — GUI editor (X/desktop)
+  - **GNOME Settings** — Desktop control panel
+
+> Tip: Restarting/altering connections often requires bouncing the connection (down/up) or reloading NM.
+
+---
+
+## 4) Configure networking — multiple ways
+
+### A) `nmcli` (CLI)
+
+**List devices & connections**
+  
+nmcli device status
+nmcli connection show        # all
+nmcli connection show --active
+ 
+
+**Set a Static IPv4 on `enp0s3`**
+  
+# Set IPv4 address & mask
+nmcli connection modify enp0s3 ipv4.addresses 10.253.1.211/24
+# Set default gateway
+nmcli connection modify enp0s3 ipv4.gateway 10.253.1.1
+# Set DNS (one or more)
+nmcli connection modify enp0s3 ipv4.dns "10.253.1.1 8.8.8.8"
+# Make IPv4 manual (static)
+nmcli connection modify enp0s3 ipv4.method manual
+
+# Bounce the connection (or: nmcli connection reload)
+nmcli connection down  enp0s3 && nmcli connection up enp0s3
+ 
+
+**Add a secondary (alias) IPv4 on the same NIC**
+
+Adding secondary static IP using nmcli
+
+# nmcli device status
+
+# nmcli connection show --active
+
+# ifconfig
+
+# nmcli connection modify enp0s3 +ipv4.addresses 10.0.2.17/24
+
+# nmcli connection reload
+
+# systemctl reboot
+
+# ip address show enp0s3
+
+ 
+
+**Verify**
+  
+ip addr show enp0s3
+ip route
+cat /etc/resolv.conf
+ 
+
+### B) `nmtui` (TUI)
+
+  
+sudo nmtui
+# Choose: "Edit a connection" → select interface
+# Set IPv4 configuration: "Manual" → add Address/Gateway/DNS
+# Save, then "Activate a connection" if needed.
+ 
+
+### C) `nm-connection-editor` (GUI)
+
+  
+nm-connection-editor
+# In the window: pick your connection → IPv4 tab → Manual → set Address/Gateway/DNS → Save
+ 
+
+### D) GNOME Settings (GUI)
+
+- **Settings → Network → Wired/Wi‑Fi → (gear icon)** → IPv4 → Manual → fill Address/Gateway/DNS → Apply.
+
+---
+
+## 5) Key network config files (FYI)
+
+- `/etc/sysconfig/network-scripts/ifcfg-*` (RHEL 7/early) — legacy per‑if cfg files.
+- `/etc/NetworkManager/system-connections/*.nmconnection` — NM keyfiles (RHEL 8/9).
+- `/etc/hosts` — static name ↔ IP entries.
+- `/etc/hostname` — system hostname (also managed via `hostnamectl`).
+- `/etc/resolv.conf` — DNS servers (may be NM-managed/overwritten).
+- `/etc/nsswitch.conf` — lookup order (e.g., `hosts: files dns`).
+
+> Prefer using NetworkManager tools to change settings; they write the right files for your version.
+
+---
+
+## 6) Basic & troubleshooting commands
+
+  
+ping 10.253.1.1             # reachability to gateway
+ping -c 3 google.com        # checks DNS + reachability
+
+ip addr                     # addresses
+ip link                     # link layer state
+ip route                    # routing table
+
+ifup enp0s3                 # legacy bring-up (may be absent)
+ifdown enp0s3               # legacy bring-down
+
+netstat -tulpen             # sockets (may need net-tools) 
+ss -tulpen                  # modern replacement for netstat
+
+traceroute 8.8.8.8          # path to host (install traceroute if needed)
+tcpdump -i enp0s3           # live packet capture (Ctrl+C to stop)
+nslookup hotmail.com        # DNS query (uses default resolver)
+dig google.com +short       # DNS query (bind-utils)
+ethtool enp0s3              # NIC link state/speed/duplex details
+ 
+
+**Route & gateway checks**
+  
+ip route get 8.8.8.8
+# shows which source IP, outgoing iface, and gateway would be used
+ 
+
+**Name resolution order**
+  
+grep ^hosts: /etc/nsswitch.conf   # typically: hosts: files dns
+ 
+
+---
+
+## 7) Notes & Tips
+
+- For **servers**, prefer **static IP**. Document IP, gateway, DNS, VLAN, and switchport.
+- When using DHCP but wanting stable names, use **DHCP reservations** on the server.
+- If you edit files by hand, **reload/bounce** the connection or restart NetworkManager:
+    
+  nmcli connection reload
+  nmcli connection down enp0s3 && nmcli connection up enp0s3
+  # or, if you must:
+  systemctl restart NetworkManager
+   
+- On headless systems, **nmcli** is the most reliable/common denominator.
+
+---
+
+## Appendix — quick one‑liners
+
+- Show active connection details:
+    
+  nmcli -f GENERAL,IP4,IP6 connection show --active
+   
+- Add additional DNS servers:
+    
+  nmcli con mod enp0s3 +ipv4.dns "1.1.1.1"
+  nmcli con up enp0s3
+   
+- Switch back to DHCP:
+    
+  nmcli con mod enp0s3 ipv4.method auto ipv4.addresses "" ipv4.gateway "" ipv4.dns ""
+  nmcli con up enp0s3
+   
