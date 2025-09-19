@@ -1,0 +1,199 @@
+
+# 🧰 Analyze Servers & Get Support — Linux/RHEL Notes
+
+## 🔎 Overview
+- When issues occur on a **Red Hat Enterprise Linux (RHEL)** server:
+  - Use basic monitoring commands:
+    - `top`, `free`, `df`, `du`, `fdisk`, etc.
+  - Review **system logs** in `/var/log/`.
+  - If unresolved, **contact Red Hat Support**.
+
+---
+
+## 📝 SOS Report (Diagnostic Utility)
+### Purpose:
+- Collects **system logs** and **configuration files** for Red Hat Support.
+
+### Command Changes:
+- **Older versions:** `sosreport`
+- **RHEL 8+:** `sos report` (inside the `sos` tool)
+
+### Usage:
+1. Must be run as **root**.
+2. Command:
+     
+   sos report
+    
+3. Steps:
+   - Enter a **Red Hat Support case ID** (generated beforehand at access.redhat.com).
+   - Tool collects logs and configs into a compressed archive.
+   - Archive location is shown after completion (e.g., `/var/tmp/sosreport-<hostname>.tar.xz`).
+4. Send the file to Red Hat Support for troubleshooting.
+
+> The newer `sos` command provides additional options like `sos clean`, `sos mask`, etc.
+
+---
+
+## 🌐 Cockpit (Web-Based Management Tool)
+Cockpit is a modern, **web-based interface** for managing Linux servers.
+
+### Key Points:
+- **Sponsored by Red Hat**, available on:
+  - RHEL, CentOS, Fedora, Ubuntu, etc.
+- Installed by default on **RHEL 8**, optional on **RHEL 7**.
+- Provides:
+  - Resource monitoring
+  - Account management
+  - Networking configuration
+  - Logs viewing
+  - Software updates
+  - Built-in **terminal access**
+
+### Default Port:
+- **HTTPS port:** `9090`
+- URL format:
+   
+  https://<server-ip>:9090
+   
+
+---
+
+## ⚙️ Install Cockpit
+### 1. Verify Internet Connectivity:
+  
+ping www.google.com
+ 
+- Ensure the server can reach the internet.
+
+### 2. Check if Cockpit is Installed:
+  
+rpm -qa | grep cockpit
+ 
+- If not installed → install it:
+    
+  # RHEL/CentOS
+  sudo dnf install cockpit -y
+   
+    
+  # Ubuntu/Debian
+  sudo apt-get install cockpit -y
+   
+
+---
+
+## ▶️ Start and Enable Cockpit Service
+  
+sudo systemctl start cockpit
+sudo systemctl enable --now cockpit.socket
+sudo systemctl status cockpit
+ 
+- **Active & running** status confirms success.
+
+> Enable ensures Cockpit auto-starts on boot.
+
+---
+
+## 🛡️ Firewall Configuration
+To allow access from external browsers:
+  
+sudo systemctl stop firewalld   # or configure port 9090 explicitly
+ 
+- Alternatively, access Cockpit **locally** via:
+   
+  https://localhost:9090
+   
+
+---
+
+## 🌐 Access Web Interface
+1. Find server IP:
+     
+   ip addr
+    
+2. Access in browser:
+    
+   https://<server-ip>:9090
+    
+3. Login as:
+   - **root** (full privileges) or
+   - Non-root user (limited functionality)
+
+---
+
+## 🖥️ Cockpit Features
+### 1. **Dashboard (Home Page)**
+- Shows:
+  - Hostname, OS version, uptime
+  - CPU & memory usage graphs
+  - Security updates status
+- Root user can **shutdown/reboot** directly.
+
+### 2. **Logs**
+- View logs in various severity levels:
+  - Emergency, Critical, Error, Info, etc.
+
+### 3. **Storage**
+- Displays mounted devices and usage.
+- Equivalent to CLI command: `df -h`
+
+### 4. **Networking**
+- Manage network interfaces:
+  - Add bonds, teams, bridges, VLANs.
+
+### 5. **Accounts**
+- Create and manage local user accounts.
+
+### 6. **Services**
+- Manage system services (`systemctl` equivalent):
+  - Start, stop, enable, disable services directly.
+
+### 7. **Applications**
+- View and manage installed applications.
+
+### 8. **Diagnostic Reports**
+- Generate diagnostic data similar to `sos report`.
+
+### 9. **Kernel Dump & SELinux**
+- View crash dump settings and control SELinux modes:
+  - Enforcing, Permissive, Disabled.
+
+### 10. **Software Updates**
+- Install available updates via GUI.
+
+### 11. **Subscriptions**
+- View Red Hat subscription details.
+
+### 12. **Terminal**
+- Built-in terminal access for running shell commands remotely.
+
+---
+
+## 📊 Cockpit Workflow Example
+| Task                 | CLI Equivalent          | Cockpit Option       |
+|----------------------|-------------------------|---------------------|
+| View CPU usage       | `top`                   | Dashboard → Usage    |
+| Check logs           | `cat /var/log/messages` | Logs tab            |
+| Add user             | `useradd`               | Accounts tab        |
+| Manage services      | `systemctl`             | Services tab        |
+| Update packages      | `dnf update`            | Software Updates tab|
+
+---
+
+## 🔐 Security Notes
+- Cockpit uses **HTTPS**, so browser may show a certificate warning:
+  - Click **Advanced → Accept Risk** to proceed.
+- Strongly recommended to secure with:
+  - Firewall rules
+  - SSL certificate
+
+---
+
+## 📝 Summary
+- Use CLI + logs for initial diagnostics.
+- Generate **SOS report** and share with Red Hat for advanced troubleshooting.
+- **Cockpit** simplifies server management with a powerful web-based UI.
+- Key Cockpit benefits:
+  - Centralized monitoring
+  - Remote access
+  - GUI-based administration
+  - Built-in terminal

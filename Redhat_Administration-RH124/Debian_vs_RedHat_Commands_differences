@@ -1,0 +1,84 @@
+# Debian vs Red Hat Command Differences for LFCS
+
+## 🌐 Package Management
+- Debian: apt update / apt upgrade / apt install pkg / apt remove pkg
+- RedHat: yum update / yum install pkg / yum remove pkg OR dnf for newer versions
+
+## 🔧 Service Management
+- Same for both (systemd):
+   systemctl start|stop|restart|enable|disable|status service_name
+  
+## 📝 Config File Paths
+- Debian: /etc/network/interfaces (older), netplan configs in /etc/netplan/
+- RedHat: /etc/sysconfig/network-scripts/ifcfg-<interface>
+
+## 🌐 Networking - Restart Network
+- Debian: systemctl restart networking
+- RedHat: systemctl restart network
+
+## 🌐 Check IP / Interfaces
+- Same for both: ip addr OR ip a
+
+## 🔐 SELinux vs AppArmor
+- Debian: AppArmor (default)
+- RedHat: SELinux (default)  
+  getenforce / setenforce to manage SELinux (RedHat only)
+
+## 🔧 Firewall
+- Debian: ufw enable / ufw allow 22 / ufw status
+- RedHat: 
+   firewall-cmd --add-port=22/tcp --permanent
+  firewall-cmd --reload
+  
+## 🗂️ Package File Search
+- Debian: dpkg -L pkg_name
+- RedHat: rpm -ql pkg_name
+
+## 🔍 Find Package Providing File
+- Debian: apt-file search filename
+- RedHat: yum provides filename OR dnf provides filename
+
+## 👤 User & Group Management
+- Same for both: useradd, passwd, usermod, groupadd, groups
+
+## 📂 Software Repo Config
+- Debian: /etc/apt/sources.list
+- RedHat: /etc/yum.repos.d/
+
+## 🧹 Clean Package Cache
+- Debian: apt clean OR apt autoremove
+- RedHat: yum clean all
+
+## 📦 Check Installed Packages
+- Debian: dpkg -l
+- RedHat: rpm -qa
+
+## 🧾 Package Info
+- Debian: apt show pkg_name
+- RedHat: yum info pkg_name OR rpm -qi pkg_name
+
+## 💻 Hostname Management
+- Same for both: hostnamectl set-hostname newname
+
+## 🗄️ Log Files
+- Debian: /var/log/syslog, /var/log/auth.log
+- RedHat: /var/log/messages, /var/log/secure
+
+## 📜 Default Shell Config Files
+- Debian: /etc/bash.bashrc
+- RedHat: /etc/bashrc
+
+## 📡 Network Tools (Install)
+- Debian: apt install net-tools
+- RedHat: yum install net-tools
+
+## 🌍 Default Web Root (Apache)
+- Both: /var/www/html (same path, config files may differ)
+
+## ⚙️ Time Sync
+- Debian: timedatectl set-ntp true
+- RedHat: chronyd service or timedatectl
+
+## 🧰 Common Package Names
+- Debian: apache2, php, build-essential
+- RedHat: httpd, php, gcc, make, rpm-build
