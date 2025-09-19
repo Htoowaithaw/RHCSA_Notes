@@ -1,0 +1,208 @@
+
+# Linux Shell Scripting Notes
+
+## 🐚 What is a Shell?
+- A **shell** is the interface between the **user** and the **kernel**.
+- It acts like a **container** that holds environment and executes commands.
+- Examples:
+  - Linux CLI shells: ` `, `sh`, `zsh`, etc.
+  - GUI shells: Windows Explorer, Linux KDE, etc.
+
+### 🔹 Check current shell:
+  
+echo $0
+ 
+
+### 🔹 List all installed shells:
+  
+cat /etc/shells
+ 
+
+### 🔹 View user's default shell:
+  
+cat /etc/passwd
+ 
+
+---
+
+## 📝 Shell Scripts
+A **shell script** is an executable file containing multiple commands that run sequentially.
+
+### Structure:
+1. **Shebang Line**
+     
+   #! /bin/ 
+    
+2. **Comments**
+     
+   # This is a comment
+    
+3. **Commands**
+   - Executed line by line.
+4. **Conditional/Loop Statements**
+   - `if`, `then`, `while`, `for`
+
+### Making a script executable:
+  
+chmod +x scriptname.sh
+ 
+
+---
+
+## 📂 Example 1: Hello World Script
+  
+vi output-screen.sh
+ 
+Content:
+  
+#! /bin/ 
+echo "Hello World"
+ 
+Run:
+  
+./output-screen.sh
+ 
+
+If not in `$PATH`, always use `./` prefix.
+
+---
+
+## 🔹 Example 2: Running Multiple Commands
+  
+#! /bin/ 
+# Script by Imran Afzal
+whoami
+echo
+pwd
+hostname
+ls -ltr
+ 
+
+---
+
+## 📦 Variables in Shell Scripts
+  
+#! /bin/ 
+a="Imran"
+b="Afzal"
+c="Linux Class"
+
+echo "My first name is $a"
+echo "My surname is $b"
+echo "My class is $c"
+ 
+
+> **Note:** Use single quotes `'` if variables contain spaces.
+
+---
+
+## 🖥️ Input & Output
+- `read` → waits for **user input**.
+- `echo` → displays **output**.
+
+Example:
+  
+#! /bin/ 
+echo "What is your name?"
+read username
+echo "Hello, $username"
+ 
+
+Example with multiple inputs:
+  
+#! /bin/ 
+echo "What is your name?"
+read name
+echo "What is your profession?"
+read profession
+echo "What is your favorite show?"
+read show
+
+echo "Hello $name"
+echo "Your profession $profession is awesome"
+echo "$show is a good show"
+ 
+
+---
+
+## 🔀 If-Then Statements
+  
+#! /bin/ 
+count=100
+
+if [ $count -eq 100 ]
+then
+  echo "Count is 100"
+else
+  echo "Count is NOT 100"
+fi
+ 
+
+### Check if a file exists:
+  
+#! /bin/ 
+if [ -e /home/user/error.txt ]
+then
+  echo "File exists"
+else
+  echo "File does NOT exist"
+fi
+ 
+
+---
+
+## 🔁 For Loops
+### Example 1:
+  
+#! /bin/ 
+for i in 1 2 3 4 5
+do
+  echo "Welcome $i times"
+done
+ 
+
+### Example 2:
+  
+#! /bin/ 
+for i in eat run jump play
+do
+  echo "See Imran $i"
+done
+ 
+
+---
+
+## 🔍 Grep Command
+**grep** = global regular expression print.
+
+### Common options:
+- `-i` → ignore case
+- `-c` → count matches
+- `-n` → show line numbers
+- `-v` → invert match (exclude pattern)
+
+### Example usage:
+  
+grep -i "seinfeld" seinfeld-characters
+grep -c "seinfeld" seinfeld-characters
+grep -vi "seinfeld" seinfeld-characters
+ 
+
+### Combine with other commands:
+  
+grep -vi "seinfeld" seinfeld-characters | awk '{print $1}' | cut -c 1-3
+ 
+
+### Search multiple keywords with `egrep`:
+  
+egrep -i "Seinfeld|Costanza" seinfeld-characters
+ 
+
+---
+
+## 🌟 Summary
+- **Shell scripts** automate repetitive tasks.
+- Start scripts with `#! /bin/ `.
+- Use `chmod +x` to make scripts executable.
+- **Key constructs:** variables, `read`, `if-then`, loops.
+- **grep** is essential for searching text in files or command outputs.
