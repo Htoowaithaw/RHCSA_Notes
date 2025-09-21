@@ -1,0 +1,127 @@
+
+# 🕒 Linux Crontab & At Command Notes
+
+## 📌 Overview
+The **crontab** and **at** commands are used for scheduling tasks in Linux.
+
+- **crontab** → Schedules recurring jobs (repeated tasks).
+- **at** → Schedules **one-time jobs** (ad-hoc tasks).
+
+These commands are essential for **automating system tasks**, such as backups, monitoring, log rotation, or running scripts at specific times.
+
+---
+
+## 🗂 Crontab
+The `crontab` command allows you to **schedule jobs** that run at specified intervals.
+
+### ✏️ Edit Crontab
+ 
+crontab -e
+ 
+- Opens the **crontab file** in the default text editor (usually `vi` or `nano`).
+- Jobs are defined using **five time fields** followed by the command to run.
+
+### 🕐 Crontab Format
+ 
+*  *  *  *  *  <command>
+|  |  |  |  |
+|  |  |  |  └─ Day of Week (0-6) [0 = Sunday]
+|  |  |  └──── Month (1-12)
+|  |  └─────── Day of Month (1-31)
+|  └────────── Hour (0-23)
+└───────────── Minute (0-59)
+ 
+
+### Example
+ 
+23 13 * 3 * echo "This is my first crontab entry" > /home/user/crontab-entry
+ 
+**Explanation:**
+- `23` → Run at the 23rd minute  
+- `13` → At 1 PM (13:00 hours)  
+- `*` → Every day of the month  
+- `3` → Only in March  
+- `*` → Every day of the week
+
+This creates a file `/home/user/crontab-entry` with the text **"This is my first crontab entry"**.
+
+---
+
+## 📋 Useful Crontab Commands
+| Command       | Description |
+|---------------|-------------|
+| `crontab -e` | Edit crontab jobs |
+| `crontab -l` | List all scheduled cron jobs |
+| `crontab -r` | Remove all cron jobs for current user |
+| `sudo crontab -e` | Edit crontab for root user |
+
+---
+
+## 🧾 Practical Walkthrough
+1. **Check the current date & time**
+    
+   date
+    
+2. **Open crontab for editing**
+    
+   crontab -e
+    
+3. **Add the following entry:**
+    
+   23 13 * 3 * echo "This is my first crontab entry" > /home/user/crontab-entry
+    
+4. **Save & exit the editor** (`Esc` + `:wq` in `vi`).
+5. **Wait for the scheduled time**, then check if the file was created:
+    
+   ls -ltr /home/user/
+   cat /home/user/crontab-entry
+    
+
+---
+
+## ⏳ At Command
+The **`at` command** is similar to `crontab` but is used for **one-time scheduling**.
+
+### Schedule a job
+ 
+at 13:45
+ 
+- Type the command you want to run (e.g., `echo "Hello World" > /tmp/testfile`).
+- Press **Ctrl+D** to save and exit.
+
+### List scheduled jobs
+ 
+atq
+ 
+
+### Remove a scheduled job
+ 
+atrm <job_id>
+ 
+
+---
+
+## 📝 Summary
+- Use **`crontab`** for recurring tasks (daily backups, reports, etc.).  
+- Use **`at`** for **one-time** tasks (like a one-time notification or cleanup).  
+- Always verify jobs using `crontab -l` or `atq`.  
+- Remember to check system time with `date` to avoid scheduling errors.
+
+---
+
+## 🔹 Example Use Case
+**Task:** Run a backup script every day at midnight.
+
+ 
+0 0 * * * /home/user/scripts/backup.sh
+ 
+
+This job will **automatically run at 12:00 AM every day**.
+
+---
+
+## 🎯 Key Takeaways
+- `crontab` = **recurring schedules**
+- `at` = **one-time schedules**
+- Understand the **five crontab time fields** to schedule tasks accurately.
+- Always test your cron jobs with logging to ensure they work correctly.
