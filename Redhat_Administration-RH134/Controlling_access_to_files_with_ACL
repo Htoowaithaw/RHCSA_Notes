@@ -1,0 +1,192 @@
+
+# 🗂️ Access Control List (ACL) in Linux
+
+## 📌 Overview
+Access Control List (ACL) provides **flexible permissions** for files and directories, extending the standard Linux permission model.  
+It allows **specific users or groups** to be granted permissions without changing group memberships or global settings.
+
+**Purpose of ACL:**
+- Standard Linux permissions are limited to **owner**, **group**, and **others**.
+- ACL allows you to **grant specific access to individual users or groups** without exposing files to everyone.
+
+Example scenario:
+- A file is owned by `root`.
+- You want **user `iafzal`** to **read or write** the file, but **not every other user**.
+- ACL enables this granular control.
+
+---
+
+## 📝 ACL Basics
+- **ACL** = Additional layer **on top of standard permissions**.
+- Fine-grained discretionary access rights for files/directories.
+- When ACL is applied, `ls -l` shows a **`+` sign** at the end of permissions.
+
+Example:
+```
+-rw-r--r--+ 1 root root  1234 Sep 19 10:00 file.txt
+```
+
+---
+
+## 🔹 Commands
+| Command | Description |
+|----------|-------------|
+| `getfacl <file>` | View ACL details for a file or directory. |
+| `setfacl` | Add, modify, or remove ACL permissions. |
+
+---
+
+### 1️⃣ Add Permission for a Specific User
+```
+setfacl -m u:<username>:<permissions> <file_path>
+```
+Example:
+```
+setfacl -m u:iafzal:rw /tmp/texas.txt
+```
+
+- `u:` = User
+- `rw` = Read & Write permissions
+- **Effect:** Grants `iafzal` read/write access without affecting others.
+
+---
+
+### 2️⃣ Add Permission for a Specific Group
+```
+setfacl -m g:<groupname>:<permissions> <file_path>
+```
+Example:
+```
+setfacl -m g:devteam:r /tmp/texas.txt
+```
+- Grants **read-only** access to group `devteam`.
+
+---
+
+### 3️⃣ Cascading ACL to Directory (Inheritance)
+Allow **all files within a directory** to inherit ACL entries:
+```
+setfacl -m d:u:<username>:<permissions> <directory_path>
+```
+Example:
+```
+setfacl -m d:u:iafzal:rw /project/data/
+```
+
+---
+
+### 4️⃣ Remove ACL for a Specific User
+```
+setfacl -x u:<username> <file_path>
+```
+Example:
+```
+setfacl -x u:iafzal /tmp/texas.txt
+```
+
+---
+
+### 5️⃣ Remove All ACLs from a File/Directory
+```
+setfacl -b <file_path>
+```
+Example:
+```
+setfacl -b /tmp/texas.txt
+```
+
+---
+
+## 🔹 Verifying ACLs
+Use `getfacl` to check:
+```
+getfacl /tmp/texas.txt
+```
+Output example:
+```
+# file: texas.txt
+# owner: root
+# group: root
+user::rw-
+user:iafzal:rw-
+group::r--
+mask::rw-
+other::r--
+```
+
+---
+
+## ❗ Important Notes
+1. **`+` sign in permissions:**  
+   Indicates ACL is applied. Example:
+   ```
+   -rw-r--r--+ 1 root root 1234 Sep 19 10:00 texas.txt
+   ```
+
+2. **Write permission ≠ Delete permission:**  
+   Even if ACL grants **write**, the user **cannot delete** the file unless they have directory-level delete permissions.
+
+3. **Deleting files is controlled by directory permissions**, not file ACL.
+
+---
+
+## 🧪 Example Walkthrough
+
+### Step 1: Create a file as root
+```
+touch /tmp/texas.txt
+ls -l /tmp/texas.txt
+```
+
+Output:
+```
+-rw-r--r-- 1 root root 0 Sep 19 10:00 texas.txt
+```
+
+### Step 2: Verify no ACL applied
+```
+getfacl /tmp/texas.txt
+```
+
+### Step 3: User `iafzal` tries to edit → Fails
+```
+vi /tmp/texas.txt
+```
+Output:
+```
+"Read only" warning at bottom → Cannot save changes
+```
+
+### Step 4: Grant `iafzal` read/write using ACL
+```
+setfacl -m u:iafzal:rw /tmp/texas.txt
+getfacl /tmp/texas.txt
+```
+
+Output:
+```
+user:iafzal:rw-
+```
+
+### Step 5: Verify edit now works
+```
+vi /tmp/texas.txt
+```
+Now `iafzal` can edit successfully.
+
+### Step 6: Remove ACL for `iafzal`
+```
+setfacl -x u:iafzal /tmp/texas.txt
+```
+
+### Step 7: Remove **all ACLs**
+```
+setfacl -b /tmp/texas.txt
+```
+
+---
+
+## 🏁 Summary
+- **ACL** = Fine-grained permissions beyond basic Linux permissions.
+- Use `setfacl` to **grant**, `getfacl` to **verify**, and `setfacl -x/-b` to **remove**.
+- ACL is essential for managing permissions in shared environments where traditional group management is insufficient.

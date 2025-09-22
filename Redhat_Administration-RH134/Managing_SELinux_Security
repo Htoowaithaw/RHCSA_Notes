@@ -1,0 +1,201 @@
+
+# 🛡️ SELinux (Security-Enhanced Linux)
+
+SELinux is a Linux kernel security module that provides a mechanism for supporting access control security policies, including **Mandatory Access Control (MAC)**.  
+It was developed as a joint project between **NSA (National Security Agency)** and the **SELinux community**.
+
+---
+
+## 📖 What is SELinux?
+- SELinux enforces rules even **if a user owns a file**.  
+- It provides **an extra layer of security** over standard Linux permissions (**DAC – Discretionary Access Control**).
+
+Example:
+- A compromised HTTP user may be blocked from reading certain files, even if they normally have permission, unless a specific SELinux policy allows it.
+
+---
+
+## 🔹 Modes of SELinux
+SELinux operates in three modes:
+
+| Mode         | Description |
+|--------------|-------------|
+| **Enforcing** (Default) | Actively enforces SELinux policies |
+| **Permissive** | Logs violations but does NOT enforce them |
+| **Disabled** | Completely turned off |
+
+**Commands to check status:**
+```bash
+sestatus      # Shows SELinux status in detail
+getenforce    # Quick check: Enforcing / Permissive / Disabled
+```
+
+**Switch modes temporarily:**
+```bash
+setenforce 1   # Enable (Enforcing)
+setenforce 0   # Set to Permissive
+```
+
+For permanent changes, edit:
+```
+/etc/selinux/config
+SELINUX=enforcing
+SELINUX=permissive
+SELINUX=disabled
+```
+
+---
+
+## ⚠️ Important Before Changing SELinux
+- Always **create a snapshot or backup** before making changes.
+- If enabling SELinux, run:
+```bash
+touch /.autorelabel
+```
+This will relabel all files on reboot to match SELinux rules.
+
+---
+
+## 🏷️ SELinux Labels
+SELinux **labels everything**: files, directories, processes, sockets.
+
+**Label format:**  
+```
+user:role:type:level
+```
+
+Example:
+```bash
+ls -lZ /usr/sbin/httpd
+-rwxr-xr-x. root root system_u:object_r:httpd_exec_t:s0 /usr/sbin/httpd
+```
+- **user:** system_u  
+- **role:** object_r  
+- **type:** httpd_exec_t *(most important)*  
+- **level:** s0
+
+### Checking Labels:
+```bash
+ls -dZ /etc/httpd        # Directory labels
+ps axZ | grep httpd      # Process labels
+netstat -tnlpZ | grep http # Socket labels
+```
+
+---
+
+## 🔧 Managing Labels
+Two main commands:
+
+| Command | Purpose |
+|----------|---------|
+| **semanage** | Permanent label changes |
+| **chcon** | Temporary label changes |
+
+Example to change label type for a file:
+```bash
+chcon -t httpd_sys_content_t /home/user/webfile.html
+```
+
+---
+
+## 🔘 Booleans in SELinux
+Booleans act as **on/off switches** for specific SELinux rules.
+
+**Examples:**
+- Allow FTP server to access home directories.
+- Allow Apache HTTPD to connect to FTP.
+
+**View all booleans:**
+```bash
+getsebool -a
+semanage boolean -l
+```
+
+**Enable a boolean:**
+```bash
+setsebool -P httpd_can_connect_ftp on
+```
+
+**Verify:**
+```bash
+getsebool httpd_can_connect_ftp
+```
+
+> `-P` makes the change persistent across reboots.
+
+---
+
+## 🧾 Example SELinux Workflow
+1. Check current mode:
+   ```bash
+   getenforce
+   ```
+2. Verify labels:
+   ```bash
+   ls -lZ /var/www/html
+   ps axZ | grep httpd
+   ```
+3. Search for relevant boolean:
+   ```bash
+   getsebool -a | grep httpd
+   ```
+4. Enable required boolean:
+   ```bash
+   setsebool -P httpd_can_network_connect on
+   ```
+
+---
+
+## 🐛 Troubleshooting
+If an action is blocked, check SELinux logs:
+```bash
+journalctl | grep AVC
+```
+- Look for **denied** messages.
+- Modify labels or enable the correct boolean to fix.
+
+---
+
+## 🚀 Disabling SELinux (If Required)
+> **Warning:** Only disable SELinux if absolutely necessary.
+
+1. Backup config:
+   ```bash
+   cp /etc/selinux/config /tmp/config.orig
+   ```
+2. Edit `/etc/selinux/config`:
+   ```
+   SELINUX=disabled
+   ```
+3. Reboot the system:
+   ```bash
+   reboot
+   ```
+4. Verify:
+   ```bash
+   getenforce
+   sestatus
+   ```
+
+---
+
+## 📌 Key SELinux Types
+| Type | Purpose |
+|------|----------|
+| **httpd_exec_t** | Executable files for Apache HTTP server |
+| **httpd_sys_content_t** | Static web content |
+| **home_dir_t** | User home directories |
+| **var_log_t** | Log files in `/var/log` |
+
+---
+
+## 📝 Summary
+- **DAC vs MAC**: DAC allows user-controlled permissions, MAC enforces strict security rules.
+- SELinux adds **granular security** by labeling files, processes, and sockets.
+- **Booleans** simplify toggling security settings on/off.
+- Always **check logs** and labels when troubleshooting.
+- Use permissive mode for testing before switching to enforcing.
+
+---
+
+By understanding SELinux basics, you can secure Linux servers in public-facing environments without disabling this powerful security feature.

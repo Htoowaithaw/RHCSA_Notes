@@ -1,0 +1,213 @@
+
+# 🎵 Tune System Performance in Linux
+
+## 📌 Overview
+Linux comes **pre-optimized** after installation, but system performance can be **fine-tuned** depending on workload and application needs.  
+This lesson covers:
+1. **Tuned Daemon** – Adjusts performance automatically using predefined profiles.
+2. **Nice & Renice Commands** – Manually prioritize or deprioritize processes.
+
+---
+
+## 1️⃣ Tuned Daemon (tuned)
+- **Tuned** = Tune (performance tuning) + **d** (daemon, runs in background).
+- Installed **by default** in RHEL/CentOS 7 & 8.
+- Provides **predefined performance profiles** for different workloads.
+
+### 🔹 Check if tuned is installed
+ 
+rpm -qa | grep tuned
+ 
+If not installed:
+ 
+sudo yum install tuned -y        # RHEL/CentOS 7
+sudo dnf install tuned -y        # RHEL/CentOS 8+
+ 
+
+### 🔹 Check tuned service status
+ 
+systemctl status tuned
+systemctl start tuned            # Start tuned
+systemctl enable tuned           # Enable at boot
+ 
+
+---
+
+## 2️⃣ Tuned Profiles
+Tuned provides **predefined profiles** to optimize performance automatically.
+
+| Profile            | Purpose |
+|--------------------|---------|
+| **balanced**       | Default; balance between performance & power saving |
+| **desktop**        | Faster response for interactive desktop use |
+| **throughput-performance** | Maximum throughput (e.g., for file servers) |
+| **latency-performance** | Low-latency workloads |
+| **network-throughput** | Optimized for network performance (large downloads/streams) |
+| **powersave**      | Reduce power usage |
+| **oracle**         | For Oracle DB or apps |
+| **virtual-guest**  | Optimize guest VMs |
+| **virtual-host**   | Optimize VM host machines |
+
+Custom profiles can also be added (e.g., vendor profiles like SAP).
+
+### 🔹 Check current active profile
+ 
+tuned-adm active
+ 
+
+### 🔹 List all available profiles
+ 
+tuned-adm list
+ 
+
+### 🔹 Change to a desired profile
+ 
+sudo tuned-adm profile balanced
+ 
+
+### 🔹 Get tuned's recommendation
+ 
+tuned-adm recommend
+ 
+This suggests the best profile based on the system.
+
+### 🔹 Turn off tuned
+ 
+sudo tuned-adm off
+ 
+> **Verify:** `tuned-adm active` → should show "No current active profile".
+
+---
+
+## 3️⃣ Managing Profiles via Web Console (Cockpit)
+You can change tuning profiles via **Cockpit** web interface.
+
+1. Access Cockpit:  
+   `https://<IP-ADDRESS>:9090`
+2. Navigate to:
+   **Overview → Configuration → Performance Profile**
+3. Select the desired profile (e.g., `balanced`) and click **Change Profile**.
+
+> ⚠️ **Firewall:** If you can't access Cockpit, check `firewalld` status:
+ 
+systemctl status firewalld
+ 
+- Stop firewall for testing:
+   
+  systemctl stop firewalld
+   
+- Or allow port 9090.
+
+---
+
+## 4️⃣ Process Prioritization: nice & renice
+
+Linux allows **process prioritization** using **nice** and **renice**.
+
+- **nice** → Start a new process with a specific priority.
+- **renice** → Change priority of an **already running process**.
+
+### Priority Ranges
+| Value | Meaning |
+|-------|---------|
+| **-20** | Highest priority |
+| **0** | Default priority |
+| **19** | Lowest priority |
+
+> By default, processes inherit a **nice value of 0**.
+
+### Relationship Between PR & NI
+- **NI (Nice)** = user-defined priority (-20 to 19).
+- **PR (Priority)** = kernel-calculated priority (0 to 139).
+  - 0–99 → Real-time processes
+  - 100–139 → User-space processes
+
+---
+
+### 🔹 Check process priorities
+ 
+top
+ 
+Columns:
+- `PID` – Process ID
+- `PR` – Kernel priority
+- `NI` – User-assigned nice level
+
+Alternative with `ps`:
+ 
+ps axo pid,comm,nice,cls --sort=-nice
+ 
+
+---
+
+### 🔹 Start a process with custom priority
+Example: Start `top` command with **high priority (-15)**:
+ 
+nice -n -15 top
+ 
+Verify in another terminal using `top` → see `PR` and `NI` values.
+
+---
+
+### 🔹 Change priority of a running process
+1. Find the **PID** of the process:
+    
+   top
+    
+   Example PID: `9360`
+2. Change priority using `renice`:
+    
+   sudo renice -n 12 -p 9360
+    
+3. Verify:
+    
+   top
+    
+   Output will show the **new NI and PR values**.
+
+---
+
+## 5️⃣ Practical Example
+- Launch `top` with default priority:
+   
+  top
+   
+- In another terminal, change priority to **highest (-15)**:
+   
+  nice -n -15 top
+   
+- Later, modify to lower priority using PID:
+   
+  renice -n 12 -p <PID>
+   
+
+---
+
+## 📝 Summary
+- **Tuned daemon** auto-optimizes Linux using **profiles**.
+- Use `tuned-adm` commands to manage performance profiles.
+- Use **nice** to start processes with a defined priority.
+- Use **renice** to adjust priority of **running processes**.
+- Higher negative value = **higher priority** (-20 is max).
+
+---
+
+## 🔹 Key Commands Reference
+| Command                     | Description |
+|----------------------------|-------------|
+| `rpm -qa | grep tuned`      | Check if tuned is installed |
+| `systemctl status tuned`    | Check tuned service status |
+| `tuned-adm active`          | Show current profile |
+| `tuned-adm list`            | List all profiles |
+| `tuned-adm profile <name>`  | Activate a specific profile |
+| `tuned-adm recommend`       | Get recommended profile |
+| `nice -n <value> <command>` | Start process with priority |
+| `renice -n <value> -p <PID>`| Change priority of running process |
+| `ps axo pid,comm,nice,cls`  | Display process priorities |
+
+---
+
+## 🎯 Final Thoughts
+- Start with **tuned** for easy performance management.
+- Use **nice/renice** for **manual process control**.
+- Combine both for maximum system performance in production environments.
