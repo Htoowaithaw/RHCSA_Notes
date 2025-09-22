@@ -25,13 +25,13 @@ SELinux operates in three modes:
 | **Disabled** | Completely turned off |
 
 **Commands to check status:**
-```bash
+```
 sestatus      # Shows SELinux status in detail
 getenforce    # Quick check: Enforcing / Permissive / Disabled
 ```
 
 **Switch modes temporarily:**
-```bash
+```
 setenforce 1   # Enable (Enforcing)
 setenforce 0   # Set to Permissive
 ```
@@ -49,7 +49,7 @@ SELINUX=disabled
 ## ⚠️ Important Before Changing SELinux
 - Always **create a snapshot or backup** before making changes.
 - If enabling SELinux, run:
-```bash
+```
 touch /.autorelabel
 ```
 This will relabel all files on reboot to match SELinux rules.
@@ -65,7 +65,7 @@ user:role:type:level
 ```
 
 Example:
-```bash
+```
 ls -lZ /usr/sbin/httpd
 -rwxr-xr-x. root root system_u:object_r:httpd_exec_t:s0 /usr/sbin/httpd
 ```
@@ -75,7 +75,7 @@ ls -lZ /usr/sbin/httpd
 - **level:** s0
 
 ### Checking Labels:
-```bash
+```
 ls -dZ /etc/httpd        # Directory labels
 ps axZ | grep httpd      # Process labels
 netstat -tnlpZ | grep http # Socket labels
@@ -92,7 +92,7 @@ Two main commands:
 | **chcon** | Temporary label changes |
 
 Example to change label type for a file:
-```bash
+```
 chcon -t httpd_sys_content_t /home/user/webfile.html
 ```
 
@@ -106,18 +106,18 @@ Booleans act as **on/off switches** for specific SELinux rules.
 - Allow Apache HTTPD to connect to FTP.
 
 **View all booleans:**
-```bash
+```
 getsebool -a
 semanage boolean -l
 ```
 
 **Enable a boolean:**
-```bash
+```
 setsebool -P httpd_can_connect_ftp on
 ```
 
 **Verify:**
-```bash
+```
 getsebool httpd_can_connect_ftp
 ```
 
@@ -127,20 +127,20 @@ getsebool httpd_can_connect_ftp
 
 ## 🧾 Example SELinux Workflow
 1. Check current mode:
-   ```bash
+   ```
    getenforce
    ```
 2. Verify labels:
-   ```bash
+   ```
    ls -lZ /var/www/html
    ps axZ | grep httpd
    ```
 3. Search for relevant boolean:
-   ```bash
+   ```
    getsebool -a | grep httpd
    ```
 4. Enable required boolean:
-   ```bash
+   ```
    setsebool -P httpd_can_network_connect on
    ```
 
@@ -148,7 +148,7 @@ getsebool httpd_can_connect_ftp
 
 ## 🐛 Troubleshooting
 If an action is blocked, check SELinux logs:
-```bash
+```
 journalctl | grep AVC
 ```
 - Look for **denied** messages.
@@ -160,7 +160,7 @@ journalctl | grep AVC
 > **Warning:** Only disable SELinux if absolutely necessary.
 
 1. Backup config:
-   ```bash
+   ```
    cp /etc/selinux/config /tmp/config.orig
    ```
 2. Edit `/etc/selinux/config`:
@@ -168,11 +168,11 @@ journalctl | grep AVC
    SELINUX=disabled
    ```
 3. Reboot the system:
-   ```bash
+   ```
    reboot
    ```
 4. Verify:
-   ```bash
+   ```
    getenforce
    sestatus
    ```

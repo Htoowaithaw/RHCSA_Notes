@@ -1,0 +1,180 @@
+
+# 🗄️ Linux Storage Management
+
+## 📌 Introduction to Storage
+Storage refers to the hard disk or data storage space in your computer. When buying a computer, three key components are checked:
+1. **Memory (RAM)**
+2. **CPU (Processor)**
+3. **Disk space (Storage)**
+
+There are **three types of storage** that can be attached to a computer:
+
+### 1. **Local Storage**
+- Physical hard drive inside your computer.
+- Comes pre-built and pre-configured.
+
+### 2. **SAN (Storage Area Network)**
+- Connects to the computer via **fiber cables**.
+- Fiber speeds: 8 Gbps, 16 Gbps, etc.
+- Used in enterprise environments for high-speed, block-level storage.
+
+### 3. **NAS (Network Attached Storage)**
+- Connected via **IP network** (e.g., NFS, Samba/Windows Shares).
+- Uses CAT5 or higher network cables.
+- Example: Shared folders mounted remotely.
+
+💡 **Interview Tip:**  
+You may be asked to explain the differences between SAN, NAS, and local storage.
+
+---
+
+## 🔹 Disk Partition Commands
+Linux provides two essential commands for viewing disk and partition details.
+
+### 1. **df Command**
+- Displays file system disk usage and mount points.
+
+```
+df
+df -h    # Human-readable format (GB, MB)
+```
+
+Output columns:
+- Filesystem | Size | Used | Avail | Use% | Mounted on
+
+### 2. **fdisk Command**
+- Displays partition information and disk layout.
+
+```
+fdisk -l
+```
+
+Example output:
+- `/dev/sda` → 10 GB
+- `/dev/sda1` → Swap (1 GB)
+- `/dev/mapper/centos-root` → Root partition (≈8.5 GB)
+
+---
+
+## ➕ Adding a New Disk and Partitioning It
+
+### **Step 1. Add Disk in VirtualBox**
+1. Open **VirtualBox** → Select VM → **Settings** → **Storage**.
+2. Click **Add Hard Disk** → **Create New Disk**.
+3. Choose **VDI** format → **Dynamically Allocated**.
+4. Name it `datadisk` → Set size to **2 GB** → Create.
+
+💡 **Create a Snapshot** first to recover if something goes wrong.
+
+---
+
+### **Step 2. Verify Disk**
+After starting your VM:
+```
+df -h
+fdisk -l
+```
+You should see the new disk as `/dev/sdb` (≈2 GB).
+
+---
+
+### **Step 3. Create a Partition**
+Run the fdisk utility:
+```
+fdisk /dev/sdb
+```
+- Press `n` → Create new partition.
+- Choose `p` → Primary partition (default).
+- Partition number: `1` (default).
+- First sector: Default (2048).
+- Last sector: Default (use full disk or `+1G` for 1 GB partition).
+- Press `w` → Write changes to disk.
+
+Verify:
+```
+fdisk -l
+```
+You should see `/dev/sdb1`.
+
+---
+
+### **Step 4. Create File System**
+Format the new partition with **XFS** (latest Linux file system type):
+```
+mkfs.xfs /dev/sdb1
+```
+
+---
+
+### **Step 5. Mount the Partition**
+Create a mount directory:
+```
+mkdir /data
+```
+
+Mount the partition:
+```
+mount /dev/sdb1 /data
+```
+
+Verify:
+```
+df -h
+```
+You should see `/data` mounted.
+
+---
+
+### **Step 6. Make Mount Permanent (fstab)**
+Edit the **fstab** file:
+```
+vi /etc/fstab
+```
+
+Add the following line at the bottom:
+```
+/dev/sdb1    /data    xfs    defaults    0 0
+```
+
+- **/dev/sdb1** → Partition
+- **/data** → Mount point
+- **xfs** → File system type
+
+💡 **Warning:** Mistakes in `/etc/fstab` can prevent the system from booting!  
+Always keep a snapshot before editing.
+
+---
+
+### **Step 7. Reboot and Verify**
+```
+init 6
+```
+After reboot:
+```
+df -h
+```
+The `/data` mount should persist.
+
+---
+
+### **Unmounting and Remounting**
+To unmount:
+```
+umount /data
+```
+
+To remount all partitions listed in `/etc/fstab`:
+```
+mount -a
+```
+
+---
+
+## 📝 Summary
+- **df** → View mounted partitions and disk usage.
+- **fdisk -l** → List all disk partitions.
+- **mkfs.xfs** → Create a new file system.
+- **mount / umount** → Mount or unmount disks.
+- **/etc/fstab** → Configure persistent mounts.
+
+By following these steps, you can safely add, partition, and manage storage on Linux systems.
