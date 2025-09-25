@@ -1,0 +1,208 @@
+
+# 🗂 Linux LVM (Logical Volume Management) Guide
+
+## 🔹 What is LVM?
+LVM (Logical Volume Management) is a **flexible storage management system** that allows you to:
+- Combine multiple physical disks into a single storage pool.
+- Create logical volumes that can be resized easily.
+- Extend storage without downtime.
+
+### **Benefits of LVM:**
+- Combine multiple disks into one **volume group**.
+- Easily **extend disk space** as needs grow.
+- Manage partitions dynamically without rebooting.
+
+---
+
+## 🔹 LVM Components
+1. **Physical Volume (PV):**
+   - Actual physical storage devices (e.g., `/dev/sda`, `/dev/sdb`).
+   - Must be initialized before being added to LVM.
+
+2. **Volume Group (VG):**
+   - A pool of combined physical volumes.
+   - Example: `oracle_vg` created from `/dev/sdc1`.
+
+3. **Logical Volume (LV):**
+   - Similar to a partition but more flexible.
+   - Created inside a volume group.
+
+4. **Filesystem:**
+   - Logical volumes must be formatted with a filesystem like `xfs` or `ext4` before mounting.
+
+---
+
+## 🔹 Step-by-Step: Creating an LVM Setup
+
+### **1. Identify New Disk**
+```
+fdisk -l
+```
+Example output:
+```
+/dev/sdc   1G
+```
+
+### **2. Create a Partition**
+```
+fdisk /dev/sdc
+```
+- Press `n` → New partition
+- Press `p` → Primary partition
+- Default start sector → `Enter`
+- Default end sector → `Enter`
+- Press `t` → Change partition type
+- Enter `8e` → Linux LVM
+- Press `w` → Write changes
+
+Verify:
+```
+fdisk -l | grep sdc
+```
+
+---
+
+### **3. Create Physical Volume (PV)**
+```
+pvcreate /dev/sdc1
+pvdisplay
+```
+
+---
+
+### **4. Create Volume Group (VG)**
+```
+vgcreate oracle_vg /dev/sdc1
+vgdisplay oracle_vg
+```
+
+---
+
+### **5. Create Logical Volume (LV)**
+```
+lvcreate -n oracle_lv -L 1000M oracle_vg
+lvdisplay
+```
+
+---
+
+### **6. Format Logical Volume**
+```
+mkfs.xfs /dev/oracle_vg/oracle_lv
+```
+
+---
+
+### **7. Mount the LV**
+```
+mkdir /oracle
+mount /dev/oracle_vg/oracle_lv /oracle
+df -h
+```
+
+To make it persistent after reboot, add entry to `/etc/fstab`:
+```
+/dev/oracle_vg/oracle_lv   /oracle   xfs   defaults   0 0
+```
+
+---
+
+## 🔹 Extending LVM Storage
+
+When disk space runs out, you can **add another disk** and extend storage.
+
+### **1. Add a New Disk**
+- Add new disk via VirtualBox or physical hardware.
+
+Check:
+```
+fdisk -l
+```
+Assume new disk is `/dev/sdd`.
+
+### **2. Create Partition on New Disk**
+```
+fdisk /dev/sdd
+# Follow same steps: n → p → defaults → t → 8e → w
+```
+
+---
+
+### **3. Create PV on New Disk**
+```
+pvcreate /dev/sdd1
+```
+
+---
+
+### **4. Extend Volume Group**
+```
+vgextend oracle_vg /dev/sdd1
+vgdisplay oracle_vg
+```
+
+---
+
+### **5. Extend Logical Volume**
+Check current LV path:
+```
+lvdisplay
+```
+Extend LV by **1GB**:
+```
+lvextend -L +1G /dev/oracle_vg/oracle_lv
+```
+
+---
+
+### **6. Grow Filesystem**
+For `xfs`:
+```
+xfs_growfs /dev/oracle_vg/oracle_lv
+```
+
+Verify:
+```
+df -h
+```
+
+---
+
+## 🔹 Summary of Key Commands
+| Task                  | Command Example |
+|-----------------------|----------------|
+| Create PV            | `pvcreate /dev/sdc1` |
+| Create VG            | `vgcreate oracle_vg /dev/sdc1` |
+| Create LV            | `lvcreate -n oracle_lv -L 1000M oracle_vg` |
+| Extend VG            | `vgextend oracle_vg /dev/sdd1` |
+| Extend LV            | `lvextend -L +1G /dev/oracle_vg/oracle_lv` |
+| Grow Filesystem      | `xfs_growfs /dev/oracle_vg/oracle_lv` |
+
+---
+
+## 🔹 LVM Workflow Recap
+```
+[Physical Disk] → [Partition] → [Physical Volume] → [Volume Group] → [Logical Volume] → [Filesystem] → [Mount Point]
+```
+
+---
+
+## 🔹 Troubleshooting Tips
+- If a disk isn't detected, run:
+  ```
+  partprobe
+  ```
+- If mount fails after reboot, check `/etc/fstab` syntax.
+- Always take snapshots in virtual environments before making changes.
+
+---
+
+## 🏁 Final Notes
+- LVM is ideal for **production environments** where storage scalability is critical.
+- You can **extend storage on the fly** without downtime.
+- Always monitor free space using:
+  ```
+  vgdisplay
+  lvdisplay
+  df -h
+  ```

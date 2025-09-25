@@ -1,0 +1,205 @@
+
+# 🗄️ Advanced Storage Management with Stratis in RHEL 8 / CentOS 8
+
+## 📖 Introduction
+Red Hat Enterprise Linux 8 introduces **Stratis**, a next-generation **local storage management solution**.  
+It simplifies managing multiple storage layers by **combining Logical Volume Management (LVM)** and **file system creation** into one unified process.
+
+- **Thin provisioning by default**.
+- Automatically extends the file system as it fills up (no manual `lvextend` needed).
+- Available in **RHEL 8**, **CentOS 8**, and CentOS **7.5+**.
+
+---
+
+## 🔹 Traditional LVM vs. Stratis
+
+| Feature | **LVM** | **Stratis** |
+|----------|---------|-------------|
+| Extend File System | Manual `lvextend` required | **Automatic** growth |
+| Base Component | Volume Groups (VG) + Logical Volumes (LV) | **Pools** + Filesystems |
+| Complexity | Multiple steps (PV → VG → LV → FS) | **Simpler**, handled automatically |
+| Initial Size Example | Start with 10GB FS → must extend manually later | FS starts at 546MB and grows automatically |
+| Snapshot Support | Yes, but manual and complex | **Built-in snapshot support** |
+
+**Example:**
+- You have 3 disks, **10GB each** → Create **pool = 30GB**.
+- Start with filesystem of **10GB** → As it fills, **Stratis automatically grows it** up to **30GB**.
+
+---
+
+## 🛠️ Installing Stratis Packages
+
+1. Install **Stratis CLI** and daemon:
+   ``` 
+   dnf install stratis-cli stratisd -y
+   ```
+
+2. Verify installation:
+   ``` 
+   rpm -qa | grep stratis
+   ```
+   Output should include:
+   - `stratisd`
+   - `stratis-cli`
+
+---
+
+## 🚀 Enable and Start Stratis Daemon
+``` 
+systemctl enable stratisd
+systemctl start stratisd
+systemctl status stratisd
+```
+- **Enable** ensures Stratis starts at boot.
+- **Start** immediately launches the service.
+
+---
+
+## 💽 Adding New Disks (VirtualBox Example)
+1. **Shutdown VM** before adding disks.
+2. **Take a snapshot** (for safety):
+   - VirtualBox → Machine → **Snapshots** → *Take Snapshot* → Name: `Before_Stratis`
+3. Add **two new disks**, 5GB each:
+   - Settings → Storage → Controller SATA → Add Disk → **Create new VDI (5GB)** → Repeat for second disk.
+4. **Restart VM**.
+5. Verify new disks:
+   ``` 
+   lsblk
+   ```
+   Example output:
+   ```
+   sdb   5G
+   sdc   5G
+   ```
+
+---
+
+## 🏗️ Creating a Stratis Pool
+Create a pool named `pool1` using `/dev/sdb`:
+``` 
+stratis pool create pool1 /dev/sdb
+```
+
+Verify:
+``` 
+stratis pool list
+```
+Output:
+```
+Name     Total / Used / Free
+pool1    5 GiB / 546 MiB / 4.45 GiB
+```
+
+---
+
+## ➕ Adding Another Disk to the Pool
+Extend `pool1` by adding `/dev/sdc`:
+``` 
+stratis pool add-data pool1 /dev/sdc
+```
+Verify:
+``` 
+stratis pool list
+```
+Now total should show **10GB**.
+
+---
+
+## 🗂️ Create a Filesystem on the Stratis Pool
+Create a filesystem named `fs1` inside `pool1`:
+``` 
+stratis filesystem create pool1 fs1
+```
+
+Verify filesystem:
+``` 
+stratis filesystem list
+```
+Output example:
+```
+Pool    Filesystem   Total / Used / Free / Limit
+pool1   fs1          546 MiB / 0 B / 546 MiB / None
+```
+
+---
+
+## 📂 Mount the Stratis Filesystem
+1. Create mount directory:
+   ``` 
+   mkdir /mnt/bigdata
+   ```
+
+2. Mount the filesystem:
+   ``` 
+   mount /dev/stratis/pool1/fs1 /mnt/bigdata
+   ```
+
+3. Verify mounting:
+   ``` 
+   df -h
+   ```
+   Example output:
+   ```
+   /dev/stratis/pool1/fs1  1.0T  0B  1.0T  0% /mnt/bigdata
+   ```
+
+**Note:**  
+- Stratis always **shows 1TB** virtual size by design.
+- Actual physical size is visible with:
+  ``` 
+  stratis filesystem list
+  ```
+
+---
+
+## 📝 Create a Snapshot
+Create a snapshot of `fs1` called `fs1-snap`:
+``` 
+stratis filesystem snapshot pool1 fs1 fs1-snap
+```
+
+Verify:
+``` 
+stratis filesystem list
+```
+Output now shows both:
+```
+fs1
+fs1-snap
+```
+
+---
+
+## 🔧 Auto-Mount at Boot (fstab Entry)
+Add to `/etc/fstab`:
+```
+UUID=<UUID_FROM_LIST>  /mnt/bigdata  xfs  defaults,x-systemd.requires=stratisd.service  0 0
+```
+
+Get the UUID:
+``` 
+stratis filesystem list
+```
+
+---
+
+## 🔍 Useful Commands Recap
+| Command | Purpose |
+|----------|---------|
+| `stratis pool list` | Show Stratis pools |
+| `stratis filesystem list` | Show filesystems |
+| `stratis pool create <name> <device>` | Create new pool |
+| `stratis pool add-data <pool> <device>` | Add disk to pool |
+| `stratis filesystem create <pool> <fsname>` | Create filesystem |
+| `stratis filesystem snapshot <pool> <fs> <snap>` | Create snapshot |
+| `df -h` | Verify mounted filesystems |
+
+---
+
+## 🎯 Summary
+- **Stratis** simplifies managing multiple disks with automatic thin provisioning.
+- Features:
+  - Automatic file system growth.
+  - Built-in snapshot capability.
+  - Combines **LVM + File System** into a single workflow.
+- Great for **data warehousing**, **virtualization**, or large storage systems.
