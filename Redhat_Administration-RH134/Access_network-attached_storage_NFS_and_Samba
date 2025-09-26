@@ -1,0 +1,250 @@
+# NFS & Samba Quick Notes (RHEL/CentOS 7/8/9 friendly)
+
+These are concise, lab‑ready steps and references based on your walkthroughs. Copy/paste as needed.
+
+---
+
+## 1) NFS — Network File System
+
+### Server (exports provider)
+**Packages**
+``` 
+dnf -y install nfs-utils libnfsidmap   # or: yum -y install ...
+rpm -qa | egrep 'nfs-utils|libnfsidmap'
+```
+
+**Services**
+``` 
+systemctl enable --now rpcbind nfs-server nfs-idmapd rpc-statd
+systemctl status rpcbind nfs-server nfs-idmapd rpc-statd
+```
+
+**Create share dir & perms**
+``` 
+mkdir -p /mypretzels
+chmod a+rwx /mypretzels
+# (optional) seed some files
+touch /mypretzels/{a,b,c}
+echo 'These pretzels are making me thirsty.' > /mypretzels/kramer
+```
+
+**/etc/exports**
+```
+/mypretzels  *(rw,sync,no_root_squash)
+# Example: limit to one client
+# /mypretzels  192.168.1.11(rw,sync,no_root_squash)
+```
+Apply:
+``` 
+exportfs -rv
+exportfs -s       # show active exports
+```
+
+**Firewall (if enabled)**
+``` 
+# Server needs these services allowed:
+firewall-cmd --add-service=nfs --add-service=mountd --add-service=rpc-bind --permanent
+firewall-cmd --reload
+```
+
+**SELinux**
+- Easiest: permissive (lab): `setenforce 0` (temporary) or edit `/etc/selinux/config` and reboot.
+- Better: keep enforcing and label export dirs with NFS types only when needed (usually default is fine).
+
+**Useful checks**
+``` 
+showmount -e localhost
+journalctl -u nfs-server -u rpcbind -u rpc-statd -u nfs-idmapd -b
+```
+
+---
+
+### Client (NFS consumer)
+**Packages & service**
+``` 
+dnf -y install nfs-utils rpcbind
+systemctl enable --now rpcbind
+```
+
+**Network/firewall on client**
+- Usually no server ports needed; ensure outbound allowed.
+- If testing fails: `ping <nfs_server>`.
+
+**Discover exports**
+``` 
+showmount -e <nfs_server_ip>
+```
+
+**Mount ad‑hoc**
+``` 
+mkdir -p /mnt/kramer
+mount -t nfs <nfs_server_ip>:/mypretzels /mnt/kramer
+df -h | grep kramer
+ls -l /mnt/kramer
+```
+
+**Persistent mount (/etc/fstab)**
+```
+<nfs_server_ip>:/mypretzels   /mnt/kramer   nfs   defaults,_netdev   0 0
+```
+Then:
+``` 
+mount -a
+```
+
+**Unmount**
+``` 
+umount /mnt/kramer
+# If "busy": fuser -vm /mnt/kramer ; lsof +f -- /mnt/kramer
+```
+
+**Troubleshooting**
+- `No route to host`: firewall on server; open nfs/mountd/rpc-bind or stop firewalld in lab.
+- `permission denied`: client IP not matched in `/etc/exports`; re‑run `exportfs -rv`.
+- `stale file handle`: server path changed; umount/remount, ensure export dir exists.
+- `RPC: Program not registered`: start `nfs-server` & `rpcbind`.
+
+---
+
+## 2) Samba (SMB/CIFS)
+
+### Server (share provider)
+**Packages**
+``` 
+dnf -y install samba samba-client samba-common   # or yum
+rpm -qa | egrep 'samba|samba-client|samba-common'
+```
+
+**Create share path & perms**
+``` 
+mkdir -p /samba/morepretzels
+chmod -R a+rwx /samba/morepretzels
+chown -R nobody:nobody /samba/morepretzels /samba
+```
+
+**SELinux (choose one)**
+- **Lab**: disable/perm: `setenforce 0` (temp) or set in `/etc/selinux/config` and reboot.
+- **Enforcing**: allow Samba to read/write to arbitrary dirs:
+``` 
+semanage fcontext -a -t samba_share_t "/samba(/.*)?"
+restorecon -Rv /samba
+# If write needed: setsebool -P samba_export_all_rw on
+```
+
+**/etc/samba/smb.conf (minimal)**
+```ini
+[global]
+   workgroup = WORKGROUP
+   netbios name = CENTOS
+   security = user
+   map to guest = Bad User
+   dns proxy = no
+
+[anonymous]
+   path = /samba/morepretzels
+   browsable = yes
+   writable  = yes
+   guest ok  = yes
+   guest only = yes
+   read only = no
+```
+Validate:
+``` 
+testparm
+```
+
+**Services**
+``` 
+systemctl enable --now smb nmb
+systemctl status smb nmb
+```
+
+**Firewall (if enabled)**
+``` 
+firewall-cmd --add-service=samba --permanent
+firewall-cmd --reload
+```
+
+**(Optional) Secured usershare example**
+``` 
+useradd sambauser
+passwd sambauser
+smbpasswd -a sambauser      # set Samba account password
+# smb.conf example stanza:
+# [secure]
+#   path = /samba/secure
+#   valid users = sambauser
+#   guest ok = no
+#   writable = yes
+#   browsable = yes
+```
+
+---
+
+### Clients
+
+#### Windows client
+1. In File Explorer address bar: `\\<server_ip>\anonymous`
+2. Read/write files. (If secured share: you’ll be prompted for username/password.)
+
+#### Linux client via CIFS
+**Packages**
+``` 
+dnf -y install cifs-utils samba-client
+```
+
+**Mount ad‑hoc**
+``` 
+mkdir -p /mnt/sam are
+mount -t cifs //<server_ip>/anonymous /mnt/sam are -o guest
+# Or with creds file:
+# printf "username=sambauser\npassword=SECRET\n" > /root/.smbcred && chmod 600 /root/.smbcred
+# mount -t cifs //<server_ip>/secure /mnt/sam are -o credentials=/root/.smbcred,vers=3.0
+```
+
+**Persistent mount (/etc/fstab)**
+```
+# Guest share:
+# //<server_ip>/anonymous  /mnt/sam are  cifs  guest,uid=0,gid=0,_netdev  0 0
+# Secured share:
+# //<server_ip>/secure     /mnt/sam are  cifs  credentials=/root/.smbcred,vers=3.0,_netdev  0 0
+```
+Then:
+``` 
+mount -a
+```
+
+**Troubleshooting**
+- Windows cannot browse: check `smb`/`nmb` running, firewall, and `smb.conf` syntax (`testparm`).
+- Linux mount fails: add `vers=3.0` (or 2.1) in options; ensure `cifs-utils` installed.
+- SELinux denials: `journalctl -t setroubleshoot` or `ausearch -m AVC`; label path `samba_share_t` and set booleans as above.
+- Permission issues on guest share: ensure path owned by `nobody:nobody` or widen perms as needed.
+
+---
+
+## Quick reference: service bundles
+``` 
+# NFS
+systemctl enable --now rpcbind nfs-server nfs-idmapd rpc-statd
+
+# Samba
+systemctl enable --now smb nmb
+```
+
+## Quick reference: show state
+``` 
+# NFS
+exportfs -s
+showmount -e <server>
+
+# Samba
+smbclient -L //<server_ip> -N   # list shares (guest)
+testparm                        # validate config
+```
+
+---
+
+## Safety notes
+- Always snapshot VMs before storage/network service changes.
+- Keep firewalld & SELinux **enabled** in real environments; use the allow‑lists/labels/booleans above instead of disabling globally.
+- For mounts at boot, include `_netdev` to avoid race conditions with network startup.
