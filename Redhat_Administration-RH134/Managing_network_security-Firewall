@@ -1,0 +1,261 @@
+
+# 🔥 Introduction to Firewall & Firewalld
+
+## 🧱 What is a Firewall?
+- A **firewall** acts like a wall to prevent unwanted network traffic, similar to a watchman/bouncer deciding who enters and exits.
+- **Purpose:** Controls data packets moving **in/out of a server** by matching them against defined **firewall rules**.
+- **Types of Firewalls:**
+  1. **Software Firewall** – runs on an **Operating System** (Linux, Windows, etc.)
+  2. **Hardware Firewall** – a **dedicated network appliance**, usually managed by network teams.
+
+---
+
+## 🌐 Real-world Analogy
+- **Server A → Server B**:
+  - Server A tries to connect to Server B using **SSH (port 22)**.
+  - Firewall checks the rule:
+    - If **allowed**, connection is established.
+    - If **blocked**, connection is rejected.
+- **Both servers** have their **own firewalls**, which check both **incoming** and **outgoing** connections.
+
+---
+
+## 🛠 Firewalld Overview
+- **Firewalld** is a modern firewall management tool replacing `iptables`.
+- Command starts with:  
+  ```bash
+  firewall-cmd
+  ```
+- Predefined service rules are stored in **XML format** (e.g., SSH, NFS, HTTP).
+- **Core Components:**
+  - **Table** → contains rules and configurations.
+  - **Chains** → define directions like `INPUT`, `OUTPUT`, `FORWARD`.
+  - **Rules** → applied to chains to filter traffic.
+  - **Targets** → what to do with matched traffic:
+    - `ACCEPT`, `REJECT`, or `DROP`.
+
+⚠️ **Important:** Do **NOT run iptables and firewalld simultaneously**.
+
+---
+
+## ⚙️ Setup & Manage Firewalld
+
+### 1. Stop iptables (if running)
+```bash
+systemctl stop iptables
+systemctl disable iptables
+systemctl mask iptables
+```
+
+### 2. Verify Firewalld Package
+```bash
+rpm -qa | grep firewalld
+# If not installed
+yum install firewalld -y
+```
+
+### 3. Start Firewalld
+```bash
+systemctl unmask firewalld
+systemctl start firewalld
+systemctl enable firewalld
+systemctl status firewalld
+```
+
+---
+
+## 📜 Check Rules & Services
+- **View current firewall settings:**
+  ```bash
+  firewall-cmd --list-all
+  ```
+  - Default active services: `ssh`, `dhcpv6-client`.
+
+- **List all predefined services:**
+  ```bash
+  firewall-cmd --get-services
+  ```
+  - Example services: `ssh`, `ftp`, `http`, `smtp`, etc.
+
+- **Reload firewall after changes:**
+  ```bash
+  firewall-cmd --reload
+  ```
+
+---
+
+## 🗂 Zones in Firewalld
+- Zones group network interfaces and rules.
+- **List all zones:**
+  ```bash
+  firewall-cmd --zones
+  ```
+
+- **Check active zone:**
+  ```bash
+  firewall-cmd --get-active-zones
+  ```
+
+- **View rules for a specific zone (e.g., public):**
+  ```bash
+  firewall-cmd --zone=public --list-all
+  ```
+
+**Common zones:**
+`block`, `dmz`, `drop`, `external`, `home`, `internal`, `public`, `trusted`, `work`.
+
+---
+
+## ➕ Adding Services & Ports
+
+### Add predefined service (temporary):
+```bash
+firewall-cmd --add-service=http
+```
+Verify:
+```bash
+firewall-cmd --list-all
+```
+
+### Make it permanent:
+```bash
+firewall-cmd --add-service=http --permanent
+firewall-cmd --reload
+```
+
+### Remove service:
+```bash
+firewall-cmd --remove-service=http --permanent
+firewall-cmd --reload
+```
+
+### Add custom port:
+```bash
+firewall-cmd --add-port=1110/tcp
+firewall-cmd --list-all
+```
+
+Remove custom port:
+```bash
+firewall-cmd --remove-port=1110/tcp
+```
+
+---
+
+## 📝 Adding Custom Third-Party Service
+1. Navigate to **services directory**:
+   ```bash
+   cd /usr/lib/firewalld/services
+   ```
+2. Copy an existing XML file and modify:
+   ```bash
+   cp ssh.xml sap.xml
+   vi sap.xml
+   ```
+3. Edit contents:
+   ```xml
+   <service>
+     <short>SAP</short>
+     <description>SAP application service</description>
+     <port protocol="tcp" port="32"/>
+   </service>
+   ```
+4. Restart Firewalld:
+   ```bash
+   systemctl restart firewalld
+   ```
+5. Verify service added:
+   ```bash
+   firewall-cmd --get-services | grep sap
+   ```
+
+---
+
+## 🔒 Blocking & Filtering Traffic
+
+### 1. Block specific **IP address**:
+```bash
+firewall-cmd --add-rich-rule='rule family="ipv4" source address="192.168.0.25" reject'
+```
+
+### 2. Block ICMP (ping) traffic:
+```bash
+firewall-cmd --add-icmp-block-inversion
+```
+Verify:
+```bash
+firewall-cmd --list-all
+```
+Remove:
+```bash
+firewall-cmd --remove-icmp-block-inversion
+```
+
+### 3. Block outgoing traffic to a website/IP
+- Find IP of the domain:
+  ```bash
+  host -t a www.facebook.com
+  ```
+- Block outgoing traffic:
+  ```bash
+  firewall-cmd --add-rich-rule='rule family="ipv4" destination address="31.13.71.36" drop'
+  ```
+
+---
+
+## 🔄 Reload & Reset Rules
+- **Reload temporary rules**:
+  ```bash
+  firewall-cmd --reload
+  ```
+- **Restart service if needed**:
+  ```bash
+  systemctl restart firewalld
+  ```
+
+---
+
+## 🧪 Practical Example – Allow HTTP Access
+1. Start HTTPD service:
+   ```bash
+   systemctl unmask httpd
+   systemctl start httpd
+   systemctl enable httpd
+   ```
+2. Verify firewall rule for HTTP:
+   ```bash
+   firewall-cmd --add-service=http
+   firewall-cmd --list-all
+   ```
+3. Access server via browser:
+   - URL: `http://<server-ip>` → Should show splash page.
+
+---
+
+## 🧹 Cleanup
+- Remove added rules or flush temporary changes:
+  ```bash
+  firewall-cmd --reload
+  ```
+
+---
+
+## 📝 Summary
+| Task                  | Command Example |
+|-----------------------|----------------|
+| Start firewalld       | `systemctl start firewalld` |
+| List all services     | `firewall-cmd --get-services` |
+| Add service           | `firewall-cmd --add-service=http` |
+| Remove service        | `firewall-cmd --remove-service=http` |
+| Add port              | `firewall-cmd --add-port=1110/tcp` |
+| Block IP address      | `firewall-cmd --add-rich-rule='rule family="ipv4" source address="192.168.0.25" reject'` |
+| Block ICMP (ping)     | `firewall-cmd --add-icmp-block-inversion` |
+| Reload firewall       | `firewall-cmd --reload` |
+
+---
+
+## 🚀 Best Practices
+- Always **reload firewall** after making changes.
+- Use **permanent rules** for production servers.
+- Regularly **audit firewall rules** to maintain security.
+- Never run **iptables and firewalld** simultaneously.

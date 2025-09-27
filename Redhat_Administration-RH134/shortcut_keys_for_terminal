@@ -1,0 +1,14 @@
+Here are a few related shortcuts that are handy:
+
+    Ctrl + A → Jump to the beginning of the command line
+
+    Ctrl + E → Jump to the end of the command line
+
+    Ctrl + W → Delete the previous word
+
+    Ctrl + K → Delete everything from the cursor to the end of the line
+
+    Ctrl + U → Delete everything from the cursor to the beginning of the line
+
+    Ctrl + C → Cancel the current command entirely
+
