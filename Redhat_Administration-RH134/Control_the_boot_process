@@ -1,0 +1,224 @@
+# Linux Boot Process, Targets, Root Password Recovery & FS Repair — Quick Notes
+
+> CentOS/RHEL 7+ (systemd-based). Works similarly on most modern distro families.
+
+---
+
+## 1) Boot sequence (high level)
+
+1. **Firmware (BIOS/UEFI)**  
+   - Power-on self-test (POST), hardware init.
+2. **Boot sector**  
+   - **MBR** (legacy, first 512 B of disk) or **EFI System Partition** (UEFI) loads the bootloader.
+3. **GRUB 2** (Grand Unified Bootloader v2)  
+   - Presents menu and loads the selected **Linux kernel** + **initramfs**.  
+   - Main config is generated into:  
+     - Legacy BIOS: `/boot/grub2/grub.cfg`  
+     - UEFI: `/boot/efi/EFI/redhat/grub.cfg` (or vendor path)
+   - Don’t edit these directly—regenerate with `grub2-mkconfig -o <path>`.
+4. **Kernel + initramfs**  
+   - Kernel detects hardware; **initramfs** provides early userspace & drivers needed to mount root FS.
+5. **PID 1: systemd**  
+   - Reads default target (`/etc/systemd/system/default.target`) and starts services/targets to reach it.
+
+---
+
+## 2) Targets vs. traditional runlevels
+
+systemd replaces runlevels with **targets** (collections of units). Useful mapping:
+
+| Runlevel | Target                     | Purpose |
+|---:|-----------------------------|---|
+| 0 | `poweroff.target`           | Halt/power off |
+| 1 | `rescue.target`             | Single-user (basic services, root shell) |
+| 2 | `multi-user.target`         | Multi-user, no GUI (same as 3 on many distros) |
+| 3 | `multi-user.target`         | Multi-user, text login |
+| 4 | `multi-user.target`         | (unused/custom) |
+| 5 | `graphical.target`          | Multi-user + graphical login |
+| 6 | `reboot.target`             | Reboot |
+
+Inspect target dependencies (what gets pulled in):
+```bash
+systemctl list-dependencies graphical.target | grep target
+```
+
+Show your current default target (runlevel):
+```bash
+systemctl get-default
+who -r           # also shows the runlevel
+```
+
+List runlevel symlinks (quick mapping on disk):
+```bash
+ls -l /lib/systemd/system/runlevel*.target
+```
+
+---
+
+## 3) Changing/using targets
+
+**Set the default** (persistent across reboots):
+```bash
+sudo systemctl set-default multi-user.target
+sudo systemctl set-default graphical.target
+```
+
+**Switch now (one-time for the current boot)**:
+```bash
+sudo systemctl isolate multi-user.target
+sudo systemctl isolate graphical.target
+```
+
+**Boot once into a specific target from GRUB**: edit the kernel line and append:  
+`systemd.unit=rescue.target` (or `multi-user.target`, `graphical.target`, `emergency.target`).
+
+---
+
+## 4) Reboot & shutdown
+
+```bash
+sudo systemctl reboot          # reboot
+sudo systemctl poweroff        # halt & power off
+sudo shutdown -r now           # reboot (shortcut, links to systemctl)
+sudo shutdown -h now           # power off
+```
+
+---
+
+## 5) Recovering the root password (RHEL/CentOS 7+ style)
+
+> Requires **console/VM console** access. If SELinux is enforcing, remember to relabel.
+
+1. **Reboot** → At GRUB menu highlight the default entry and press **`e`** to edit.  
+2. On the kernel line (**starts with `linux16` or `linux`**), change:  
+   - Replace `ro` with `rw`  
+   - Append **one** of the following (both are common approaches, pick one):  
+     - **`init=/sysroot/bin/sh`**  *(classic method in your lesson)*  
+     - **`rd.break`** *(dracut emergency shell method)*
+3. Press **Ctrl‑x** to boot.
+
+4. At the prompt:
+   - If you used `init=/sysroot/bin/sh`:
+     ```bash
+     chroot /sysroot
+     passwd root
+     touch /.autorelabel      # important if SELinux was enforcing
+     exit
+     reboot -f
+     ```
+   - If you used `rd.break`:
+     ```bash
+     mount -o remount,rw /sysroot
+     chroot /sysroot
+     passwd root
+     touch /.autorelabel
+     exit; exit               # leave chroot and dracut shell
+     ```
+
+> **SELinux note:** the `/.autorelabel` will relabel on next boot; it can take a while. Skipping this may block logins if contexts don’t match.
+
+---
+
+## 6) Repairing boot/fstab/filesystem issues
+
+**Typical symptoms:** system drops to **emergency mode**, or you see “Dependency failed for …”.
+
+### 6.1 Diagnose
+```bash
+journalctl -xb                    # review last boot logs
+systemctl status *.mount          # see failed mounts
+cat /etc/fstab
+blkid                             # list UUIDs / types
+lsblk -f                          # nice tree with FS types/UUIDs
+```
+
+**Common causes & fixes**
+
+- **Wrong UUID/label in `/etc/fstab`**  
+  - Get the correct UUID via `blkid`/`lsblk -f`, fix `/etc/fstab`, then:
+    ```bash
+    systemctl daemon-reload
+    mount -a
+    ```
+
+- **Mount point directory missing**  
+  - Create it: `mkdir -p /path/to/mountpoint` then `mount -a`.
+
+- **Bad mount options**  
+  - Remove problematic options; test with `mount -a` (will report the first failure).
+
+- **Filesystem corruption**  
+  - Boot into rescue/emergency; ensure the FS is **unmounted**; then run:  
+    - ext* : `fsck -f /dev/sdXN`  
+    - xfs  : `xfs_repair /dev/sdXN` *(don’t run `fsck` on XFS)*
+
+### 6.2 Remount root read-write in emergency
+```bash
+mount -o remount,rw /
+# fix files (e.g., /etc/fstab) then:
+systemctl daemon-reload
+```
+
+### 6.3 One-time boot overrides from GRUB
+
+Append to the kernel line for quick troubleshooting:
+- `systemd.unit=emergency.target`  *(minimal shell, rootfs often read-only)*
+- `systemd.unit=rescue.target`     *(single-user mode with more services)*
+- `ignore_loglevel loglevel=7`     *(more kernel verbosity)*
+
+---
+
+## 7) GRUB2 quick reference
+
+- **Regenerate config** (don’t hand-edit generated file):
+  ```bash
+  # Legacy BIOS:
+  sudo grub2-mkconfig -o /boot/grub2/grub.cfg
+  # UEFI:
+  sudo grub2-mkconfig -o /boot/efi/EFI/redhat/grub.cfg
+  ```
+- **Change default entry**: `grub2-set-default <index|menuentry>`  
+  (View entries with `awk -F' '$1=="menuentry " {print i++ " : " $2}' /etc/grub2.cfg` or the UEFI path.)
+
+---
+
+## 8) Handy commands (cheatsheet)
+
+```bash
+# Current target / switch target
+systemctl get-default
+systemctl set-default multi-user.target
+systemctl isolate rescue.target
+
+# Show failed units, mounts
+systemctl --failed
+systemctl status local-fs.target
+
+# Boot log
+journalctl -b -p err..alert
+journalctl -xb
+
+# Filesystem & block info
+lsblk -f
+blkid
+findmnt -t xfs,ext4
+
+# Repair (offline)
+fsck -f /dev/sdXN       # ext2/3/4
+xfs_repair /dev/sdXN    # XFS
+
+# Reboot/Poweroff
+systemctl reboot
+systemctl poweroff
+```
+
+---
+
+## 9) Safety checklist
+
+- Have **console access** before changing boot params.  
+- If SELinux was enforcing and you changed system files, **`touch /.autorelabel`** in the chroot.  
+- Always **backup `/etc/fstab`** before edits.  
+- Never run **`fsck` on a mounted filesystem** (especially XFS).  
+- Prefer **`systemctl set-default`** over editing symlinks by hand.  
+- Document what you change (snapshot/notes) so you can roll back quickly.

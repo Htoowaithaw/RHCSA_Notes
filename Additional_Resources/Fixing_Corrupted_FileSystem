@@ -1,0 +1,188 @@
+
+# 🗂️ File System Corruption & Repair in Linux
+
+## 📌 What is a File System?
+A **file system** is a way to organize and store files on a disk. It determines how data is stored and retrieved.
+
+**Examples of File Systems:**
+- Linux: `ext3`, `ext4`, `xfs`
+- Windows: `NTFS`, `FAT`
+
+**Common Linux partitions:**
+- `/var`, `/etc`, `/root`, `/home`
+
+When setting up a disk, you must first **assign a file system type** (e.g., `ext4`), then **partition** it as needed.
+
+💡 **Tip:**  
+Separate partitions are often created for `/var`, `/home`, etc., to prevent corruption in one partition from affecting the entire system.
+
+---
+
+## 🛠️ Detecting File System Issues
+
+### 1. **Check Mounted File Systems**
+```bash
+df -h
+```
+- Shows mounted file systems and usage.
+- Add `-T` to display file system type.
+
+### 2. **List Disks & Partitions**
+```bash
+fdisk -l
+```
+- Lists all disks and their partitions.
+
+### 3. **Check LVM details** (if using LVM)
+```bash
+pvdisplay
+vgdisplay
+lvdisplay
+```
+
+### 4. **Check System Logs**
+File system errors are often logged in `/var/log/messages` or `/var/log/syslog`:
+```bash
+tail -f /var/log/messages
+```
+Look for **bad block** or **disk error** messages.
+
+---
+
+## 🔍 Running `fsck` to Fix Corruption
+
+### ⚠️ Important Rules
+- **Never run `fsck` on a mounted file system.**
+- Always run it on the **block device** (e.g., `/dev/sdb1`), **NOT** the mount point (`/var`).
+
+### 1. **Unmount the file system**
+```bash
+umount /mount_point
+```
+Example:
+```bash
+umount /sparedata
+```
+
+### 2. **Run `fsck` on the block device**
+```bash
+fsck /dev/sdb1
+```
+If you want it to **auto-confirm fixes**, use:
+```bash
+fsck -y /dev/sdb1
+```
+
+#### ❌ Common Error
+If you try to run `fsck` on a mounted partition, you will see:
+```
+e2fsck: Cannot continue, aborting.
+/dev/sdb1 is mounted.
+```
+
+---
+
+## 🗂️ Example Workflow
+
+### 1. Identify Corruption
+```bash
+df -h | grep -v tmpfs
+```
+Output example:
+```
+/dev/mapper/rl-root    17G  7.0G   10G  41%  /
+/dev/sda1             960M  538M  423M  56%  /boot
+/dev/sdb1             5.0G  100M  4.9G   2%  /sparedata
+```
+
+### 2. Try `fsck` while mounted → FAILS
+```bash
+fsck /dev/sdb1
+```
+Error:
+```
+e2fsck: Cannot continue, /dev/sdb1 is mounted.
+```
+
+### 3. Unmount and Re-run
+```bash
+umount /sparedata
+fsck -y /dev/sdb1
+```
+If clean:
+```
+/dev/sdb1: clean, no errors found
+```
+If bad blocks are found, it will attempt to fix them.
+
+---
+
+## 🧰 Repairing the ROOT File System (`/`)
+
+You **cannot unmount root** while the OS is running.  
+Solution: **Boot from a rescue ISO**.
+
+### Steps:
+1. Attach CentOS/RedHat ISO to VM → `Devices > Optical Drives > Choose Disk Image`.
+2. Reboot the system:
+   ```bash
+   reboot
+   ```
+3. From the boot menu, choose:
+   **Troubleshooting → Rescue a CentOS System**
+4. When prompted, select option **3 (Skip to shell)** to avoid mounting.
+
+### In Rescue Shell:
+```bash
+df -h
+```
+- Confirms only the rescue environment is mounted.
+
+### Run File System Check:
+For `ext4`:
+```bash
+fsck -y /dev/sda1
+```
+For `xfs`:
+```bash
+xfs_repair /dev/sda1
+```
+> `fsck` **does NOT work on XFS**. Use `xfs_repair` instead.
+
+The tool will go through **Phase 1-6** to scan and repair.
+
+---
+
+## 📝 Mount Points & Run Levels Recap
+| Partition | Purpose |
+|------------|----------|
+| `/` | Root filesystem |
+| `/boot` | Bootloader files |
+| `/var` | Logs, mail, spool |
+| `/home` | User data |
+| `/tmp` | Temporary files |
+
+---
+
+## 🚀 Final Steps After Repair
+1. **Unmount the ISO/CD-ROM** in VirtualBox:
+   - Devices → Optical Drives → **Force Unmount**
+2. Reboot the system:
+   ```bash
+   reboot
+   ```
+3. Verify with:
+   ```bash
+   df -h
+   tail -f /var/log/messages
+   ```
+
+---
+
+## 🧾 Summary
+- Always **check logs** first for disk issues.
+- **Unmount the partition** before running `fsck`.
+- Use `fsck -y` for auto-repair.
+- **Root FS repair requires rescue mode**.
+- For `XFS`, **use `xfs_repair` instead of `fsck`**.
+- After repair, reboot and verify with logs.
